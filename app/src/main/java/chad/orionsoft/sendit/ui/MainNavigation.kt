@@ -27,5 +27,8 @@ fun MainNavigation() {
         composable(NavigationConstants.NAV_SENDER_MAIN) {
             SenderMainScreen()
         }
+        composable(NavigationConstants.NAV_RECEIVER_MAIN) {
+            ReceiverMainScreen()
+        }
     }
 }

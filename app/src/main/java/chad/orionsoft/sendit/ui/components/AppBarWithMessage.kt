@@ -2,9 +2,14 @@ package chad.orionsoft.sendit.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,34 +17,75 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBarWithMessage(title: String,
                       message: String? = null,
-                      isErrorMessage: Boolean = false) {
+                      isErrorMessage: Boolean = false,
+                      withProgress: Float? = null) {
+    var messageSize : Pair<Dp, Dp> by remember {
+        mutableStateOf(Pair(0.dp, 0.dp))
+    }
+    val density = LocalDensity.current
     Column {
         TopAppBar(title = {
             Text(text = title)
         })
         AnimatedVisibility(visible = !message.isNullOrBlank()) {
             Card(
-                shape = RoundedCornerShape(0.dp, 0.dp, 8.dp,8.dp)
+                shape = RoundedCornerShape(0.dp, 0.dp, 8.dp,8.dp),
+                modifier =  if(withProgress != null) {
+                    Modifier.onGloballyPositioned {
+                        with(density) {
+                            val height = it.size.height.toDp()
+                            val width = it.size.width.toDp()
+                            messageSize = Pair(width, height)
+                        }
+                    }
+                } else Modifier
             ) {
-                Text(
-                    text = message ?: "",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            if (isErrorMessage) MaterialTheme.colorScheme.error
-                            else MaterialTheme.colorScheme.primary
+                Box {
+                    if(withProgress != null) {
+                        Box(
+                            modifier = Modifier
+                                .width(messageSize.first.times(withProgress))
+                                .height(messageSize.second)
+                                .background(MaterialTheme.colorScheme.primary)
                         )
-                        .padding(8.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
+                    }
+                    Text(
+                        text = message ?: "",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            shadow = Shadow(
+                                offset = Offset(1f,1f),
+                                blurRadius = 2f
+                            )
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                if (withProgress == null) {
+                                    if (isErrorMessage) MaterialTheme.colorScheme.error
+                                    else MaterialTheme.colorScheme.primary
+                                } else Color.Transparent
+                            )
+                            .padding(8.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         }
     }

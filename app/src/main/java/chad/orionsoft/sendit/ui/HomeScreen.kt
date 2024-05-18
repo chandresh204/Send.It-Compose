@@ -75,13 +75,13 @@ fun HomeScreen(navToScreen: (String) -> Unit) {
             }
             ActionCard(modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = animatedOffset), openEditScreen = navToScreen)
+                .offset(y = animatedOffset), navToScreen = navToScreen)
         }
     }
 }
 
 @Composable
-fun ActionCard(modifier: Modifier = Modifier, openEditScreen: (String) -> Unit) {
+fun ActionCard(modifier: Modifier = Modifier, navToScreen: (String) -> Unit) {
     Card(modifier = modifier
         .fillMaxWidth()
         .padding(16.dp)) {
@@ -91,15 +91,15 @@ fun ActionCard(modifier: Modifier = Modifier, openEditScreen: (String) -> Unit) 
             horizontalArrangement = Arrangement.SpaceBetween) {
             ActionItem(iconRes = R.drawable.send_icon1,
                 text = stringResource(id = R.string.send)) {
-                openEditScreen(NavigationConstants.NAV_SENDER_MAIN)
+                navToScreen(NavigationConstants.NAV_SENDER_MAIN)
             }
             ActionItem(iconRes = R.drawable.receive_icon_small,
                 text = stringResource(id = R.string.receive)) {
-
+                navToScreen(NavigationConstants.NAV_RECEIVER_MAIN)
             }
             ActionItem(iconRes = R.drawable.edit_icon_small,
                 text = stringResource(id = R.string.edit)) {
-                openEditScreen(NavigationConstants.NAV_EDIT)
+                navToScreen(NavigationConstants.NAV_EDIT)
             }
         }
     }
