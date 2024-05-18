@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Send.It</string>
+    <string name="send">Send</string>
+    <string name="receive">Receive</string>
+    <string name="edit">Edit</string>
+    <string name="welcome_to_send_it">Welcome To Send.It</string>
+    <string name="enter_name_to_continue">Please Enter your name so others can identify you.</string>
+    <string name="next">Next</string>
+    <string name="save">Save</string>
+    <string name="discard">Discard And Close</string>
+    <string name="or">or</string>
+
+    <string name="wlan_connection_required">WLAN Connection Required</string>
+    <string name="wlan_explanation">To Share file to other devices Send.It needs both devices to be connected on same wifi network, currently looks like this device is not connected to any wifi network. </string>
+    <string name="wlan_connect_to_wifi">Connect to same wifi network on which the other device is connected</string>
+    <string name="wlan_create_network">Create your own WLAN network by turning on mobile hotspot and ask other device to join you</string>
+    <string name="button_connect_to_wifi">Connect To Wifi</string>
+    <string name="button_create_network">Create Network</string>
+</resources>
