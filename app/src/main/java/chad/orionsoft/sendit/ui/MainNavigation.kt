@@ -25,10 +25,20 @@ fun MainNavigation() {
             EditScreen()
         }
         composable(NavigationConstants.NAV_SENDER_MAIN) {
-            SenderMainScreen()
+            SenderMainScreen {
+                navController.navigate(it)
+            }
         }
         composable(NavigationConstants.NAV_RECEIVER_MAIN) {
             ReceiverMainScreen()
+        }
+        composable(NavigationConstants.NAV_SENDER_IMAGES) {
+            SenderImagesScreen {
+                navController.navigate(NavigationConstants.NAV_FULL_SCREEN_IMAGE)
+            }
+        }
+        composable(NavigationConstants.NAV_FULL_SCREEN_IMAGE) {
+            FullScreenImage()
         }
     }
 }

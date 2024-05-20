@@ -22,17 +22,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
+import chad.orionsoft.sendit.utils.NavigationConstants
 
 @Preview
 @Composable
-fun SenderMainScreen() {
+fun SenderMainScreen(navTo: (String) -> Unit = {}) {
 
     Scaffold(topBar = {
         AppBarWithMessage(stringResource(R.string.app_name))
     }) {
         LazyVerticalGrid(modifier = Modifier.padding(it), columns = GridCells.Adaptive(100.dp)) {
             this.item {
-                ActionItem(title = "Images", icon = R.drawable.image_icon_small) {}
+                ActionItem(title = "Images", icon = R.drawable.image_icon_small) {
+                    navTo(NavigationConstants.NAV_SENDER_IMAGES)
+                }
             }
             this.item {
                 ActionItem(title = "Audio", icon = R.drawable.music_icon_small) {}

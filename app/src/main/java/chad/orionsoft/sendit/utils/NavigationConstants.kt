@@ -7,4 +7,6 @@ object NavigationConstants {
     const val NAV_EDIT = "editScreen"
     const val NAV_SENDER_MAIN = "senderMain"
     const val NAV_RECEIVER_MAIN = "receiverMain"
+    const val NAV_SENDER_IMAGES = "senderImages"
+    const val NAV_FULL_SCREEN_IMAGE = "fullScreenImage"
 }
