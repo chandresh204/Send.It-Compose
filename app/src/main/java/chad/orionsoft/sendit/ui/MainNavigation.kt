@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
 import chad.orionsoft.sendit.utils.NavigationConstants
 
 @Composable

@@ -1,4 +1,4 @@
-package chad.orionsoft.sendit.ui
+package chad.orionsoft.sendit.ui.welcome_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +16,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -23,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.RuntimeConstants
@@ -32,6 +35,15 @@ import chad.orionsoft.sendit.utils.RuntimeConstants
 )
 @Composable
 fun WelcomeScreen(navToHome: () -> Unit = {}) {
+
+    val welcomeViewModel : WelcomeViewModel = hiltViewModel()
+
+    val uiState by welcomeViewModel.uiState.collectAsState()
+
+    if(uiState.moveToNextScreen) {
+        navToHome()
+    }
+
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -45,10 +57,12 @@ fun WelcomeScreen(navToHome: () -> Unit = {}) {
         Spacer(modifier = Modifier.padding(4.dp))
         OutlinedTextField(
             leadingIcon = {
-                          Icon(Icons.Default.Face, contentDescription = "User")
+                Icon(Icons.Default.Face, contentDescription = "User")
             },
-            value = "",
-            onValueChange = {},
+            value = uiState.userName ?: "",
+            onValueChange = {
+                welcomeViewModel.onEvent(WelcomeEvents.OnUserNameChanged(it))
+            },
             placeholder = {
                 Text(text = "e.g. John",
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
@@ -56,7 +70,9 @@ fun WelcomeScreen(navToHome: () -> Unit = {}) {
             shape = RoundedCornerShape(Constants.OUTLINE_TEXT_FIELD_RADIUS.dp),
         )
         Spacer(modifier = Modifier.padding(8.dp))
-        Button(onClick = navToHome) {
+        Button(onClick = {
+            welcomeViewModel.onEvent(WelcomeEvents.OnNextClick)
+        }, enabled = !uiState.userName.isNullOrEmpty()) {
             Text(stringResource(id = R.string.next))
         }
     }
