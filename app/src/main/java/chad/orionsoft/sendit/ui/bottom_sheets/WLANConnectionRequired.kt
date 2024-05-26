@@ -1,4 +1,4 @@
-package chad.orionsoft.sendit.bottom_sheets
+package chad.orionsoft.sendit.ui.bottom_sheets
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

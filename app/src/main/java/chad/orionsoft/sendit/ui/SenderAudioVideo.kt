@@ -13,7 +13,7 @@ import chad.orionsoft.sendit.ui.components.FileItemCard
 
 @Preview
 @Composable
-fun SenderAudioVideo() {
+fun SenderAudioVideo(isAudioElseVideo: Boolean = true) {
     Scaffold(topBar = {
         AppBarWithMessage(
             title = stringResource(id = R.string.app_name) + " - 122 Files",

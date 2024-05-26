@@ -40,5 +40,14 @@ fun MainNavigation() {
         composable(NavigationConstants.NAV_FULL_SCREEN_IMAGE) {
             FullScreenImage()
         }
+        composable(NavigationConstants.NAV_SENDER_AUDIO) {
+            SenderAudioVideo(true)
+        }
+        composable(NavigationConstants.NAV_SENDER_VIDEO) {
+            SenderAudioVideo(false)
+        }
+        composable(NavigationConstants.NAV_SENDER_FILES_SELECT) {
+            SenderFileSelect()
+        }
     }
 }

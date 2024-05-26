@@ -38,13 +38,19 @@ fun SenderMainScreen(navTo: (String) -> Unit = {}) {
                 }
             }
             this.item {
-                ActionItem(title = "Audio", icon = R.drawable.music_icon_small) {}
+                ActionItem(title = "Audio", icon = R.drawable.music_icon_small) {
+                    navTo(NavigationConstants.NAV_SENDER_AUDIO)
+                }
             }
             this.item {
-                ActionItem(title = "Video", icon = R.drawable.video_icon_small) {}
+                ActionItem(title = "Video", icon = R.drawable.video_icon_small) {
+                    navTo(NavigationConstants.NAV_SENDER_VIDEO)
+                }
             }
             this.item {
-                ActionItem(title = "Folder", icon = R.drawable.open_storage) {}
+                ActionItem(title = "Folder", icon = R.drawable.open_storage) {
+                    navTo(NavigationConstants.NAV_SENDER_FILES_SELECT)
+                }
             }
             this.item {
                 ActionItem(title = "Receive", icon = R.drawable.receive_icon_small) {}

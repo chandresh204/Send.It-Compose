@@ -9,4 +9,7 @@ object NavigationConstants {
     const val NAV_RECEIVER_MAIN = "receiverMain"
     const val NAV_SENDER_IMAGES = "senderImages"
     const val NAV_FULL_SCREEN_IMAGE = "fullScreenImage"
+    const val NAV_SENDER_AUDIO = "senderAudio"
+    const val NAV_SENDER_VIDEO = "senderVideo"
+    const val NAV_SENDER_FILES_SELECT = "senderFilesSelect"
 }

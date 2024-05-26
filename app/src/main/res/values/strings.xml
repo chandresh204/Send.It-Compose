@@ -16,4 +16,5 @@
     <string name="wlan_create_network">Create your own WLAN network by turning on mobile hotspot and ask other device to join you</string>
     <string name="button_connect_to_wifi">Connect To Wifi</string>
     <string name="button_create_network">Create Network</string>
+    <string name="add_files_manually">Click on the + button to select the files manually</string>
 </resources>
