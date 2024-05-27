@@ -1,7 +1,6 @@
-package chad.orionsoft.sendit.ui
+package chad.orionsoft.sendit.ui.edit_screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -21,19 +20,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun EditScreen() {
+fun EditScreen(onBack: () -> Unit) {
+
+    val viewModel = hiltViewModel<EditScreenViewModel>()
+    val uiState by viewModel.editScreenState.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(title = {
@@ -41,7 +45,7 @@ fun EditScreen() {
                         " - " + stringResource(id = R.string.edit))
             },
                 navigationIcon = {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 })
@@ -54,21 +58,26 @@ fun EditScreen() {
         ) {
             Text(text = "Username:")
             OutlinedTextField(
-                value = "", onValueChange = { },
+                value = uiState.userName, onValueChange = { new ->
+                    viewModel.onEvent(EditScreenEvent.OnUseNameUpdated(new))
+                },
                 shape = RoundedCornerShape(
                     Constants.OUTLINE_TEXT_FIELD_RADIUS.dp
                 )
             )
-            MaxImageSizeToPreviewSettings() // TODO remove if not required
+    //        MaxImageSizeToPreviewSettings() // TODO remove if not required
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { }) {
+                Button(onClick = {
+                    viewModel.onEvent(EditScreenEvent.OnSaveClicked)
+                    onBack()
+                }, enabled = uiState.userName.isNotEmpty()) {
                     TextWithIcon(Icons.Default.Check, text = stringResource(R.string.save))
                 }
                 Button(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
                     ),
-                    onClick = { }) {
+                    onClick = onBack) {
                     TextWithIcon(Icons.Default.Close, text = stringResource(R.string.discard))
                 }
             }
