@@ -16,6 +16,7 @@ class WelcomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(WelcomeState())
     val uiState = _uiState.asStateFlow()
 
+    val tag = "WelcomeViewModel"
     init {
         if(!preferenceRepository.getUserNameFromPreferences().isNullOrEmpty()) {
             _uiState.update {

@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,6 +36,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetSearching
+import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith2Buttons
+import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.NavigationConstants
 import chad.orionsoft.sendit.utils.RuntimeConstants
@@ -42,7 +48,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun HomeScreen(navToScreen: (String) -> Unit) {
     Scaffold {
-        Box(modifier = Modifier.padding(it).fillMaxSize()) {
+        Box(modifier = Modifier
+            .padding(it)
+            .fillMaxSize()) {
             var viewOffset by remember {
                 mutableStateOf(200.dp)
             }
@@ -59,7 +67,8 @@ fun HomeScreen(navToScreen: (String) -> Unit) {
                 .fillMaxWidth()
                 .align(Alignment.Center)
                 .offset {
-                    IntOffset(0,
+                    IntOffset(
+                        0,
                         ((animatedOffset / 2) - 100.dp)
                             .toPx()
                             .toInt()

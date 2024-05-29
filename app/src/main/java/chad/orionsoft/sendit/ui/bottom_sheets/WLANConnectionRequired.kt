@@ -3,7 +3,9 @@ package chad.orionsoft.sendit.ui.bottom_sheets
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,29 +18,35 @@ import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.utils.Constants
 
-@Preview(showBackground = true)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WLANConnectionRequiredBottomSheet() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(Constants.DIALOG_PADDING.dp)
-    ) {
-        Text(text = stringResource(id = R.string.wlan_connection_required),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.padding(vertical = 9.dp))
-        Text(text = stringResource(id = R.string.wlan_explanation))
-        Spacer(modifier = Modifier.padding(vertical = 9.dp))
-        Text(text = stringResource(id = R.string.wlan_connect_to_wifi))
-        OutlinedButton(onClick = {  }) {
-            Text(text = stringResource(id = R.string.button_connect_to_wifi))
+fun WLANConnectionRequiredBottomSheet(
+    onDismiss: () -> Unit,
+    connectToWifiClick: () -> Unit,
+    createNetworkClick: () -> Unit
+) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(Constants.DIALOG_PADDING.dp)
+        ) {
+            Text(text = stringResource(id = R.string.wlan_connection_required),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.padding(vertical = 9.dp))
+            Text(text = stringResource(id = R.string.wlan_explanation))
+            Spacer(modifier = Modifier.padding(vertical = 9.dp))
+            Text(text = stringResource(id = R.string.wlan_connect_to_wifi))
+            OutlinedButton(onClick = {  }) {
+                Text(text = stringResource(id = R.string.button_connect_to_wifi))
+            }
+            Spacer(modifier = Modifier.padding(vertical = 9.dp))
+            Text(text = "--" + stringResource(id = R.string.or) + "--")
+            Spacer(modifier = Modifier.padding(vertical = 9.dp))
+            Text(text = stringResource(id = R.string.wlan_create_network))
+            OutlinedButton(onClick = {  }) {
+                Text(text = stringResource(id = R.string.button_create_network))
+            }
+            Spacer(modifier = Modifier.padding(vertical = 9.dp))
         }
-        Spacer(modifier = Modifier.padding(vertical = 9.dp))
-        Text(text = "--" + stringResource(id = R.string.or) + "--")
-        Spacer(modifier = Modifier.padding(vertical = 9.dp))
-        Text(text = stringResource(id = R.string.wlan_create_network))
-        OutlinedButton(onClick = {  }) {
-            Text(text = stringResource(id = R.string.button_create_network))
-        }
-        Spacer(modifier = Modifier.padding(vertical = 9.dp))
     }
 }

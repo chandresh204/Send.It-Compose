@@ -14,6 +14,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -21,12 +26,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.ui.bottom_sheets.WLANConnectionRequiredBottomSheet
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
+import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionSender
 import chad.orionsoft.sendit.utils.NavigationConstants
 
 @Preview
 @Composable
 fun SenderMainScreen(navTo: (String) -> Unit = {}) {
+
+    var createConnection by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(Unit) {
+        createConnection = true
+    }
 
     Scaffold(topBar = {
         AppBarWithMessage(stringResource(R.string.app_name))
@@ -58,11 +72,18 @@ fun SenderMainScreen(navTo: (String) -> Unit = {}) {
         }
     }
 
+    if(createConnection) {
+        CreateConnectionSender {
+            createConnection = false
+        }
+    }
 }
 
 @Composable
 private fun ActionItem(title:String, @DrawableRes icon: Int, navTo: () -> Unit) {
-    Card(modifier = Modifier.clickable(onClick = navTo).padding(8.dp)) {
+    Card(modifier = Modifier
+        .clickable(onClick = navTo)
+        .padding(8.dp)) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             Image(painterResource(icon), contentDescription = null, Modifier.size(100.dp))
             Text(text = title, style = MaterialTheme.typography.titleLarge)
