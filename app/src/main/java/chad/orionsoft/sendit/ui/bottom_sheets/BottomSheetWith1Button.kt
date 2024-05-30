@@ -30,7 +30,6 @@ fun BottomSheetWith1Button(
     subtitle: String,
     negativeButton: @Composable () -> Unit,
     negativeButtonClick: () -> Unit,
-    onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -38,10 +37,10 @@ fun BottomSheetWith1Button(
         coroutineScope.launch {
             sheetState.hide()
             delay(500)
-            onDismiss()
+            negativeButtonClick()
         }
     }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+    ModalBottomSheet(onDismissRequest = negativeButtonClick, sheetState = sheetState) {
         Column(modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
@@ -63,6 +62,6 @@ private fun Preview() {
     SendItTheme {
         BottomSheetWith1Button("Connected To", "on 12544.154.545",
             negativeButton = { TextWithIcon(Icons.Default.Close, text = "Close")  },
-            {}, {})
+            {})
     }
 }

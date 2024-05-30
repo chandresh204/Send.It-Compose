@@ -35,14 +35,17 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetSearching(title:String, searched: List<String>, onDismiss: () -> Unit) {
+fun BottomSheetSearching(title:String,
+                         searched: List<String>,
+                         onReceiverSelected: (String) -> Unit,
+                         onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
-    val hideAndCloseSheet = {
+    val hideAndCloseSheet : (() -> Unit) -> Unit= { action ->
         coroutineScope.launch {
             sheetState.hide()
             delay(500)
-            onDismiss()
+            action()
         }
     }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
@@ -54,7 +57,7 @@ fun BottomSheetSearching(title:String, searched: List<String>, onDismiss: () -> 
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()) {
                 Text(text = title, style = MaterialTheme.typography.titleLarge)
-                OutlinedButton(onClick = { hideAndCloseSheet() },
+                OutlinedButton(onClick = { hideAndCloseSheet(onDismiss) },
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     )) {
@@ -66,7 +69,7 @@ fun BottomSheetSearching(title:String, searched: List<String>, onDismiss: () -> 
             LazyColumn {
                 items(searched) {
                     SearchedItem(it) {
-                        hideAndCloseSheet()
+                        hideAndCloseSheet { onReceiverSelected(it) }
                     }
                 }
             }
@@ -77,7 +80,8 @@ fun BottomSheetSearching(title:String, searched: List<String>, onDismiss: () -> 
 @Composable
 private fun SearchedItem(title: String, onClick: () -> Unit) {
     Card(modifier = Modifier
-        .fillMaxWidth().clickable(onClick = onClick)
+        .fillMaxWidth()
+        .clickable(onClick = onClick)
         .padding(vertical = 8.dp)) {
         Text(text = title, modifier = Modifier
             .fillMaxWidth()
@@ -89,6 +93,6 @@ private fun SearchedItem(title: String, onClick: () -> Unit) {
 @Composable
 private fun Preview() {
     SendItTheme {
-        BottomSheetSearching("Searching for receiver", listOf("device 1", "Device 2", "device 3")) {}
+        BottomSheetSearching("Searching for receiver", listOf("device 1", "Device 2", "device 3"), {}) {}
     }
 }
