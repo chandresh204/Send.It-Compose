@@ -26,7 +26,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
     val uiState by vModel.ccSenderState.collectAsState()
 
     LaunchedEffect(true) {
-        val finishReceiver = vModel.finishReceiver.collect {
+        vModel.finishReceiver.collect {
             onFinish()
         }
     }

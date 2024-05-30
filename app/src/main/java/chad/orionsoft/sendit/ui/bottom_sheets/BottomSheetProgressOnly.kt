@@ -11,25 +11,14 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.utils.Constants
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetProgressOnly(title: String, progress:Float? = null) {
     val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
-    val hideAndCloseSheet : (() -> Unit) -> Unit= { action ->
-        coroutineScope.launch {
-            sheetState.hide()
-            delay(500)
-            action()
-        }
-    }
     ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
         Column(modifier = Modifier
             .fillMaxWidth()
