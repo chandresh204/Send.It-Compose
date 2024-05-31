@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,7 +38,6 @@ import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionReceiv
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
 
-@Preview
 @Composable
 fun ReceiverMainScreen(onBack: () -> Unit) {
     var appBarBriefProgress by remember {
