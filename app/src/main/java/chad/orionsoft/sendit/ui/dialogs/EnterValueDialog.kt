@@ -2,11 +2,15 @@ package chad.orionsoft.sendit.ui.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -43,37 +47,44 @@ fun EnterValueDialog(
             dismissOnBackPress = false,
         )
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(Constants.PAGE_PADDING.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Text(text = title, style = MaterialTheme.typography.titleLarge)
-            Text(text = subtitle, style = MaterialTheme.typography.bodySmall)
-            OutlinedTextField(
-                value = codeStr,
-                onValueChange = {
-                    codeStr = it
-                },
-                textStyle = TextStyle(fontSize = 35.sp,
-                    letterSpacing = 16.sp,
-                    textAlign = TextAlign.Center),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone
-                ),
-            )
-            Button(onClick = {
-                onCodeSubmit(codeStr)
-            }) {
-                Text(text = "Submit")
+        Card(modifier = Modifier
+            .fillMaxWidth(),
+            shape = RoundedCornerShape(Constants.DIALOG_CORNER.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(Constants.PAGE_PADDING.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(text = title, style = MaterialTheme.typography.titleLarge)
+                Text(text = subtitle, style = MaterialTheme.typography.bodySmall)
+                OutlinedTextField(
+                    value = codeStr,
+                    shape = RoundedCornerShape(Constants.OUTLINE_TEXT_FIELD_RADIUS.dp),
+                    onValueChange = {
+                        codeStr = it
+                    },
+                    textStyle = TextStyle(
+                        fontSize = 35.sp,
+                        letterSpacing = 16.sp,
+                        textAlign = TextAlign.Center
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone
+                    ),
+                )
+                Button(onClick = {
+                    onCodeSubmit(codeStr)
+                }) {
+                    Text(text = "Submit")
+                }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun Preview() {
     SendItTheme {

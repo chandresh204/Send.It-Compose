@@ -35,15 +35,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
+import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionReceiver
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun ReceiverMainScreen() {
+fun ReceiverMainScreen(onBack: () -> Unit) {
     var appBarBriefProgress by remember {
         mutableStateOf("")
+    }
+    var isConnected by remember {
+        mutableStateOf(false)
     }
     val listState = rememberLazyListState()
     val listFirstItemIndex = remember {
@@ -75,6 +78,12 @@ fun ReceiverMainScreen() {
                 InQueueCard(icon = R.drawable.music_icon,
                     title = "Item $pos", size = "$pos MB")
             }
+        }
+    }
+    if(!isConnected) {
+        CreateConnectionReceiver {
+            if(it) isConnected = true
+            else onBack()
         }
     }
 }

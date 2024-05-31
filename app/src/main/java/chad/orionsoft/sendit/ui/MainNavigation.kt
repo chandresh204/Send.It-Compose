@@ -34,7 +34,9 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_RECEIVER_MAIN) {
-            ReceiverMainScreen()
+            ReceiverMainScreen {
+                navController.popBackStack()
+            }
         }
         composable(NavigationConstants.NAV_SENDER_IMAGES) {
             SenderImagesScreen {
