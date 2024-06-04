@@ -18,4 +18,5 @@
     <string name="button_connect_to_wifi">Connect To Wifi</string>
     <string name="button_create_network">Create Network</string>
     <string name="add_files_manually">Click on the + button to select the files manually</string>
+    <string name="turn_on_hotspot">Please turn on Mobile Hotspot</string>
 </resources>

@@ -36,14 +36,14 @@ fun WLANConnectionRequiredBottomSheet(
             Text(text = stringResource(id = R.string.wlan_explanation))
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
             Text(text = stringResource(id = R.string.wlan_connect_to_wifi))
-            OutlinedButton(onClick = {  }) {
+            OutlinedButton(onClick = connectToWifiClick) {
                 Text(text = stringResource(id = R.string.button_connect_to_wifi))
             }
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
             Text(text = "--" + stringResource(id = R.string.or) + "--")
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
             Text(text = stringResource(id = R.string.wlan_create_network))
-            OutlinedButton(onClick = {  }) {
+            OutlinedButton(onClick = createNetworkClick) {
                 Text(text = stringResource(id = R.string.button_create_network))
             }
             Spacer(modifier = Modifier.padding(vertical = 9.dp))

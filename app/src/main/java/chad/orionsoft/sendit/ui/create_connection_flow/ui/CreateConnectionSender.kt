@@ -7,7 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetProgressOnly
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetSearching
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetShowConnectCode
@@ -47,8 +49,11 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
         }
 
         ConnectStep.CheckIsWLAN -> {
-            WLANConnectionRequiredBottomSheet({}, { }) {
-
+            val context = LocalContext.current
+            WLANConnectionRequiredBottomSheet({}, {
+                StartActivity.openWifiSettings(context)
+            }) {
+                StartActivity.openTetherSettings(context)
             }
         }
 
