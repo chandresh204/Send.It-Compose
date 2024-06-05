@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.utils.Constants
@@ -24,6 +25,7 @@ fun WLANConnectionRequiredBottomSheet(
     connectToWifiClick: () -> Unit,
     createNetworkClick: () -> Unit
 ) {
+    // TODO add cancel button and
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(Constants.DIALOG_PADDING.dp)
