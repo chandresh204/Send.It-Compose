@@ -1,9 +1,11 @@
 package chad.orionsoft.sendit.ui.sender_image
 
-import android.net.Uri
+import chad.orionsoft.sendit.model.MediaImageDataQ
 
 data class SenderImagesState(
-    val images: List<ImageData> = emptyList()
+    val images: List<ImageUiData> = emptyList()
 )
 
-data class ImageData(val id: Int, val uri: Uri, var isSelected: Boolean = false)
+data class ImageUiData(
+    val imageData: MediaImageDataQ,
+    var isSelected: Boolean = false)

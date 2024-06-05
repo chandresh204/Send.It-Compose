@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.sender_image
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
+import coil.compose.AsyncImage
 
 @Preview
 @Composable
@@ -38,7 +40,7 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit = {}) {
     Scaffold(
         topBar = {
             AppBarWithMessage(
-                title = stringResource(R.string.app_name) + " - 20 Images",
+                title = stringResource(R.string.app_name) + " - ${uiState.images.size} Images",
                 message = "20 selected, Total : 20 MB, Free Space: 1.1 GB",
                 withProgress = 0.2f
             )
@@ -47,13 +49,11 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit = {}) {
         LazyVerticalGrid(
             modifier = Modifier.padding(it),
             columns = GridCells.Adaptive(100.dp)) {
-            items(uiState.images, key = {img ->
-                img.id
-            }) { img ->
-                ImageView(img.isSelected, {
+            items(uiState.images) { img ->
+                ImageView(img.isSelected, img.imageData.uri, {
                     viewFullScreen("")
                 }) {
-                    vModel.onEvent(SenderImagesEvent.OnSelectClick(img.id))
+          //          vModel.onEvent(SenderImagesEvent.OnSelectClick(img.imageData.id))
                 }
             }
         }
@@ -62,11 +62,12 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit = {}) {
 
 @Composable
 private fun ImageView(isSelected: Boolean,
+                      uri: Uri,
                       viewFullScreen: () -> Unit,
                       onSelected: () -> Unit) {
     Box(modifier = Modifier) {
-        Image(
-            painterResource(id = R.drawable.sendit_icon_graphics),
+        AsyncImage(
+            model = uri,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .alpha(if (isSelected) 0.5f else 1f)
