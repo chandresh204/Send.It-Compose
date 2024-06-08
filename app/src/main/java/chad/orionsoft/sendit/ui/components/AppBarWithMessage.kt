@@ -4,15 +4,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,7 +37,8 @@ import androidx.compose.ui.unit.dp
 fun AppBarWithMessage(title: String,
                       message: String? = null,
                       isErrorMessage: Boolean = false,
-                      withProgress: Float? = null) {
+                      withProgress: Float? = null,
+                      onBackPress: (() -> Unit)? = null) {
     var messageSize : Pair<Dp, Dp> by remember {
         mutableStateOf(Pair(0.dp, 0.dp))
     }
@@ -43,7 +46,15 @@ fun AppBarWithMessage(title: String,
     Column {
         TopAppBar(title = {
             Text(text = title)
-        })
+        },
+            navigationIcon = {
+                onBackPress?.let {
+                    IconButton(onClick = onBackPress) {
+                        Icon(Icons.Default.ArrowBack, "back")
+                    }
+                }
+            }
+            )
         AnimatedVisibility(visible = !message.isNullOrBlank()) {
             Card(
                 shape = RoundedCornerShape(0.dp, 0.dp, 8.dp,8.dp),

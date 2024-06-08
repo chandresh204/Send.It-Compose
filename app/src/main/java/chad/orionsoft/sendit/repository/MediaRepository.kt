@@ -2,9 +2,10 @@ package chad.orionsoft.sendit.repository
 
 import android.content.ContentUris
 import android.content.Context
+import android.net.Uri
 import android.provider.MediaStore
+import chad.orionsoft.sendit.model.MediaAudioData
 import chad.orionsoft.sendit.model.MediaImageData
-import chad.orionsoft.sendit.model.MediaImageDataQ
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -13,33 +14,9 @@ class MediaRepository @Inject constructor(
 ) {
 
     private val imagesList = mutableListOf<MediaImageData>()
-    private val imageListQ = mutableListOf<MediaImageDataQ>()
+    private val audioList = mutableListOf<MediaAudioData>()
 
     fun getImages() : List<MediaImageData> {
-        val imageURI= MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        context.contentResolver.query(
-            imageURI,null,null,null,null).use { cursor ->
-            if(cursor!=null && cursor.moveToFirst()) {
-
-                var count=0
-                val indexID=cursor.getColumnIndex(MediaStore.Images.Media._ID)
-                val indexDATa=cursor.getColumnIndex(MediaStore.Images.Media.DATA)
-                val titleIndex=cursor.getColumnIndex(MediaStore.Images.Media.TITLE)
-
-                do {
-                    val thisID=cursor.getLong(indexID)
-                    val data=cursor.getString(indexDATa)
-                    val title=cursor.getString(titleIndex)
-                    count++
-                    imagesList.add(MediaImageData(thisID,data,title, ""))
-                } while (cursor.moveToNext())
-            }
-        }
-        imagesList.sortByDescending { imageObject -> imageObject.lastModified }
-        return imagesList
-    }
-
-    fun getImagesQ() : List<MediaImageDataQ> {
         val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         context.contentResolver
             .query(imageUri, null, null, null, null).use { iCursor ->
@@ -60,11 +37,62 @@ class MediaRepository @Inject constructor(
                             size = iStream?.available()?.toLong() ?: 0L
                             iStream?.close()
                         }
-                        imageListQ.add(MediaImageDataQ(uri, title, size, modified))
+                        imagesList.add(MediaImageData(id, uri, title, size, modified))
                     } while (iCursor.moveToNext())
                 }
             }
-        imageListQ.sortByDescending { imageObjectQ -> imageObjectQ.lastModified }
-        return imageListQ
+        imagesList.sortByDescending { imageObjectQ -> imageObjectQ.lastModified }
+        return imagesList
+    }
+
+    fun generateAudioList() : List<MediaAudioData> {
+        val audioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+
+        val aCursor = context.contentResolver.query(audioUri,null,null,null,null)
+        val alCursor = context.contentResolver.query(albumUri,null,null,null,null)
+
+        if (aCursor!=null && aCursor.moveToFirst()) {
+
+            val idIndex = aCursor.getColumnIndex(MediaStore.Audio.Media._ID)
+            val alIndex1 = aCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)
+            val titleIndex = aCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
+            val artistIndex = aCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
+            val durationIndex = aCursor.getColumnIndex(MediaStore.Audio.Media.DURATION)
+            val sizeIndex = aCursor.getColumnIndex(MediaStore.Audio.Media.SIZE)
+            val nameIndex = aCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)
+            val modifiedIndex = aCursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED)
+
+            do {
+                val alId1 = aCursor.getLong(alIndex1)
+                var artUri = Uri.parse("null")
+                if (alCursor!=null && alCursor.moveToFirst()) {
+                    val alIndex2 = alCursor.getColumnIndex(MediaStore.Audio.Albums._ID)
+                    do {
+                        val alId2 = alCursor.getLong(alIndex2)
+                        if (alId1 == alId2) {
+                            artUri= ContentUris.withAppendedId(albumUri, alId2)
+                            break
+                        }
+                    } while (alCursor.moveToNext())
+                }
+                val id = aCursor.getLong(idIndex)
+                val uri = ContentUris.withAppendedId(audioUri, aCursor.getLong(idIndex))
+                val title = aCursor.getString(titleIndex)
+                val artist = aCursor.getString(artistIndex)
+                val duration = aCursor.getInt(durationIndex)
+                val size = aCursor.getLong(sizeIndex)
+                val name = aCursor.getString(nameIndex)
+                val modified = aCursor.getLong(modifiedIndex)
+                audioList.add(MediaAudioData(
+                    id,
+                    uri,name ?: "unknown",
+                    title ?: "unknown",artist ?: "unknown",duration,artUri,size,modified,
+                    false))
+            } while (aCursor.moveToNext())
+        }
+        aCursor?.close()
+        alCursor?.close()
+        return audioList
     }
 }

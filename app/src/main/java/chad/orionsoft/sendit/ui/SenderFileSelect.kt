@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
-import chad.orionsoft.sendit.ui.components.FileItemCard
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 
 @Composable
@@ -50,13 +49,13 @@ fun SenderFileSelect() {
         } else {
             LazyColumn(modifier = Modifier.padding(it)) {
                 items(22) { index ->
-                    FileItemCard(
-                        title = "Title : $index",
-                        information = "Information: $index",
-                        thumbnail = R.drawable.debian_icon_small,
-                        isSelected = index %4 == 0,
-                        isPlayIconElseViewIcon = false
-                    )
+//                    FileItemCard(
+//                        title = "Title : $index",
+//                        information = "Information: $index",
+//                        thumbnail = R.drawable.debian_icon_small,
+//                        isSelected = index %4 == 0,
+//                        isPlayIconElseViewIcon = false
+//                    )
                 }
             }
         }

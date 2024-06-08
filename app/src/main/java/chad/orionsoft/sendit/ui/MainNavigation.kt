@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
+import chad.orionsoft.sendit.ui.sender_audio.SenderAudio
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
 import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
 import chad.orionsoft.sendit.utils.NavigationConstants
@@ -40,18 +41,24 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_SENDER_IMAGES) {
-            SenderImagesScreen {
+            SenderImagesScreen({
                 navController.navigate(NavigationConstants.NAV_FULL_SCREEN_IMAGE)
+            }) {
+                navController.popBackStack()
             }
         }
         composable(NavigationConstants.NAV_FULL_SCREEN_IMAGE) {
             FullScreenImage()
         }
         composable(NavigationConstants.NAV_SENDER_AUDIO) {
-            SenderAudioVideo(true)
+            SenderAudio {
+                navController.popBackStack()
+            }
         }
         composable(NavigationConstants.NAV_SENDER_VIDEO) {
-            SenderAudioVideo(false)
+            SenderAudio {
+                navController.popBackStack()
+            }
         }
         composable(NavigationConstants.NAV_SENDER_FILES_SELECT) {
             SenderFileSelect()
