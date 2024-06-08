@@ -130,33 +130,4 @@ class SenderImagesViewModel @Inject constructor(
         } while (i <= maxImageVisitedIndex )
         isThumbnailLoadingAlreadyRunning = false
     }
-
-    private fun loadThumbnails() {
-        uiState.value.images.forEachIndexed { index, imageUIData ->
-            try {
-                val thumbnail = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    context.contentResolver.loadThumbnail(
-                        imageUIData.imageData.uri,
-                        Size(100, 100), null
-                    )
-                } else {
-                    // TODO compress for performance
-                    BitmapFactory.decodeStream(
-                        context.contentResolver.openInputStream(imageUIData.imageData.uri)
-                    )
-                }
-                val oldList = uiState.value.images.toMutableList()
-                oldList[index] = oldList[index].copy(
-                    thumbnailBitmap = thumbnail
-                )
-                _uiState.update {
-                    it.copy(
-                        images = oldList
-                    )
-                }
-            } catch (e: Exception) {
-                Log.e(tag, "exception in thumbnail: $e")
-            }
-        }
-    }
 }

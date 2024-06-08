@@ -1,9 +1,6 @@
 package chad.orionsoft.sendit.ui.components
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.os.Build
-import android.util.Size
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
-import coil.compose.AsyncImage
 
 @Composable
 fun MediaItemViewBar(

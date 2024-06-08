@@ -1,7 +1,7 @@
 package chad.orionsoft.sendit.model
 
 import android.net.Uri
-import java.io.File
+
 data class MediaImageData(
     val id: Long,
     val uri: Uri,
