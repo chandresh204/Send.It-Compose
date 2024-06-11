@@ -105,7 +105,7 @@ class SenderImagesViewModel @Inject constructor(
                 val thumbnail = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     context.contentResolver.loadThumbnail(
                         imgData.imageData.uri,
-                        Size(100, 100), null
+                        Size(300, 300), null
                     )
                 } else {
                     // TODO compress for performance

@@ -5,6 +5,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -17,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
+import chad.orionsoft.sendit.ui.components.DropDownMenuData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
 
 @Composable
@@ -37,7 +41,14 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onBack: () -> Uni
                 title = stringResource(R.string.app_name) + " - ${uiState.images.size} Images",
                 message = "${uiState.selectedCount} selected, Total : ${uiState.selectedSizeToDisplay}, Free Space: 1.1 GB",
                 withProgress = 0.2f,
-                onBackPress = onBack
+                onBackPress = onBack,
+                appBarMenu = listOf(
+                    DropDownMenuData(Icons.Default.Check, "Select all") {
+
+                    },
+                    DropDownMenuData(Icons.Default.Clear, "Clear all") {
+                    },
+                )
             )
         }
     ) {

@@ -1,23 +1,32 @@
 package chad.orionsoft.sendit.ui.sender_audio
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
+import chad.orionsoft.sendit.ui.components.DropDownMenuData
 import chad.orionsoft.sendit.ui.components.MediaItemViewBar
+import chad.orionsoft.sendit.ui.components.SearchView
 import chad.orionsoft.sendit.utils.Converters
 
 @Composable
@@ -32,6 +41,7 @@ fun SenderAudio(onBack: () -> Unit) {
         derivedStateOf { listState.firstVisibleItemIndex }
     }
 
+
     vModel.onEvent(SenderAudioEvent.OnLastVisibleIndexChanged(visibleItemSize.value + firstVisibleItem.value))
 
     Scaffold(topBar = {
@@ -39,7 +49,17 @@ fun SenderAudio(onBack: () -> Unit) {
             title = stringResource(id = R.string.app_name) + " - ${uiState.audioList.size} Files",
             message = "${uiState.selectedCount} selected, Total : ${uiState.selectedSizeToDisplay}, Free Space: 1.1 GB",
             withProgress = 0.6f,
-            onBackPress = onBack
+            onBackPress = onBack,
+            isProvideSearch = true,
+            appBarMenu = listOf(
+                DropDownMenuData(Icons.Default.Check, "Select all") {
+
+                },
+                DropDownMenuData(Icons.Default.Clear, "Clear all") {
+                },
+                DropDownMenuData(Icons.Default.List, "Sort By") {
+            }
+        )
         )
     }) {
         LazyColumn(modifier = Modifier.padding(it), state = listState) {

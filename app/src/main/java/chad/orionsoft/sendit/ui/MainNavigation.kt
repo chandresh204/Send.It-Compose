@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
 import chad.orionsoft.sendit.ui.sender_audio.SenderAudio
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
+import chad.orionsoft.sendit.ui.sender_video.SenderVideo
 import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
 import chad.orionsoft.sendit.utils.NavigationConstants
 
@@ -56,7 +57,7 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_SENDER_VIDEO) {
-            SenderAudio {
+            SenderVideo {
                 navController.popBackStack()
             }
         }

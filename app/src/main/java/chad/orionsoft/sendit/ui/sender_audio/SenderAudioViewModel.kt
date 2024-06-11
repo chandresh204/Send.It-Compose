@@ -23,10 +23,10 @@ class SenderAudioViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _avState = MutableStateFlow(SenderAVState())
+    private val _avState = MutableStateFlow(SenderAudioState())
     val avState = _avState.asStateFlow()
 
-    private val tag = "SenderAVViewModel"
+    private val tag = "SenderAudioViewModel"
 
     private var maxIndexOfLoadThumbnail = 0
 
@@ -60,13 +60,13 @@ class SenderAudioViewModel @Inject constructor(
 
             is SenderAudioEvent.OnSelectClick -> {
                 Log.d(tag, "OnClick id: ${event.id}")
-                changeSelectionStateOfImage(event.id)
+                changeSelectionStateOfAudio(event.id)
             }
         }
 
     }
 
-    private fun changeSelectionStateOfImage(id: Long) {
+    private fun changeSelectionStateOfAudio(id: Long) {
         val oldList = avState.value.audioList.toMutableList()
         val index = oldList.indexOf(oldList.find { it.audioData.id == id })
         if(index >= 0) {

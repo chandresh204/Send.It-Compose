@@ -1,9 +1,11 @@
 package chad.orionsoft.sendit.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -11,7 +13,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,10 +29,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -38,23 +47,82 @@ fun AppBarWithMessage(title: String,
                       message: String? = null,
                       isErrorMessage: Boolean = false,
                       withProgress: Float? = null,
+                      appBarMenu: List<DropDownMenuData> = emptyList(),
+                      isProvideSearch: Boolean = false,
+                      onSearchQueryChanged: (String) -> Unit = {},
                       onBackPress: (() -> Unit)? = null) {
     var messageSize : Pair<Dp, Dp> by remember {
         mutableStateOf(Pair(0.dp, 0.dp))
     }
+    var isSearching by remember {
+        mutableStateOf(false)
+    }
+
+    var searchText by remember {
+        mutableStateOf("")
+    }
+
+    var expandedDropDown by remember {
+        mutableStateOf(false)
+    }
+
     val density = LocalDensity.current
     Column {
-        TopAppBar(title = {
-            Text(text = title)
-        },
-            navigationIcon = {
-                onBackPress?.let {
-                    IconButton(onClick = onBackPress) {
-                        Icon(Icons.Default.ArrowBack, "back")
+        if(isSearching) {
+            SearchView(query = searchText, onQueryChanged = {
+                searchText = it
+                onSearchQueryChanged(it)
+            }) {
+                isSearching = false
+            }
+        } else {
+            TopAppBar(title = {
+                Text(text = title)
+            },
+                navigationIcon = {
+                    onBackPress?.let {
+                        IconButton(onClick = onBackPress) {
+                            Icon(Icons.Default.ArrowBack, "back")
+                        }
+                    }
+                },
+                actions = {
+                    if(isProvideSearch) {
+                        IconButton(onClick = {
+                            isSearching = true
+                        }) {
+                            Icon(Icons.Default.Search, "search")
+                        }
+                    }
+                    if(appBarMenu.isNotEmpty()) {
+                        Box {
+                            IconButton(onClick = {
+                                expandedDropDown = true
+                            }) {
+                                Icon(Icons.Default.MoreVert, "menu")
+                            }
+                        }
+                        DropdownMenu(expanded = expandedDropDown,
+                            onDismissRequest = {
+                                expandedDropDown = false
+                            }) {
+                            appBarMenu.forEach {
+                                DropdownMenuItem(text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(it.icon, null)
+                                        Text(text = it.text)
+                                    }
+                                },
+                                    onClick = {
+                                        it.onSelected
+                                        expandedDropDown = false
+                                    })
+                            }
+                        }
                     }
                 }
-            }
             )
+        }
         AnimatedVisibility(visible = !message.isNullOrBlank()) {
             Card(
                 shape = RoundedCornerShape(0.dp, 0.dp, 8.dp,8.dp),
@@ -101,3 +169,9 @@ fun AppBarWithMessage(title: String,
         }
     }
 }
+
+data class DropDownMenuData(
+    val icon: ImageVector,
+    val text: String,
+    val onSelected: () -> Unit,
+)

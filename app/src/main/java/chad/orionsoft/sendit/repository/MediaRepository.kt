@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import chad.orionsoft.sendit.model.MediaAudioData
 import chad.orionsoft.sendit.model.MediaImageData
+import chad.orionsoft.sendit.model.MediaVideoData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -15,6 +16,7 @@ class MediaRepository @Inject constructor(
 
     private val imagesList = mutableListOf<MediaImageData>()
     private val audioList = mutableListOf<MediaAudioData>()
+    private val videosList = mutableListOf<MediaVideoData>()
 
     fun getImages() : List<MediaImageData> {
         val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -94,5 +96,30 @@ class MediaRepository @Inject constructor(
         aCursor?.close()
         alCursor?.close()
         return audioList
+    }
+
+    fun generateVideoList() : List<MediaVideoData> {
+        val vURI = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        context.contentResolver.query(vURI,null,null,null,null).use { vCursor ->
+            if (vCursor!=null && vCursor.moveToFirst()) {
+
+                val idIndex = vCursor.getColumnIndex(MediaStore.Video.Media._ID)
+                val titleIndex = vCursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)
+                val durationIndex = vCursor.getColumnIndex(MediaStore.Video.Media.DURATION)
+                val sizeIndex = vCursor.getColumnIndex(MediaStore.Video.Media.SIZE)
+                val lastModifiedIndex = vCursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)
+
+                do {
+                    val id = vCursor.getLong(idIndex)
+                    val uri = ContentUris.withAppendedId(vURI, id)
+                    val title = vCursor.getString(titleIndex)
+                    val duration = vCursor.getInt(durationIndex)
+                    val size = vCursor.getLong(sizeIndex)
+                    val modified = vCursor.getLong(lastModifiedIndex)
+                    videosList.add(MediaVideoData(id, uri,title,duration,size, modified,false))
+                } while (vCursor.moveToNext())
+            }
+        }
+        return videosList
     }
 }

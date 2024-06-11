@@ -29,6 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -72,6 +75,7 @@ fun MediaItemViewBar(
             if(thumbnailBitmap != null) {
                 Image(
                     bitmap = thumbnailBitmap.asImageBitmap(),
+                    contentScale = ContentScale.Crop,
                     modifier= Modifier
                         .size(40.dp)
                         .clip(CircleShape),
@@ -182,7 +186,12 @@ fun MediaItemViewGrid(
                                 Alignment.TopStart
                             )
                             .padding(5.dp),
-                        style = MaterialTheme.typography.bodySmall)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            shadow = Shadow(
+                                color = MaterialTheme.colorScheme.background,
+                                offset = Offset(2f,2f),
+                            )
+                        ))
                 }
                 if(isSelected) {
                     Checkbox(checked = true,
@@ -191,7 +200,7 @@ fun MediaItemViewGrid(
                 }
             }
         }
-        Text(text = title)
+        Text(text = title, maxLines = 1, style = MaterialTheme.typography.bodySmall)
     }
 
 }
