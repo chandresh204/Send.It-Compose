@@ -61,6 +61,14 @@ class SenderVideoViewModel @Inject constructor(
                 Log.d(tag, "OnClick id: ${event.id}")
                 changeSelectionStateOfVideo(event.id)
             }
+
+            SenderVideoEvent.OnClearAllSelection -> {
+                clearAllSelection()
+            }
+            SenderVideoEvent.OnSelectAll -> {
+                selectAll()
+            }
+            SenderVideoEvent.OnSortingChangeClicked -> TODO()
         }
     }
 
@@ -85,11 +93,53 @@ class SenderVideoViewModel @Inject constructor(
                     },
                 )
             }
-            _avState.update {
-                it.copy(
-                    selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
-                )
-            }
+            updateTotalSelectedSize()
+        }
+    }
+
+    private fun clearAllSelection() {
+        val oldList = avState.value.videoList.toMutableList()
+        for(i in oldList.indices) {
+            oldList[i] = oldList[i].copy(
+                selected = false
+            )
+        }
+        _avState.update {
+            it.copy(
+                videoList = oldList,
+                selectedCount = 0,
+                selectedSize = 0L
+            )
+        }
+        updateTotalSelectedSize()
+    }
+
+    private fun selectAll() {
+        val oldList = avState.value.videoList.toMutableList()
+        var selectedCount = 0
+        var totalSize = 0L
+        for (i in oldList.indices) {
+            oldList[i] = oldList[i].copy(
+                selected = true
+            )
+            selectedCount++
+            totalSize += oldList[i].videoData.size
+        }
+        _avState.update {
+            it.copy(
+                videoList = oldList,
+                selectedCount = selectedCount,
+                selectedSize = totalSize
+            )
+        }
+        updateTotalSelectedSize()
+    }
+
+    private fun updateTotalSelectedSize() {
+        _avState.update {
+            it.copy(
+                selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
+            )
         }
     }
 

@@ -112,7 +112,7 @@ fun AppBarWithMessage(title: String,
                                     }
                                 },
                                     onClick = {
-                                        it.onSelected
+                                        it.onSelected()
                                         expandedDropDown = false
                                     })
                             }

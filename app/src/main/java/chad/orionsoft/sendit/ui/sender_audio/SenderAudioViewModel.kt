@@ -62,6 +62,14 @@ class SenderAudioViewModel @Inject constructor(
                 Log.d(tag, "OnClick id: ${event.id}")
                 changeSelectionStateOfAudio(event.id)
             }
+
+            is SenderAudioEvent.OnClearAllSelection -> {
+                clearAllSelection()
+            }
+            is SenderAudioEvent.OnSelectAll -> {
+                selectAll()
+            }
+            is SenderAudioEvent.OnSortingChangeClicked -> TODO()
         }
 
     }
@@ -87,11 +95,53 @@ class SenderAudioViewModel @Inject constructor(
                     },
                 )
             }
-            _avState.update {
-                it.copy(
-                    selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
-                )
-            }
+            updateTotalSelectedSize()
+        }
+    }
+
+    private fun clearAllSelection() {
+        val oldList = avState.value.audioList.toMutableList()
+        for(i in oldList.indices) {
+            oldList[i] = oldList[i].copy(
+                selected = false
+            )
+        }
+        _avState.update {
+            it.copy(
+                audioList = oldList,
+                selectedCount = 0,
+                selectedSize = 0L
+            )
+        }
+        updateTotalSelectedSize()
+    }
+
+    private fun selectAll() {
+        val oldList = avState.value.audioList.toMutableList()
+        var selectedCount = 0
+        var totalSize = 0L
+        for (i in oldList.indices) {
+            oldList[i] = oldList[i].copy(
+                selected = true
+            )
+            selectedCount++
+            totalSize += oldList[i].audioData.size
+        }
+        _avState.update {
+            it.copy(
+                audioList = oldList,
+                selectedCount = selectedCount,
+                selectedSize = totalSize
+            )
+        }
+        updateTotalSelectedSize()
+    }
+
+    private fun updateTotalSelectedSize() {
+        _avState.update {
+            it.copy(
+                selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
+            )
         }
     }
 

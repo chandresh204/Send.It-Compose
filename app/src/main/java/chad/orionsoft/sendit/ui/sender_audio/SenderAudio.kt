@@ -48,11 +48,13 @@ fun SenderAudio(onBack: () -> Unit) {
             isProvideSearch = true,
             appBarMenu = listOf(
                 DropDownMenuData(Icons.Default.Check, "Select all") {
-
+                    vModel.onEvent(SenderAudioEvent.OnSelectAll)
                 },
                 DropDownMenuData(Icons.Default.Clear, "Clear all") {
+                    vModel.onEvent(SenderAudioEvent.OnClearAllSelection)
                 },
                 DropDownMenuData(Icons.Default.List, "Sort By") {
+                    vModel.onEvent(SenderAudioEvent.OnSortingChangeClicked)
             }
         )
         )
