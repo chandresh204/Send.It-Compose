@@ -1,7 +1,5 @@
 package chad.orionsoft.sendit.ui.sender_video
 
-import chad.orionsoft.sendit.ui.sender_audio.SenderAudioEvent
-
 sealed class SenderVideoEvent {
 
     data class OnLastVisibleIndexChanged(val lastIndex: Int) : SenderVideoEvent()
