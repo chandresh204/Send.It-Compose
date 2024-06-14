@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.ui.sender_audio
 
-import android.graphics.Bitmap
 import chad.orionsoft.sendit.model.MediaAudioData
 
 data class SenderAudioState(

@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.ui.sender_video
 
-import android.graphics.Bitmap
 import chad.orionsoft.sendit.model.MediaVideoData
 
 data class SenderVideoState(
