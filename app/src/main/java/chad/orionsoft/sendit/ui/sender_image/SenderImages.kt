@@ -30,11 +30,6 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onBack: () -> Uni
     val uiState by vModel.uiState.collectAsState()
     val gridState = rememberLazyGridState()
 
-    val gridVisibleItems = remember { derivedStateOf { gridState.layoutInfo.visibleItemsInfo.size } }
-    val firstVisibleIndex = remember { derivedStateOf { gridState.firstVisibleItemIndex } }
-
-    vModel.onEvent(SenderImagesEvent.OnGridLastVisibleChanged(firstVisibleIndex.value + gridVisibleItems.value))
-
     Scaffold(
         topBar = {
             AppBarWithMessage(
@@ -44,9 +39,10 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onBack: () -> Uni
                 onBackPress = onBack,
                 appBarMenu = listOf(
                     DropDownMenuData(Icons.Default.Check, "Select all") {
-
+                        vModel.onEvent(SenderImagesEvent.OnSelectAll)
                     },
                     DropDownMenuData(Icons.Default.Clear, "Clear all") {
+                        vModel.onEvent(SenderImagesEvent.OnClearAllSelection)
                     },
                 )
             )
@@ -56,10 +52,12 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onBack: () -> Uni
             state = gridState,
             modifier = Modifier.padding(it),
             columns = GridCells.Adaptive(100.dp)) {
-            items(uiState.images) { img ->
+            items(uiState.images, key = {
+                it.imageData.id
+            }) { img ->
                 MediaItemViewGrid(
                     isSelected = img.isSelected,
-                    thumbnailBitmap = img.thumbnailBitmap,
+                    thumbUri = img.imageData.uri,
                     placeHolder = null,
                     title = "",
                     subtitle = "",

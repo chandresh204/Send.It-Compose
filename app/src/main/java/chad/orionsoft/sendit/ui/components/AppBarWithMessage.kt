@@ -47,7 +47,9 @@ fun AppBarWithMessage(title: String,
                       withProgress: Float? = null,
                       appBarMenu: List<DropDownMenuData> = emptyList(),
                       isProvideSearch: Boolean = false,
+                      onEnteredInSearchMode: () -> Unit = {},
                       onSearchQueryChanged: (String) -> Unit = {},
+                      onSearchClosed: () -> Unit = {},
                       onBackPress: (() -> Unit)? = null) {
     var messageSize : Pair<Dp, Dp> by remember {
         mutableStateOf(Pair(0.dp, 0.dp))
@@ -72,6 +74,8 @@ fun AppBarWithMessage(title: String,
                 onSearchQueryChanged(it)
             }) {
                 isSearching = false
+                searchText = ""
+                onSearchClosed()
             }
         } else {
             TopAppBar(title = {
@@ -88,6 +92,7 @@ fun AppBarWithMessage(title: String,
                     if(isProvideSearch) {
                         IconButton(onClick = {
                             isSearching = true
+                            onEnteredInSearchMode()
                         }) {
                             Icon(Icons.Default.Search, "search")
                         }

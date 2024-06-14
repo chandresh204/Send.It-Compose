@@ -24,6 +24,7 @@ import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
 import chad.orionsoft.sendit.ui.components.DropDownMenuData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
+import chad.orionsoft.sendit.ui.sender_audio.SenderAudioEvent
 import chad.orionsoft.sendit.utils.Converters
 
 @Composable
@@ -31,15 +32,6 @@ fun SenderVideo(onBack: () -> Unit) {
 
     val vModel = hiltViewModel<SenderVideoViewModel>()
     val uiState by vModel.avState.collectAsState()
- //   val listState = rememberLazyListState()
-    val gridState = rememberLazyGridState()
-
-    val visibleItemSize = remember { derivedStateOf { gridState.layoutInfo.visibleItemsInfo.size } }
-    val firstVisibleItem = remember {
-        derivedStateOf { gridState.firstVisibleItemIndex }
-    }
-
-    vModel.onEvent(SenderVideoEvent.OnLastVisibleIndexChanged(visibleItemSize.value + firstVisibleItem.value))
 
     Scaffold(topBar = {
         AppBarWithMessage(
@@ -58,15 +50,29 @@ fun SenderVideo(onBack: () -> Unit) {
                 DropDownMenuData(Icons.Default.List, "Sort By") {
                     vModel.onEvent(SenderVideoEvent.OnSortingChangeClicked)
                 }
-        ))
+        ),
+            onEnteredInSearchMode = {
+                vModel.onEvent(SenderVideoEvent.OnSearch(""))
+            },
+            onSearchQueryChanged = {
+                vModel.onEvent(SenderVideoEvent.OnSearch(it))
+            },
+            onSearchClosed = {
+                vModel.onEvent(SenderVideoEvent.OnSearch(null)) // null means exit from search
+            })
     }) {
-        LazyVerticalGrid(state = gridState,
+        LazyVerticalGrid(
             modifier = Modifier.padding(it),
             columns = GridCells.Adaptive(100.dp)) {
-            items(uiState.videoList) { vid ->
+            val displayList = if(uiState.isSearching) {
+                uiState.searchedList
+            } else uiState.videoList
+            items(displayList, key = { vidData ->
+                vidData.videoData.id
+            }) { vid ->
                 MediaItemViewGrid(
                     isSelected = vid.selected,
-                    thumbnailBitmap = vid.thumbnailBitmap,
+                    thumbUri = vid.videoData.uri,
                     placeHolder = R.drawable.video_icon_small,
                     title = vid.videoData.title,
                     subtitle = "${Converters.formatDuration(vid.videoData.duration)}\n" +
@@ -78,21 +84,5 @@ fun SenderVideo(onBack: () -> Unit) {
                 }
             }
         }
-//        LazyColumn(modifier = Modifier.padding(it), state = listState) {
-//            items(uiState.videoList) { vid ->
-//                MediaItemViewGrid(
-//                    isSelected = vid.selected,
-//                    thumbnailBitmap = vid.thumbnailBitmap,
-//                    placeHolder = R.drawable.music_icon_small,
-//                    title = vid.videoData.title,
-//                    subtitle = "${Converters.formatDuration(vid.videoData.duration)} " +
-//                            Converters.formatDataString(vid.videoData.size),
-//                    actionIconVector = Icons.Default.PlayArrow,
-//                    actionIconDrawableRes = null,
-//                    onActionClick = {  }) {
-//                    vModel.onEvent(SenderVideoEvent.OnSelectClick(vid.videoData.id))
-//                }
-//            }
-//        }
     }
 }

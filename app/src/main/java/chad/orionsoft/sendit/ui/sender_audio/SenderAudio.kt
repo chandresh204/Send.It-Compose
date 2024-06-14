@@ -14,7 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,15 +31,6 @@ fun SenderAudio(onBack: () -> Unit) {
 
     val vModel = hiltViewModel<SenderAudioViewModel>()
     val uiState by vModel.avState.collectAsState()
-    val listState = rememberLazyListState()
-
-    val visibleItemSize = remember { derivedStateOf { listState.layoutInfo.visibleItemsInfo.size } }
-    val firstVisibleItem = remember {
-        derivedStateOf { listState.firstVisibleItemIndex }
-    }
-
-
-    vModel.onEvent(SenderAudioEvent.OnLastVisibleIndexChanged(visibleItemSize.value + firstVisibleItem.value))
 
     Scaffold(topBar = {
         AppBarWithMessage(
@@ -56,14 +49,29 @@ fun SenderAudio(onBack: () -> Unit) {
                 DropDownMenuData(Icons.Default.List, "Sort By") {
                     vModel.onEvent(SenderAudioEvent.OnSortingChangeClicked)
             }
-        )
+        ),
+            onEnteredInSearchMode = {
+                vModel.onEvent(SenderAudioEvent.OnSearch(""))
+            },
+            onSearchQueryChanged = {
+                vModel.onEvent(SenderAudioEvent.OnSearch(it))
+            },
+            onSearchClosed = {
+                vModel.onEvent(SenderAudioEvent.OnSearch(null)) // null means exit from search
+            }
+
         )
     }) {
-        LazyColumn(modifier = Modifier.padding(it), state = listState) {
-            items(uiState.audioList) { aud ->
+        LazyColumn(modifier = Modifier.padding(it)) {
+            val displayList = if(uiState.isSearching) {
+                uiState.searchedList
+            } else uiState.audioList
+            items(displayList, key = { audData ->
+                audData.audioData.id
+            }) { aud ->
                 MediaItemViewBar(
                     isSelected = aud.selected,
-                    thumbnailBitmap = aud.thumbnailBitmap,
+                    thumbUri = aud.audioData.albumArt,
                     placeHolder = R.drawable.music_icon_small,
                     title = aud.audioData.title,
                     subtitle = "${Converters.formatDuration(aud.audioData.duration)} " +

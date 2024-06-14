@@ -1,15 +1,9 @@
 package chad.orionsoft.sendit.ui.sender_image
 
-import android.content.Context
-import android.graphics.BitmapFactory
-import android.os.Build
-import android.util.Log
-import android.util.Size
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,7 +12,6 @@ import javax.inject.Inject
 @HiltViewModel
 class SenderImagesViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
-    @ApplicationContext private val context: Context
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(SenderImagesState())
@@ -26,17 +19,12 @@ class SenderImagesViewModel @Inject constructor(
 
     private val tag = "SenderImageViewModel"
 
-    private var maxImageVisitedIndex = 0
-
-    private var isThumbnailLoadingAlreadyRunning = false
-
     init {
         _uiState.update {
             it.copy(
                 images = getAllImages().toMutableList()
             )
         }
-//        loadThumbnails()
     }
 
 
@@ -47,18 +35,11 @@ class SenderImagesViewModel @Inject constructor(
                 changeSelectionStateOfImage(event.id)
             }
 
-            is SenderImagesEvent.OnGridLastVisibleChanged -> {
-                if(event.lastIndex > maxImageVisitedIndex) {
-                    if(!isThumbnailLoadingAlreadyRunning) {
-                        val startingPoint = maxImageVisitedIndex
-                        maxImageVisitedIndex = event.lastIndex
-                        loadThumbnails2(startingPoint)
-                        Log.d(tag, "Thumbnail loading not running: Starting for $startingPoint to $maxImageVisitedIndex")
-                    } else {
-                        maxImageVisitedIndex = event.lastIndex
-                        Log.d(tag, "Thumbnail already running updating count to $maxImageVisitedIndex")
-                    }
-                }
+            SenderImagesEvent.OnClearAllSelection -> {
+                clearAllSelection()
+            }
+            SenderImagesEvent.OnSelectAll -> {
+                selectAll()
             }
         }
     }
@@ -96,38 +77,50 @@ class SenderImagesViewModel @Inject constructor(
         }
     }
 
-    private fun loadThumbnails2(startingIndex: Int) {
-        var i = startingIndex
-        do {
-            isThumbnailLoadingAlreadyRunning = true
-            val imgData = uiState.value.images[i]
-            try {
-                val thumbnail = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    context.contentResolver.loadThumbnail(
-                        imgData.imageData.uri,
-                        Size(300, 300), null
-                    )
-                } else {
-                    // TODO compress for performance
-                    BitmapFactory.decodeStream(
-                        context.contentResolver.openInputStream(imgData.imageData.uri)
-                    )
-                }
-                val oldList = uiState.value.images.toMutableList()
-                oldList[i] = oldList[i].copy(
-                    thumbnailBitmap = thumbnail
-                )
-                _uiState.update {
-                    it.copy(
-                        images = oldList
-                    )
-                }
-                Log.e(tag, "finished for $i ")
-            } catch (e: Exception) {
-                Log.e(tag, "exception in thumbnail: $e")
-            }
-            i++
-        } while (i <= maxImageVisitedIndex )
-        isThumbnailLoadingAlreadyRunning = false
+    private fun clearAllSelection() {
+        val oldList = uiState.value.images.toMutableList()
+        for(i in oldList.indices) {
+            oldList[i] = oldList[i].copy(
+                isSelected = false
+            )
+        }
+        _uiState.update {
+            it.copy(
+                images = oldList,
+                selectedCount = 0,
+                selectedSize = 0L
+            )
+        }
+        updateTotalSelectedSize()
     }
+
+    private fun selectAll() {
+        val oldList = uiState.value.images.toMutableList()
+        var selectedCount = 0
+        var totalSize = 0L
+        for (i in oldList.indices) {
+            oldList[i] = oldList[i].copy(
+                isSelected = true
+            )
+            selectedCount++
+            totalSize += oldList[i].imageData.size
+        }
+        _uiState.update {
+            it.copy(
+                images = oldList,
+                selectedCount = selectedCount,
+                selectedSize = totalSize
+            )
+        }
+        updateTotalSelectedSize()
+    }
+
+    private fun updateTotalSelectedSize() {
+        _uiState.update {
+            it.copy(
+                selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
+            )
+        }
+    }
+
 }

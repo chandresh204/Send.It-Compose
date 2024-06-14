@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui.components
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,7 +46,7 @@ import chad.orionsoft.sendit.utils.Constants
 @Composable
 fun MediaItemViewBar(
     isSelected : Boolean,
-    thumbnailBitmap: Bitmap?,
+    thumbUri: Uri,
     @DrawableRes placeHolder: Int,
     title: String,
     subtitle: String,
@@ -59,7 +60,8 @@ fun MediaItemViewBar(
         .padding(
             horizontal = Constants.PAGE_PADDING.dp,
             vertical = 6.dp
-        ).clickable(onClick = onViewClick),
+        )
+        .clickable(onClick = onViewClick),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )) {
@@ -71,21 +73,10 @@ fun MediaItemViewBar(
                     else MaterialTheme.colorScheme.background
                 )
                 .padding(horizontal = 8.dp, vertical = 4.dp)) {
-            if(thumbnailBitmap != null) {
-                Image(
-                    bitmap = thumbnailBitmap.asImageBitmap(),
-                    contentScale = ContentScale.Crop,
-                    modifier= Modifier
-                        .size(40.dp)
-                        .clip(CircleShape),
-                    contentDescription = null
-                )
-            } else {
-                Image(
-                    painter = painterResource(placeHolder),
-                    modifier= Modifier.size(40.dp),
-                    contentDescription = null)
-            }
+            AsyncThumbnail(placeholder = placeHolder, imageUri = thumbUri,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
@@ -112,7 +103,7 @@ fun MediaItemViewBar(
 @Composable
 fun MediaItemViewGrid(
     isSelected : Boolean,
-    thumbnailBitmap: Bitmap?,
+    thumbUri: Uri,
     @DrawableRes placeHolder: Int?,
     title: String,
     subtitle: String,
@@ -128,40 +119,15 @@ fun MediaItemViewGrid(
             )
         ) {
             Box(modifier = Modifier) {
-                if(thumbnailBitmap != null) {
-                    Image(
-                        bitmap = thumbnailBitmap.asImageBitmap(),
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .alpha(if (isSelected) 0.5f else 1f)
-                            .height(120.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable(onClick = onViewClick),
-                        contentDescription = null)
-                } else {
-                    if(placeHolder == null) {
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .alpha(if (isSelected) 0.5f else 1f)
-                            .height(120.dp)
-                            .padding(8.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable(onClick = onViewClick))
-                    } else {
-                        Image(
-                            painterResource(placeHolder),
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .alpha(if (isSelected) 0.5f else 1f)
-                                .height(120.dp)
-                                .padding(8.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable(onClick = onViewClick),
-                            contentDescription = null)
-                    }
-                }
+                AsyncThumbnail(placeholder = placeHolder,
+                    imageUri = thumbUri,
+                    thumbnailSize = 300,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(if (isSelected) 0.5f else 1f)
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(onClick = onViewClick))
                 IconButton(onClick = onActionClick,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -211,7 +177,7 @@ private fun Preview() {
         Column {
             MediaItemViewBar(
                 isSelected = false,
-                thumbnailBitmap = null,
+                thumbUri = Uri.parse(""),
                 placeHolder = R.drawable.music_icon_small,
                 title = "Music 1",
                 subtitle = "Size 12 MB, 00:00",
@@ -221,7 +187,7 @@ private fun Preview() {
             ) {}
             MediaItemViewBar(
                 isSelected = true,
-                thumbnailBitmap = null,
+                thumbUri = Uri.parse(""),
                 placeHolder = R.drawable.music_icon_small,
                 title = "Music 2",
                 subtitle = "Size 21 MB, 00:14",
@@ -232,7 +198,7 @@ private fun Preview() {
             Row {
                 MediaItemViewGrid(
                     isSelected = true,
-                    thumbnailBitmap = null,
+                    thumbUri = Uri.parse(""),
                     placeHolder = R.drawable.music_icon_small,
                     title = "Music 2",
                     subtitle = "00:14",
@@ -242,7 +208,7 @@ private fun Preview() {
                 ) {}
                 MediaItemViewGrid(
                     isSelected = false,
-                    thumbnailBitmap = null,
+                    thumbUri = Uri.parse(""),
                     placeHolder = R.drawable.music_icon_small,
                     title = "",
                     subtitle = "05:30",

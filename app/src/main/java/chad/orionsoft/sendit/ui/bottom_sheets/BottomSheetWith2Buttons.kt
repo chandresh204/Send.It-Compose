@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.ui.bottom_sheets
 
-import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,7 +48,8 @@ fun BottomSheetWith2Buttons(
             onDismiss()
         }
     }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+    ModalBottomSheet(onDismissRequest = onDismiss,
+        sheetState = sheetState) {
         Column(modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
