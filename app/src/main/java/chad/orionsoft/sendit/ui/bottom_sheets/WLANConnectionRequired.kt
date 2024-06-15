@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +27,10 @@ fun WLANConnectionRequiredBottomSheet(
     createNetworkClick: () -> Unit
 ) {
     // TODO add cancel button and
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    val sheetState = rememberModalBottomSheetState(
+        confirmValueChange = { false }
+    )
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(Constants.DIALOG_PADDING.dp)
         ) {

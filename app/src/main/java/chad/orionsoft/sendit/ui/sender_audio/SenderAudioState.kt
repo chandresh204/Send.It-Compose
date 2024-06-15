@@ -10,7 +10,6 @@ data class SenderAudioState(
     val isSearching: Boolean = false,
     val searchedList : List<AudioUIData> = emptyList()
 )
-
 data class AudioUIData(
     val audioData: MediaAudioData,
     val selected: Boolean,

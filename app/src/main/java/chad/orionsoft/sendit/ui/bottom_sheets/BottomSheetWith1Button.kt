@@ -31,7 +31,9 @@ fun BottomSheetWith1Button(
     negativeButton: @Composable () -> Unit,
     negativeButtonClick: () -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        confirmValueChange = {false}
+    )
     val coroutineScope = rememberCoroutineScope()
     val hideAndCloseSheet = {
         coroutineScope.launch {

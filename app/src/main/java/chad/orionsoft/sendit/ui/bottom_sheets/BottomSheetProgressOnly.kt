@@ -18,7 +18,9 @@ import chad.orionsoft.sendit.utils.Constants
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetProgressOnly(title: String, progress:Float? = null) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        confirmValueChange = {false}
+    )
     ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
         Column(modifier = Modifier
             .fillMaxWidth()

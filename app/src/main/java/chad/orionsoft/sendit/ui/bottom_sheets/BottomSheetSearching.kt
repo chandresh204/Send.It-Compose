@@ -39,7 +39,9 @@ fun BottomSheetSearching(title:String,
                          searched: List<String>,
                          onReceiverSelected: (String) -> Unit,
                          onDismiss: () -> Unit) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        confirmValueChange = {false}
+    )
     val coroutineScope = rememberCoroutineScope()
     val hideAndCloseSheet : (() -> Unit) -> Unit= { action ->
         coroutineScope.launch {
