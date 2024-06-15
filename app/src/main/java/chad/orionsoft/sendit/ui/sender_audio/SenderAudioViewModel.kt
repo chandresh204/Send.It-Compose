@@ -3,6 +3,7 @@ package chad.orionsoft.sendit.ui.sender_audio
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.repository.MediaRepository
+import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SenderAudioViewModel @Inject constructor(
-    private val mediaRepository: MediaRepository,
+    mediaRepository: MediaRepository,
 ) : ViewModel() {
 
     private val _avState = MutableStateFlow(SenderAudioState())
@@ -21,12 +22,47 @@ class SenderAudioViewModel @Inject constructor(
     private val tag = "SenderAudioViewModel"
 
     init {
+        val fullList = mediaRepository.generateAudioList().map { data ->
+            AudioUIData(data, false)
+        }
         _avState.update {
             it.copy(
-                audioList = mediaRepository.generateAudioList().map { data ->
-                    AudioUIData(data, false)
-                }
+                audioList = fullList
             )
+        }
+        sortTheList(avState.value.selectedSortOrder)
+    }
+
+    private fun sortTheList(sortOrder: SortOrder) {
+        val aList = when(sortOrder) {
+            SortOrder.ByName -> {
+                avState.value.audioList.sortedBy { it.audioData.title }
+
+            }
+            SortOrder.ByDate -> {
+                avState.value.audioList.sortedByDescending { it.audioData.modified }
+            }
+        }
+        _avState.update {
+            it.copy(
+                audioList = aList
+            )
+        }
+        if(avState.value.isSearching) {
+            val searchList = when(sortOrder) {
+                SortOrder.ByName -> {
+                    avState.value.searchedList.sortedBy { it.audioData.title }
+
+                }
+                SortOrder.ByDate -> {
+                    avState.value.searchedList.sortedByDescending { it.audioData.modified }
+                }
+            }
+            _avState.update {
+                it.copy(
+                    searchedList = searchList
+                )
+            }
         }
     }
 
@@ -43,7 +79,14 @@ class SenderAudioViewModel @Inject constructor(
             is SenderAudioEvent.OnSelectAll -> {
                 selectAll()
             }
-            is SenderAudioEvent.OnSortingChangeClicked -> TODO()
+            is SenderAudioEvent.OnSortingChanged -> {
+                _avState.update {
+                    it.copy(
+                        selectedSortOrder = event.newSort
+                    )
+                }
+                sortTheList(event.newSort)
+            }
             is SenderAudioEvent.OnSearch -> {
                 // TODO improve performance by ignoring quick text changes
                 if(event.query == null) {

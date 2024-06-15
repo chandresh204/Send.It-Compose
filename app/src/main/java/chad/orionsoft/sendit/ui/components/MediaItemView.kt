@@ -42,6 +42,7 @@ import chad.orionsoft.sendit.utils.Constants
 
 @Composable
 fun MediaItemViewBar(
+    modifier: Modifier,
     isSelected : Boolean,
     thumbUri: Uri,
     @DrawableRes placeHolder: Int,
@@ -52,7 +53,7 @@ fun MediaItemViewBar(
     onActionClick: () -> Unit,
     onViewClick:() -> Unit
 ) {
-    Card(modifier = Modifier
+    Card(modifier = modifier
         .fillMaxWidth()
         .padding(
             horizontal = Constants.PAGE_PADDING.dp,
@@ -99,6 +100,7 @@ fun MediaItemViewBar(
 
 @Composable
 fun MediaItemViewGrid(
+    modifier: Modifier = Modifier,
     isSelected : Boolean,
     thumbUri: Uri,
     @DrawableRes placeHolder: Int?,
@@ -109,7 +111,7 @@ fun MediaItemViewGrid(
     onActionClick: () -> Unit,
     onViewClick:() -> Unit
 ) {
-    Column(modifier = Modifier.padding(4.dp)) {
+    Column(modifier = modifier.padding(4.dp)) {
         Card(
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 5.dp
@@ -173,6 +175,7 @@ private fun Preview() {
     SendItTheme {
         Column {
             MediaItemViewBar(
+                Modifier,
                 isSelected = false,
                 thumbUri = Uri.parse(""),
                 placeHolder = R.drawable.music_icon_small,
@@ -183,6 +186,7 @@ private fun Preview() {
                 onActionClick = {}
             ) {}
             MediaItemViewBar(
+                Modifier,
                 isSelected = true,
                 thumbUri = Uri.parse(""),
                 placeHolder = R.drawable.music_icon_small,
@@ -194,6 +198,7 @@ private fun Preview() {
             ) {}
             Row {
                 MediaItemViewGrid(
+                    Modifier,
                     isSelected = true,
                     thumbUri = Uri.parse(""),
                     placeHolder = R.drawable.music_icon_small,
@@ -204,6 +209,7 @@ private fun Preview() {
                     onActionClick = {}
                 ) {}
                 MediaItemViewGrid(
+                    Modifier,
                     isSelected = false,
                     thumbUri = Uri.parse(""),
                     placeHolder = R.drawable.music_icon_small,

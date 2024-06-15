@@ -105,11 +105,6 @@ private fun SelectionItem(isSelected: Boolean, text: String, onSelect: () -> Uni
     }
 }
 
-data class OptionData(
-    val id: Int,
-    val label: String
-)
-
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {

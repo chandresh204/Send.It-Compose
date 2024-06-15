@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.sender_audio
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,20 +13,30 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.ui.bottom_sheets.OptionSelectBottomSheet
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
 import chad.orionsoft.sendit.ui.components.DropDownMenuData
 import chad.orionsoft.sendit.ui.components.MediaItemViewBar
+import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Converters
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SenderAudio(onBack: () -> Unit) {
 
     val vModel = hiltViewModel<SenderAudioViewModel>()
     val uiState by vModel.avState.collectAsState()
+
+    var isSortingChangeRequest by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(topBar = {
         AppBarWithMessage(
@@ -42,9 +53,10 @@ fun SenderAudio(onBack: () -> Unit) {
                     vModel.onEvent(SenderAudioEvent.OnClearAllSelection)
                 },
                 DropDownMenuData(Icons.Default.List, "Sort By") {
-                    vModel.onEvent(SenderAudioEvent.OnSortingChangeClicked)
-            }
-        ),
+// vModel.onEvent(SenderAudioEvent.OnSortingChangeClicked)
+                    isSortingChangeRequest = true
+                }
+            ),
             onEnteredInSearchMode = {
                 vModel.onEvent(SenderAudioEvent.OnSearch(""))
             },
@@ -65,6 +77,7 @@ fun SenderAudio(onBack: () -> Unit) {
                 audData.audioData.id
             }) { aud ->
                 MediaItemViewBar(
+                    modifier = Modifier.animateItemPlacement(),
                     isSelected = aud.selected,
                     thumbUri = aud.audioData.albumArt,
                     placeHolder = R.drawable.music_icon_small,
@@ -76,6 +89,18 @@ fun SenderAudio(onBack: () -> Unit) {
                     onActionClick = {  }) {
                     vModel.onEvent(SenderAudioEvent.OnSelectClick(aud.audioData.id))
                 }
+            }
+        }
+
+        if(isSortingChangeRequest) {
+            OptionSelectBottomSheet(
+                title = stringResource(R.string.change_sort_order),
+                options = SortOrder.entries,
+                selectedOption = uiState.selectedSortOrder,
+                onSelectOption = { order ->
+                    vModel.onEvent(SenderAudioEvent.OnSortingChanged(order))
+                }) {
+                isSortingChangeRequest = false
             }
         }
     }

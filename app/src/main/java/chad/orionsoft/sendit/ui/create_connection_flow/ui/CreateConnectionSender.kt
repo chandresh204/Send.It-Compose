@@ -50,7 +50,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
 
         ConnectStep.CheckIsWLAN -> {
             val context = LocalContext.current
-            WLANConnectionRequiredBottomSheet({}, {
+            WLANConnectionRequiredBottomSheet(onFinish, {
                 StartActivity.openWifiSettings(context)
             }) {
                 StartActivity.openTetherSettings(context)

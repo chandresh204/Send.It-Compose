@@ -41,7 +41,7 @@ fun CreateConnectionReceiver(onFinish : (Boolean) -> Unit) {
             WLANConnectionRequiredBottomSheet(
                 onDismiss = {  },
                 connectToWifiClick = { }) {
-
+                onFinish(false)
             }
         }
 

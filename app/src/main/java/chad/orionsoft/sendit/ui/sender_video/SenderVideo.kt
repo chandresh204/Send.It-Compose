@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.sender_video
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -13,21 +14,31 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.ui.bottom_sheets.OptionSelectBottomSheet
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
 import chad.orionsoft.sendit.ui.components.DropDownMenuData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
+import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Converters
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SenderVideo(onBack: () -> Unit) {
 
     val vModel = hiltViewModel<SenderVideoViewModel>()
     val uiState by vModel.avState.collectAsState()
+
+    var isSortingChangeRequest by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(topBar = {
         AppBarWithMessage(
@@ -44,9 +55,9 @@ fun SenderVideo(onBack: () -> Unit) {
                     vModel.onEvent(SenderVideoEvent.OnClearAllSelection)
                 },
                 DropDownMenuData(Icons.Default.List, "Sort By") {
-                    vModel.onEvent(SenderVideoEvent.OnSortingChangeClicked)
+                    isSortingChangeRequest = true
                 }
-        ),
+            ),
             onEnteredInSearchMode = {
                 vModel.onEvent(SenderVideoEvent.OnSearch(""))
             },
@@ -67,6 +78,7 @@ fun SenderVideo(onBack: () -> Unit) {
                 vidData.videoData.id
             }) { vid ->
                 MediaItemViewGrid(
+                    modifier = Modifier.animateItemPlacement(),
                     isSelected = vid.selected,
                     thumbUri = vid.videoData.uri,
                     placeHolder = R.drawable.video_icon_small,
@@ -78,6 +90,17 @@ fun SenderVideo(onBack: () -> Unit) {
                     onActionClick = {  }) {
                     vModel.onEvent(SenderVideoEvent.OnSelectClick(vid.videoData.id))
                 }
+            }
+        }
+        if(isSortingChangeRequest) {
+            OptionSelectBottomSheet(
+                title = stringResource(R.string.change_sort_order),
+                options = SortOrder.entries,
+                selectedOption = uiState.selectedSortOrder,
+                onSelectOption = { order ->
+                    vModel.onEvent(SenderVideoEvent.OnSortingChanged(order))
+                }) {
+                isSortingChangeRequest = false
             }
         }
     }

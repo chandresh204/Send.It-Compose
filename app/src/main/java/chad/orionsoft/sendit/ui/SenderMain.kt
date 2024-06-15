@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
-import chad.orionsoft.sendit.ui.bottom_sheets.WLANConnectionRequiredBottomSheet
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
 import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionSender
 import chad.orionsoft.sendit.utils.NavigationConstants

@@ -3,6 +3,7 @@ package chad.orionsoft.sendit.ui.sender_video
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.repository.MediaRepository
+import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SenderVideoViewModel @Inject constructor(
-    private val mediaRepository: MediaRepository
+    mediaRepository: MediaRepository
 ) : ViewModel() {
 
     private val _avState = MutableStateFlow(SenderVideoState())
@@ -21,12 +22,47 @@ class SenderVideoViewModel @Inject constructor(
     private val tag = "SenderVideoViewModel"
 
     init {
+        val fullList = mediaRepository.generateVideoList().map { data ->
+            VideoUiData(data, false)
+        }
         _avState.update {
             it.copy(
-                videoList = mediaRepository.generateVideoList().map { data ->
-                    VideoUiData(data, false)
-                }
+                videoList = fullList
             )
+        }
+        sortTheList(avState.value.selectedSortOrder)
+    }
+
+    private fun sortTheList(sortOrder: SortOrder) {
+        val aList = when(sortOrder) {
+            SortOrder.ByName -> {
+                avState.value.videoList.sortedBy { it.videoData.title }
+
+            }
+            SortOrder.ByDate -> {
+                avState.value.videoList.sortedByDescending { it.videoData.lastModified }
+            }
+        }
+        _avState.update {
+            it.copy(
+                videoList = aList
+            )
+        }
+        if(avState.value.isSearching) {
+            val searchList = when(sortOrder) {
+                SortOrder.ByName -> {
+                    avState.value.searchedList.sortedBy { it.videoData.title }
+
+                }
+                SortOrder.ByDate -> {
+                    avState.value.searchedList.sortedByDescending { it.videoData.lastModified }
+                }
+            }
+            _avState.update {
+                it.copy(
+                    searchedList = searchList
+                )
+            }
         }
     }
 
@@ -43,7 +79,14 @@ class SenderVideoViewModel @Inject constructor(
             SenderVideoEvent.OnSelectAll -> {
                 selectAll()
             }
-            SenderVideoEvent.OnSortingChangeClicked -> TODO()
+            is SenderVideoEvent.OnSortingChanged -> {
+                _avState.update {
+                    it.copy(
+                        selectedSortOrder = event.sortOrder
+                    )
+                }
+                sortTheList(event.sortOrder)
+            }
             is SenderVideoEvent.OnSearch ->  {
                 // TODO improve performance by ignoring quick text changes
                 if(event.query == null) {

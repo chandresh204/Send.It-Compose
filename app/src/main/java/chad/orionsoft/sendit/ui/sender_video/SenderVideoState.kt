@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui.sender_video
 
 import chad.orionsoft.sendit.model.MediaVideoData
+import chad.orionsoft.sendit.ui.model.SortOrder
 
 data class SenderVideoState(
     val videoList : List<VideoUiData> = emptyList(),
@@ -8,7 +9,8 @@ data class SenderVideoState(
     val selectedSize: Long =0,
     val isSearching: Boolean = false,
     val searchedList: List<VideoUiData> = emptyList(),
-    val selectedSizeToDisplay: String = "0 B"
+    val selectedSizeToDisplay: String = "0 B",
+    val selectedSortOrder: SortOrder = SortOrder.ByDate
 )
 
 data class VideoUiData(
