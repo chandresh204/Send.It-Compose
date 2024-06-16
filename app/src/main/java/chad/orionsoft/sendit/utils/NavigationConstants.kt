@@ -12,4 +12,7 @@ object NavigationConstants {
     const val NAV_SENDER_AUDIO = "senderAudio"
     const val NAV_SENDER_VIDEO = "senderVideo"
     const val NAV_SENDER_FILES_SELECT = "senderFilesSelect"
+
+    // arguments
+    const val FULL_SCREEN_IMG_URI = "fullScreenImageUri"
 }

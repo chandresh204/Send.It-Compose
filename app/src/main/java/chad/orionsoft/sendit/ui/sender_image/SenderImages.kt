@@ -20,6 +20,8 @@ import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
 import chad.orionsoft.sendit.ui.components.DropDownMenuData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
+import chad.orionsoft.sendit.utils.Converters
+import org.json.JSONObject
 
 @Composable
 fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onBack: () -> Unit) {
@@ -62,11 +64,12 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onBack: () -> Uni
                     actionIconVector = null,
                     actionIconDrawableRes = R.drawable.eye_icon_small,
                     onActionClick = {
-                        viewFullScreen(img.imageData.uri.path ?: "")
+                        viewFullScreen(Converters.encodeUriPath(img.imageData.uri.path.toString()))
                     }) {
                     vModel.onEvent(SenderImagesEvent.OnSelectClick(img.imageData.id))
                 }
             }
         }
     }
+
 }

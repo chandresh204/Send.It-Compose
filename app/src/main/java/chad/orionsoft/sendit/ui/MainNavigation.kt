@@ -1,14 +1,20 @@
 package chad.orionsoft.sendit.ui
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavArgs
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
 import chad.orionsoft.sendit.ui.sender_audio.SenderAudio
+import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
 import chad.orionsoft.sendit.ui.sender_video.SenderVideo
 import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
+import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
 
 @Composable
@@ -42,14 +48,22 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_SENDER_IMAGES) {
-            SenderImagesScreen({
-                navController.navigate(NavigationConstants.NAV_FULL_SCREEN_IMAGE)
+            SenderImagesScreen({ pathInJson ->
+                val route1 = NavigationConstants.NAV_FULL_SCREEN_IMAGE + "/$pathInJson"
+                navController.navigate(route1)
             }) {
                 navController.popBackStack()
             }
         }
-        composable(NavigationConstants.NAV_FULL_SCREEN_IMAGE) {
-            FullScreenImage()
+        composable(
+            route = NavigationConstants.NAV_FULL_SCREEN_IMAGE + "/{${NavigationConstants.FULL_SCREEN_IMG_URI}}",
+            arguments = listOf( navArgument(NavigationConstants.FULL_SCREEN_IMG_URI) {
+                type = NavType.StringType
+            })
+        ) {
+            val arg = it.arguments?.getString(NavigationConstants.FULL_SCREEN_IMG_URI)
+            val decodedPath = Converters.decodeUriPath(arg ?: "")
+            FullScreenImage(decodedPath)
         }
         composable(NavigationConstants.NAV_SENDER_AUDIO) {
             SenderAudio {

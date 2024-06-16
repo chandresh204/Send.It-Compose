@@ -43,7 +43,6 @@ fun AsyncThumbnail(modifier: Modifier = Modifier,
                 loadedBitmap = context.contentResolver.loadThumbnail(
                     imageUri, Size(thumbnailSize,thumbnailSize), null)
             }
-            Log.d("AsyncThumbnail", "loaded for: $imageUri")
         } catch (e: Exception) {
             Log.e("AsyncThumbnail", "$e")
         }

@@ -1,5 +1,9 @@
 package chad.orionsoft.sendit.utils
 
+import org.json.JSONObject
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.util.Calendar
 import java.util.Formatter
 import kotlin.math.roundToLong
@@ -43,4 +47,14 @@ object Converters {
             formatter.format("%tM:%tS", cal, cal).toString()
         }
     }
+
+    fun convertPathInJson(path: String) : JSONObject {
+        val jObject = JSONObject()
+        jObject.put("path", path)
+        return jObject
+    }
+
+    fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
+
+    fun decodeUriPath(encoded: String) : String = URLDecoder.decode(encoded, StandardCharsets.UTF_8.toString())
 }
