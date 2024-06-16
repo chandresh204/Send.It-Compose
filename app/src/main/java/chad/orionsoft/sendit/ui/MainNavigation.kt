@@ -1,8 +1,6 @@
 package chad.orionsoft.sendit.ui
 
-import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavArgs
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable

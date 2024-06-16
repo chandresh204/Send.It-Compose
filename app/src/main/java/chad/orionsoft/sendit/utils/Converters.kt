@@ -48,12 +48,6 @@ object Converters {
         }
     }
 
-    fun convertPathInJson(path: String) : JSONObject {
-        val jObject = JSONObject()
-        jObject.put("path", path)
-        return jObject
-    }
-
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
 
     fun decodeUriPath(encoded: String) : String = URLDecoder.decode(encoded, StandardCharsets.UTF_8.toString())

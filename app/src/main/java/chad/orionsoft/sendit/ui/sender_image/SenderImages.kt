@@ -21,7 +21,6 @@ import chad.orionsoft.sendit.ui.components.AppBarWithMessage
 import chad.orionsoft.sendit.ui.components.DropDownMenuData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
 import chad.orionsoft.sendit.utils.Converters
-import org.json.JSONObject
 
 @Composable
 fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onBack: () -> Unit) {
