@@ -8,7 +8,6 @@ import chad.orionsoft.sendit.domain.UDPOperations
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCSenderEvent
 import chad.orionsoft.sendit.ui.create_connection_flow.state.CCSenderState
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ConnectStep
-import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

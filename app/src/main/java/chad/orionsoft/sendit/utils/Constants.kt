@@ -9,5 +9,4 @@ object Constants {
     const val APP_CODE="sendit004"
     const val SEARCH_CODE = "Searching"
     const val RECEIVER_PORT = 4444
-    const val TEST_CONNECTION_TIMEOUT = 100
 }
