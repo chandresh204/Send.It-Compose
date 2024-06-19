@@ -47,6 +47,7 @@ class CCSenderViewModel @Inject constructor(
             networkObserver.wlanChangeReceiver.collect { isOnWLAN ->
                 isOnWlan = isOnWLAN
                 if(isOnWlan && ccSenderState.value.currentStep == ConnectStep.CheckIsWLAN) {
+                    startSearchingReceiver()
                     _ccSenderState.update {
                         it.copy(
                             currentStep = ConnectStep.SearchReceiver
@@ -117,9 +118,27 @@ class CCSenderViewModel @Inject constructor(
                 onEvent(CCSenderEvent.OnCancelProcess)
                 return@launch
             }
-            udpOperations.broadcastSearch(broadCastAddress)
+            udpOperations.broadcastSearch(broadCastAddress).collect {
+                val receiverName = extractReceiverNameFromBroadcastRes(it.response ?: "")
+                if(!ccSenderState.value.receiverList.contains(receiverName)) {
+                    val newList = ccSenderState.value.receiverList.toMutableList()
+                    newList.add(receiverName)
+                    println("broadcastResult >>> $receiverName")
+                    _ccSenderState.update {
+                        it.copy(
+                            receiverList = newList
+                        )
+                    }
+                }
+            }
             // TODO continue process
         }
+    }
+
+    private fun extractReceiverNameFromBroadcastRes(result: String) : String {
+        val startIndex = result.indexOf("/*") + 2
+        val endIndex = result.indexOf("*/")
+        return result.substring(startIndex, endIndex)
     }
 
 }

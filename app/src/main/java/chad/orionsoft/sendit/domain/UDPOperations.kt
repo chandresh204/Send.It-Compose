@@ -9,7 +9,13 @@ import chad.orionsoft.sendit.utils.Constants.RECEIVER_PORT
 import chad.orionsoft.sendit.utils.Constants.SEARCH_CODE
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -21,8 +27,13 @@ class UDPOperations @Inject constructor(
 ) {
 
     private var tag = "UDPOperation"
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     suspend fun obtainBroadcastAddress() : String? {
+        if(RuntimeConstants.BROAD_ADDR != null) {
+            println("broadcast address: ${RuntimeConstants.BROAD_ADDR}")
+            return RuntimeConstants.BROAD_ADDR
+        }
         val searchBytes = ("$APP_CODE/*$SEARCH_CODE*/").toByteArray()
         val tm = context.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         val mobDataState = tm.dataState
@@ -44,16 +55,23 @@ class UDPOperations @Inject constructor(
         return null
     }
 
-    suspend fun broadcastSearch(broadcastAddress: String) {
+    suspend fun broadcastSearch(broadcastAddress: String): Flow<UDPResponse> {
+        val channel = Channel<UDPResponse>()
         val searchBytes = ("$APP_CODE/*$SEARCH_CODE*/").toByteArray()
-        while (true) {
-            val recei = sendOnUdp(searchBytes, broadcastAddress, soTimeout = 4000)
-            Log.d(tag, "recev: $recei")
+        ioScope.launch {
+            while (true) {
+                val recei = sendOnUdp(searchBytes, broadcastAddress, soTimeout = 4000)
+                if(recei?.receiverAddress != null) {
+                    channel.send(recei)
+                    delay(2000)
+                }
+            }
         }
+        return channel.receiveAsFlow()
     }
 
     private suspend fun sendOnUdp(bytes: ByteArray, host: String, waitForResponse : Boolean = true,
-                                  soTimeout: Int = 15000, receiverPort : Int = RECEIVER_PORT) : String? {
+                                  soTimeout: Int = 15000, receiverPort : Int = RECEIVER_PORT) : UDPResponse? {
         return withContext(Dispatchers.IO) {
             try {
                 val dSocket = DatagramSocket()
@@ -62,13 +80,14 @@ class UDPOperations @Inject constructor(
                 dSocket.send(sendPacket)
                 if(waitForResponse) {
                     dSocket.soTimeout = soTimeout
-                    val buff = ByteArray(100)
+                    val buff = ByteArray(1024)
                     val receiverPacket = DatagramPacket(buff, buff.size)
                     dSocket.receive(receiverPacket)
                     val add = receiverPacket.address
-                    return@withContext add.toString()
+                    val res = String(buff,0, buff.size)
+                    return@withContext UDPResponse(add, res)
                 } else {
-                    return@withContext "Success"
+                    return@withContext UDPResponse(null, null)
                 }
             } catch (e: Exception) {
                 Log.e(tag, "Exception on UDP , host: $host --> $e")
@@ -77,3 +96,8 @@ class UDPOperations @Inject constructor(
         }
     }
 }
+
+data class UDPResponse(
+    val receiverAddress: InetAddress?,
+    val response: String?
+)
