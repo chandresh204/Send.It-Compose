@@ -34,10 +34,13 @@ class NetworkObserver @Inject constructor(
     private val tag = "NetworkObserver"
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
+    private var isWifiConnected = false
+
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         // network is available for use
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
+            isWifiConnected = true
             getBroadcastAddressOfWifi()
             ioScope.launch {
                 isWLANPossible.send(true)
@@ -48,6 +51,7 @@ class NetworkObserver @Inject constructor(
         // lost network connection
         override fun onLost(network: Network) {
             super.onLost(network)
+            isWifiConnected = false
             isOnWLAN()
             Log.d(tag, "Lost")
         }
@@ -93,7 +97,7 @@ class NetworkObserver @Inject constructor(
 
         val apStateChangeReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
-                isOnWLAN()
+                if(!isWifiConnected) isOnWLAN()
             }
         }
         context.registerReceiver(apStateChangeReceiver, IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))

@@ -58,7 +58,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
         }
 
         ConnectStep.SearchReceiver -> {
-            BottomSheetSearching(title = "Searching For Receiver", searched = uiState.receiverList,
+            BottomSheetSearching(title = "Searching For Receiver", searched = uiState.receiverListToDisplay,
                 onReceiverSelected = {
                     vModel.onEvent(CCSenderEvent.OnReceiverSelected(it))
                 }) {
@@ -68,7 +68,8 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
 
         ConnectStep.ShowConnectCode -> {
             BottomSheetShowConnectCode(title = "Connect Code",
-                subtitle = "Ask Receiver to Enter below code to connect", code = "1234", bottomLine = "") {
+                subtitle = "Ask Receiver to Enter below code to connect",
+                code = vModel.connectCode, bottomLine = "") {
                 vModel.onEvent(CCSenderEvent.OnCancelProcess)
             }
         }

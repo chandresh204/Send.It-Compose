@@ -8,6 +8,8 @@ import chad.orionsoft.sendit.domain.UDPOperations
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCSenderEvent
 import chad.orionsoft.sendit.ui.create_connection_flow.state.CCSenderState
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ConnectStep
+import chad.orionsoft.sendit.ui.create_connection_flow.state.ReceiverData
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +38,10 @@ class CCSenderViewModel @Inject constructor(
     private var isOnWlan = false
 
     private val tag = "CCSenderViewModel"
+
+    val connectCode by lazy {
+        RuntimeConstants.generateRandomCode()
+    }
 
     private val _onFinishChannel = Channel<Boolean>()
     val finishReceiver = _onFinishChannel.receiveAsFlow()
@@ -82,30 +88,39 @@ class CCSenderViewModel @Inject constructor(
             }
 
             is CCSenderEvent.OnReceiverSelected -> {
+                currentJob?.cancel("selected")
                 val isKnownReceiver = false // TODO get details from shared prefs
-                _ccSenderState.update {
-                    it.copy(
-                        currentStep = if (!isKnownReceiver) ConnectStep.ShowConnectCode
-                        else ConnectStep.FinalHandshake,
-                        selectedReceiver = event.name
-                    )
-                }
-
-
                 ioScope.launch {
-                    delay(5000)
-                    _ccSenderState.update {
-                        it.copy(
-                            currentStep = ConnectStep.FinalHandshake,
-                        )
+                    val selectedReceiver = ccSenderState.value.receiverList.find {
+                        it.name == event.name
                     }
-                    delay(5000)
-                    _ccSenderState.update {
-                        it.copy(
-                            currentStep = ConnectStep.Connected,
-                        )
+                    selectedReceiver?.let { receiver ->
+                        _ccSenderState.update {
+                            it.copy(
+                                currentStep = if (!isKnownReceiver) ConnectStep.ShowConnectCode
+                                else ConnectStep.FinalHandshake,
+                                selectedReceiver = selectedReceiver
+                            )
+                        }
+                        udpOperations.receiverHandshake(receiver.address)
                     }
+
                 }
+
+//                ioScope.launch {
+//                    delay(5000)
+//                    _ccSenderState.update {
+//                        it.copy(
+//                            currentStep = ConnectStep.FinalHandshake,
+//                        )
+//                    }
+//                    delay(5000)
+//                    _ccSenderState.update {
+//                        it.copy(
+//                            currentStep = ConnectStep.Connected,
+//                        )
+//                    }
+//                }
             }
         }
     }
@@ -120,13 +135,18 @@ class CCSenderViewModel @Inject constructor(
             }
             udpOperations.broadcastSearch(broadCastAddress).collect {
                 val receiverName = extractReceiverNameFromBroadcastRes(it.response ?: "")
-                if(!ccSenderState.value.receiverList.contains(receiverName)) {
+                if(ccSenderState.value.receiverList.find {  recvData ->
+                    recvData.name == receiverName } == null ) {
                     val newList = ccSenderState.value.receiverList.toMutableList()
-                    newList.add(receiverName)
+                    newList.add(ReceiverData(it.receiverAddress,receiverName))
+                    val displayList = newList.map {  receiver ->
+                        receiver.name
+                    }
                     println("broadcastResult >>> $receiverName")
-                    _ccSenderState.update {
-                        it.copy(
-                            receiverList = newList
+                    _ccSenderState.update { state ->
+                        state.copy(
+                            receiverList = newList,
+                            receiverListToDisplay = displayList
                         )
                     }
                 }
