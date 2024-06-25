@@ -20,6 +20,7 @@ import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCSenderEvent
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ConnectStep
 import chad.orionsoft.sendit.ui.create_connection_flow.view_model.CCSenderViewModel
+import chad.orionsoft.sendit.utils.RuntimeConstants
 
 @Composable
 fun CreateConnectionSender(onFinish: () -> Unit) {
@@ -59,7 +60,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
 
         ConnectStep.SearchReceiver -> {
             BottomSheetSearching(title = "Searching For Receiver", searched = uiState.receiverListToDisplay,
-                onReceiverSelected = {
+                onOptionSelected = {
                     vModel.onEvent(CCSenderEvent.OnReceiverSelected(it))
                 }) {
                 vModel.onEvent(CCSenderEvent.OnCancelProcess)
@@ -74,18 +75,27 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
             }
         }
         ConnectStep.FinalHandshake -> {
-            BottomSheetProgressOnly(title = "Connecting to ${uiState.selectedReceiver}")
+            BottomSheetProgressOnly(title = "Connecting to ${RuntimeConstants.receiverDetails?.name}")
         }
 
         ConnectStep.Connected -> {
             BottomSheetWith1Button(
-                title = "Connected to ${uiState.selectedReceiver}",
+                title = "Connected to ${RuntimeConstants.receiverDetails?.name}",
                 subtitle = "",
                 negativeButton = {
                                  TextWithIcon(Icons.Default.Check, text = "Done")
                 }) {
                 vModel.onEvent(CCSenderEvent.OnCancelProcess)
             }
+        }
+
+        ConnectStep.Error -> {
+            BottomSheetWith1Button(
+                title = "An Error Occurred",
+                subtitle = "",
+                negativeButton = {
+                    TextWithIcon(Icons.Default.Close, text = "Close")
+                }, { onFinish() })
         }
     }
 

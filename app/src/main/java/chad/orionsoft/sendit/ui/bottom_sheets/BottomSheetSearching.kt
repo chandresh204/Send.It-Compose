@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun BottomSheetSearching(title:String,
                          searched: List<String>,
-                         onReceiverSelected: (String) -> Unit,
+                         onOptionSelected: (String) -> Unit,
                          onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(
         confirmValueChange = {false}
@@ -71,7 +71,7 @@ fun BottomSheetSearching(title:String,
             LazyColumn {
                 items(searched) {
                     SearchedItem(it) {
-                        hideAndCloseSheet { onReceiverSelected(it) }
+                        hideAndCloseSheet { onOptionSelected(it) }
                     }
                 }
             }

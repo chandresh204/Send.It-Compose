@@ -2,7 +2,7 @@ package chad.orionsoft.sendit.utils
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import java.net.InetAddress
+import chad.orionsoft.sendit.ui.create_connection_flow.state.ReceiverData
 import kotlin.random.Random
 
 object RuntimeConstants {
@@ -12,7 +12,7 @@ object RuntimeConstants {
 
     var BROAD_ADDR : String? = null
 
-    var receiverAddress : InetAddress? = null
+    var receiverDetails : ReceiverData? = null
 
     fun generateRandomCode() : String {
         val code1= Random.nextInt(10)

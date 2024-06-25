@@ -1,0 +1,21 @@
+repeat {
+s1 -> obtain broadcast address
+s2 -> send broadcast repeadly
+s3 -> collect available receiver
+on receiver select, break this loop
+}
+s4 -> send select signal , send username in connect details
+s5 -> receive device info from receiver,
+delay for some time
+s6 -> check if the receiver is known or unknown or not supported, note the new port adress for communication,
+if known receiver {
+s7_a1 -> send connect ok code 
+s7_a2 -> receive free space, note receiver details (FINISH HERE) 
+}
+if unknown receiver {
+s7_b1 -> generate random code, send enter code request
+s7_b2 -> receive entered code
+s7_b3 -> check received code and reply whatever the result, i.e. true/ false
+s7_b4 -> if code was right, receive free space in reply (FINISH SUCCESS).
+	else code was wrong, show error and close
+}

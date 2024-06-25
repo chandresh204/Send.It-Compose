@@ -1,0 +1,21 @@
+repeat {
+r1 -> keep receiving on default port
+	if received a broadcast then
+	r2 -> reply any received broadcast from sender
+	else if received a next signal
+	exit the loop, process received signal in r3
+}
+r3 -> create a new random port for next process and send device info as reply of next
+signal received in previous step device info includes: uniqueId, newPort, appVersion
+repeat {
+r4 -> start receiving on new port
+	if received connect ok signal
+	r5_a1 -> send connect ok with free space, note sender details , break loop (FINISH HERE)
+	if received enter code signal
+	r5_a2 -> enter the code and send in reply, wait back in step r4
+	
+	if received enter code answer signal
+	r5_a3 -> if received right , break loop (FINISH SUCCESS)
+		else show error and close
+}	
+
