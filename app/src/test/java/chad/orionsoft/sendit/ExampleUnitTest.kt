@@ -1,8 +1,6 @@
 package chad.orionsoft.sendit
 
 import org.junit.Test
-
-import org.junit.Assert.*
 import kotlin.random.Random
 
 /**
