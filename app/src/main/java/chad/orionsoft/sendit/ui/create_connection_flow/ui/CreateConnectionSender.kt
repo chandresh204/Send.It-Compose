@@ -8,7 +8,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetProgressOnly
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetSearching
@@ -27,6 +29,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
 
     val vModel = hiltViewModel<CCSenderViewModel>()
     val uiState by vModel.ccSenderState.collectAsState()
+    val receiverDetails = vModel.receiverDetails
 
     LaunchedEffect(true) {
         vModel.finishReceiver.collect {
@@ -75,12 +78,12 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
             }
         }
         ConnectStep.FinalHandshake -> {
-            BottomSheetProgressOnly(title = "Connecting to ${RuntimeConstants.receiverDetails?.name}")
+            BottomSheetProgressOnly(title = "Connecting to ${receiverDetails?.name}")
         }
 
         ConnectStep.Connected -> {
             BottomSheetWith1Button(
-                title = "Connected to ${RuntimeConstants.receiverDetails?.name}",
+                title = "Connected to ${receiverDetails?.name}",
                 subtitle = "",
                 negativeButton = {
                                  TextWithIcon(Icons.Default.Check, text = "Done")
@@ -91,7 +94,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
 
         ConnectStep.Error -> {
             BottomSheetWith1Button(
-                title = "An Error Occurred",
+                title = uiState.error ?: stringResource(R.string.an_error_occurred),
                 subtitle = "",
                 negativeButton = {
                     TextWithIcon(Icons.Default.Close, text = "Close")

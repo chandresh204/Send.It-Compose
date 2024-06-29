@@ -6,6 +6,7 @@ object Constants {
     const val DIALOG_PADDING = 8
     const val DIALOG_CORNER = 24
     const val DEFAULT_BROADCAST_PORT= 4444
+    const val ENTER_CODE_TIME_OUT = 30 // seconds
 
 //    const val APP_CODE = "zôrC*jìéHÊ3mFF¾4ÕúëHXåÐ"
 
@@ -19,7 +20,7 @@ object Constants {
 
     // receiver code
     // BROADCAST_REPLY = "$BROADCAST_MSG/*$receiverName*/" -- for info only, do not delete
-    // DEVICE_INFO_REPLY = "$RECEIVER_SELECT_MESSAGE/*uniqueId*/newport#appVersion" -- for info only, do not delete
+    // DEVICE_INFO_REPLY = "$RECEIVER_SELECT_MESSAGE/*uniqueId*/newport#appVersion!%freeSpace" -- for info only, do not delete
     // FREE_SPACE_SIGNAL = "$CONNECT_NOW/*freeSpace*/"  -- for info only, do not delete
     // ENTER_CODE_REPLY = "$ENTER_CODE_SIGNAL/*code*/" -- for info only, do not delete
 

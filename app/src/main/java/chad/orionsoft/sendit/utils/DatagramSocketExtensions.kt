@@ -29,29 +29,33 @@ object DatagramSocketExtensions {
         msg: String,
         toAddress: InetAddress,
         toPort: Int,
-        waitForResponse: Boolean = true
+        waitForResponse: Boolean = true,
+        soTimeout1 : Int = 10000,
+        retryCount : Int = 2
     ): UDPResponse {
         val payload = msg.toByteArray()
         Log.d("DatagramSocket", "sending: $msg")
-        return try {
+        val res: UDPResponse
+        try {
             val sendPacket = DatagramPacket(payload, payload.size, toAddress, toPort)
             this.send(sendPacket)
             if (waitForResponse) {
-                this.soTimeout = soTimeout
+                this.soTimeout = soTimeout1
                 val buff = ByteArray(1024)
                 val receiverPacket = DatagramPacket(buff, buff.size)
                 this.receive(receiverPacket)
                 val add = receiverPacket.address
                 val port = receiverPacket.port
-                val res = String(buff, 0, receiverPacket.length)
-                Log.d("DatagramSocket", "reply: $res --> $msg")
-                return UDPResponse(true, add, port, res)
+                val res1 = String(buff, 0, receiverPacket.length)
+                Log.d("DatagramSocket", "reply: $res1 --> $msg")
+                return UDPResponse(true, add, port, res1)
             }
             Log.d("DatagramSocket", "sent --> $msg")
-            UDPResponse(true, InetAddress.getLocalHost(), -1, "sent successfully")
+            return UDPResponse(true, InetAddress.getLocalHost(), -1, "sent successfully")
         } catch (e: Exception) {
             Log.e("DatagramSocket", "exception during send $e")
-            UDPResponse(false, InetAddress.getLocalHost(), -1, "error: $e")
+            res = UDPResponse(false, InetAddress.getLocalHost(), -1, "error: $e")
         }
+        return res
     }
 }

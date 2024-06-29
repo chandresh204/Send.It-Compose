@@ -2,6 +2,7 @@ package chad.orionsoft.sendit.ui.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +34,7 @@ import chad.orionsoft.sendit.utils.Constants
 fun EnterValueDialog(
     title: String,
     subtitle: String,
+    timerValue: Int,
     onCodeSubmit: (String) -> Unit,
     onDismiss: () -> Unit) {
     var codeStr by remember {
@@ -71,10 +73,16 @@ fun EnterValueDialog(
                         keyboardType = KeyboardType.Phone
                     ),
                 )
-                Button(onClick = {
-                    onCodeSubmit(codeStr)
-                }) {
-                    Text(text = "Submit")
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                    Button(onClick = {
+                        onCodeSubmit(codeStr)
+                    }) {
+                        Text(text = "Submit")
+                    }
+                    if(timerValue > 0) {
+                        Text(text = "In $timerValue Sec")
+                    }
                 }
             }
         }
@@ -85,6 +93,6 @@ fun EnterValueDialog(
 @Composable
 private fun Preview() {
     SendItTheme {
-        EnterValueDialog("Add Code", "to Connect", {}) {}
+        EnterValueDialog("Add Code", "to Connect", 15 ,{}) {}
     }
 }

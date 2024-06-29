@@ -8,7 +8,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetProgressOnly
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetSearching
@@ -25,6 +27,7 @@ fun CreateConnectionReceiver(onFinish : (Boolean) -> Unit) {
 
     val vModel = hiltViewModel<CCReceiverViewModel>()
     val uiState by vModel.receiverState.collectAsState()
+    val senderDetails = vModel.senderDetails
 
     LaunchedEffect(true) {
         vModel.finishReceiver.collect {
@@ -36,7 +39,7 @@ fun CreateConnectionReceiver(onFinish : (Boolean) -> Unit) {
         ReceiverConnectStep.Waiting -> {
             BottomSheetSearching(title = "Waiting for sender",
                 searched = emptyList(), onOptionSelected = {}) {
-                onFinish(false)
+                vModel.onEvent(CCReceiverEvent.OnCancelSearch)
             }
         }
 
@@ -52,27 +55,40 @@ fun CreateConnectionReceiver(onFinish : (Boolean) -> Unit) {
         ReceiverConnectStep.EnterCode -> {
             EnterValueDialog(
                 title = "Enter Code",
-                subtitle = "Enter Code Receive file form ${uiState.senderData?.name}", onCodeSubmit = {
+                subtitle = "Enter Code Receive file form ${senderDetails?.name}",
+                timerValue = uiState.enterCodeTimer ?: -1,
+                onCodeSubmit = {
                     vModel.onEvent(CCReceiverEvent.OnCodeEntered(it))
                 }) {
 
             }
         }
         ReceiverConnectStep.FinalHandshake -> {
-            BottomSheetProgressOnly(title = "Connecting to ${uiState.senderData?.name}")
+            BottomSheetProgressOnly(title = "Connecting to ${senderDetails?.name}")
         }
         ReceiverConnectStep.Connected -> {
             BottomSheetWith1Button(
-                title = "Connected to ${uiState.senderData?.name}",
+                title = "Connected to ${senderDetails?.name}",
                 subtitle = "",
                 negativeButton = {
                     TextWithIcon(Icons.Default.Check, text = "Done")
-                }) {}
+                }) {
+                onFinish(true)
+            }
         }
 
         ReceiverConnectStep.Error -> {
             BottomSheetWith1Button(
-                title = "An Error Occurred",
+                title = uiState.error ?: stringResource(R.string.an_error_occurred),
+                subtitle = "",
+                negativeButton = {
+                    TextWithIcon(Icons.Default.Close, text = "Close")
+                }, { onFinish(false) })
+        }
+
+        ReceiverConnectStep.EnterCodeResult -> {
+            BottomSheetWith1Button(
+                title = "Entered Code result",
                 subtitle = "",
                 negativeButton = {
                     TextWithIcon(Icons.Default.Close, text = "Close")

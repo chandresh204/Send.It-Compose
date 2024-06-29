@@ -6,6 +6,7 @@ data class CCSenderState(
     val currentStep : ConnectStep = ConnectStep.AskToConnect,
     val receiverList : List<ReceiverData> = emptyList(),
     val receiverListToDisplay : List<String> = emptyList(),
+    val error: String? = null
 )
 
 data class ReceiverData(

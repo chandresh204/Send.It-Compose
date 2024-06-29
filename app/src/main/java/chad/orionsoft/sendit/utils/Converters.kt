@@ -47,6 +47,12 @@ object Converters {
         }
     }
 
+    fun extractDataInNormalCase(response: String) : String {
+        val startIndex = response.indexOf("/*") + 2
+        val endIndex = response.indexOf("*/")
+        return response.substring(startIndex, endIndex)
+    }
+
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
 
     fun decodeUriPath(encoded: String) : String = URLDecoder.decode(encoded, StandardCharsets.UTF_8.toString())

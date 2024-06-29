@@ -7,6 +7,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.domain.NetworkObserver
+import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.model.UDPResponse
 import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCSenderEvent
@@ -15,6 +16,9 @@ import chad.orionsoft.sendit.ui.create_connection_flow.state.ConnectStep
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ReceiverData
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Constants.CONNECT_NOW
+import chad.orionsoft.sendit.utils.Constants.ENTER_CODE_SIGNAL
+import chad.orionsoft.sendit.utils.Constants.MIN_SUPPORT_VERSION
+import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.DatagramSocketExtensions.sendData
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,12 +27,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.DatagramSocket
@@ -53,6 +59,8 @@ class CCSenderViewModel @Inject constructor(
 
     private var operationReceiverPort = Constants.DEFAULT_BROADCAST_PORT
 
+    var receiverDetails : ReceiverData? = null
+
     val connectCode by lazy {
         RuntimeConstants.generateRandomCode()
     }
@@ -72,7 +80,7 @@ class CCSenderViewModel @Inject constructor(
                             currentStep = ConnectStep.SearchReceiver
                         )
                     }
-                    RuntimeConstants.receiverDetails = null
+                    receiverDetails = null
                     broadcastSearch()
                 }
             }
@@ -83,7 +91,7 @@ class CCSenderViewModel @Inject constructor(
         when(event) {
             CCSenderEvent.OnStartConnectionProcess -> {
                 val nextState = if(isOnWlan) {
-                    RuntimeConstants.receiverDetails = null
+                    receiverDetails = null
                     currentJob = ioScope.launch {
                         broadcastSearch()
                     }
@@ -99,20 +107,26 @@ class CCSenderViewModel @Inject constructor(
             }
 
             CCSenderEvent.OnCancelProcess -> {
-                RuntimeConstants.receiverDetails = null
-                currentJob?.cancel("user interrupt")
+                receiverDetails = null
                 ioScope.launch {
+                    _ccSenderState.update {
+                        it.copy(
+                            currentStep = ConnectStep.FinalHandshake
+                        )
+                    }
+                    currentJob?.cancelAndJoin()
                     _onFinishChannel.send(true)
                 }
+
             }
 
             is CCSenderEvent.OnReceiverSelected -> {
                 currentJob?.cancel("selected")
                 ioScope.launch {
-                    RuntimeConstants.receiverDetails = ccSenderState.value.receiverList.find {
+                    receiverDetails = ccSenderState.value.receiverList.find {
                         it.name == event.name
                     }
-                    RuntimeConstants.receiverDetails?.let { receiver ->
+                    receiverDetails?.let { receiver ->
                         _ccSenderState.update {
                             it.copy(
                                 currentStep = ConnectStep.FinalHandshake,
@@ -122,11 +136,7 @@ class CCSenderViewModel @Inject constructor(
                         if(deviceInfo.success) {
                             checkReceiverInfo(deviceInfo)
                         } else {
-                            _ccSenderState.update {
-                                it.copy(
-                                    currentStep = ConnectStep.CheckIsWLAN,
-                                )
-                            }
+                            setError("receiver not responding")
                         }
                     }
 
@@ -147,6 +157,63 @@ class CCSenderViewModel @Inject constructor(
         operationReceiverPort = newPort.toInt()
         Log.d("CreateConnection", "s6 check receiver")
         delay(1100)
+        if(appVer.toInt() < MIN_SUPPORT_VERSION) {
+            setError("Receiver using old version, could not continue")
+            sendReceiverNotSupported(udpResponse.partnerAddress, operationReceiverPort, "old version")
+            return
+        }
+        val isKnownDevice = false // TODO check if unknown device
+        if(!isKnownDevice) {
+            _ccSenderState.update {
+                it.copy(
+                    currentStep = ConnectStep.ShowConnectCode
+                )
+            }
+            val enteredCode = sendEnterCodeRequest(udpResponse.partnerAddress, operationReceiverPort)
+            if(enteredCode.success) {
+                try {
+                    val resStr = enteredCode.response
+                    if(resStr.contains(ENTER_CODE_SIGNAL)) {
+                        val enteredCode1 = Converters.extractDataInNormalCase(resStr)
+                        if(enteredCode1 == "1234") {
+                            _ccSenderState.update {
+                                it.copy(
+                                    currentStep = ConnectStep.FinalHandshake
+                                )
+                            }
+                        } else {
+                            setError("Receiver sent wrong code, could not connect")
+                        }
+                        if(receiverDetails == null) {
+                            setError("Receiver details not found")
+                        } else {
+                            val finalResponse = sendEnterCodeResult(udpResponse.partnerAddress, operationReceiverPort, enteredCode1 == "1234")
+                            if(finalResponse.success) {
+                                if(finalResponse.response.contains(CONNECT_NOW)) {
+                                    val freeSpace = Converters.extractDataInNormalCase(finalResponse.response).toLong()
+                                    RuntimeConstants.connectedDeviceDetails = ConnectedDeviceDetails(
+                                        receiverDetails?.name ?: "Unknown",
+                                        receiverDetails?.address!!,
+                                        freeSpace
+                                    )
+                                    Log.d("CreateConnection", "Connected : ${RuntimeConstants.connectedDeviceDetails}")
+                                    _ccSenderState.update {
+                                        it.copy(
+                                            currentStep = ConnectStep.Connected
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        return
+                    }
+                } catch (e:Exception) {
+                    Log.e("CreateConnection", "s7_b1 >> Exception receiving code")
+                }
+            } else {
+                setError()
+            }
+        }
         val freeSpaceRes = sendConnectOkSignal(udpResponse.partnerAddress, operationReceiverPort)
         if(freeSpaceRes.success) {
             try {
@@ -167,11 +234,7 @@ class CCSenderViewModel @Inject constructor(
                 Log.e("CreateConnection", "s7_a2 >> Exception getting free space")
             }
         }
-        _ccSenderState.update {
-            it.copy(
-                currentStep = ConnectStep.Error
-            )
-        }
+        setError()
     }
 
     private suspend fun broadcastSearch() {
@@ -185,8 +248,9 @@ class CCSenderViewModel @Inject constructor(
             val dSocket = DatagramSocket()
             dSocket.soTimeout = 4000
             while (
+                isActive &&
                 ccSenderState.value.currentStep == ConnectStep.SearchReceiver &&
-                RuntimeConstants.receiverDetails == null) {
+                    receiverDetails == null) {
                 Log.d("CreateConnection", "s2 -> sending broadcast")
                 val result = dSocket.sendData(
                     Constants.BROADCAST_MSG, InetAddress.getByName(broadcastAddress),
@@ -311,8 +375,8 @@ class CCSenderViewModel @Inject constructor(
         return withContext(Dispatchers.IO) {
             val sendSocket = DatagramSocket()
             Log.d("CreateConnection", "s7_b1 -> send enter code signal")
-            val res = sendSocket.sendData("${Constants.ENTER_CODE_SIGNAL}/*${createMyUsername()}",
-                toAddress, toPort)
+            val res = sendSocket.sendData("$ENTER_CODE_SIGNAL/*${createMyUsername()}",
+                toAddress, toPort, soTimeout1 = 30000)
             return@withContext res
         }
     }
@@ -322,7 +386,7 @@ class CCSenderViewModel @Inject constructor(
             val sendSocket = DatagramSocket()
             Log.d("CreateConnection", "s7_b3 -> send enter code result signal")
             val res = sendSocket.sendData(
-                "${Constants.CODE_ENTERED_SIGNAL_RESULT}/*$result",
+                "${Constants.CODE_ENTERED_SIGNAL_RESULT}/*$result*/",
                 toAddress, toPort
             )
             return@withContext res
@@ -333,6 +397,15 @@ class CCSenderViewModel @Inject constructor(
         val startIndex = result.indexOf("/*") + 2
         val endIndex = result.indexOf("*/")
         return result.substring(startIndex, endIndex)
+    }
+
+    private fun setError(msg: String? = null) {
+        _ccSenderState.update {
+            it.copy(
+                currentStep = ConnectStep.Error,
+                error = msg
+            )
+        }
     }
 
 }
