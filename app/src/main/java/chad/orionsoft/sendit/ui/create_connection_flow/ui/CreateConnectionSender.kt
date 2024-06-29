@@ -22,7 +22,6 @@ import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCSenderEvent
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ConnectStep
 import chad.orionsoft.sendit.ui.create_connection_flow.view_model.CCSenderViewModel
-import chad.orionsoft.sendit.utils.RuntimeConstants
 
 @Composable
 fun CreateConnectionSender(onFinish: () -> Unit) {

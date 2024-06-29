@@ -31,7 +31,6 @@ object DatagramSocketExtensions {
         toPort: Int,
         waitForResponse: Boolean = true,
         soTimeout1 : Int = 10000,
-        retryCount : Int = 2
     ): UDPResponse {
         val payload = msg.toByteArray()
         Log.d("DatagramSocket", "sending: $msg")
