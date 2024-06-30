@@ -30,7 +30,7 @@ import java.net.DatagramSocket
 import javax.inject.Inject
 import kotlin.random.Random
 
-class CreateConnectionProcess @Inject constructor(
+class ReceiverConnectionProcess @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
     @ApplicationContext private val context: Context
 ) {
@@ -134,7 +134,7 @@ class CreateConnectionProcess @Inject constructor(
                 val got = res.response
                 if(got.contains(CONNECT_NOW)) {
                     responseChannel.send(res)
-                    Log.d("CreateConnection", "r5_a1 -> sent connect ok with free space (FINISH)")
+                    Log.d("CreateConnection", "r5_a1 -> sent connect ok")
                     opSocket?.close()
                     break
                 }

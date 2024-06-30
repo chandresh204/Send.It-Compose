@@ -2,7 +2,7 @@ package chad.orionsoft.sendit.ui.create_connection_flow.view_model
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import chad.orionsoft.sendit.domain.CreateConnectionProcess
+import chad.orionsoft.sendit.domain.ReceiverConnectionProcess
 import chad.orionsoft.sendit.domain.NetworkObserver
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCReceiverEvent
@@ -31,7 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CCReceiverViewModel @Inject constructor(
     private val networkObserver: NetworkObserver,
-    private val connectionProcess: CreateConnectionProcess,
+    private val connectionProcess: ReceiverConnectionProcess,
 ) : ViewModel() {
 
     private val _ccReceiverState = MutableStateFlow(CCReceiverState())

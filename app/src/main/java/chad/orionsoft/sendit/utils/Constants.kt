@@ -25,5 +25,5 @@ object Constants {
     // ENTER_CODE_REPLY = "$ENTER_CODE_SIGNAL/*code*/" -- for info only, do not delete
 
 
-    const val MIN_SUPPORT_VERSION = 6
+    const val MIN_SUPPORT_VERSION = 120
 }

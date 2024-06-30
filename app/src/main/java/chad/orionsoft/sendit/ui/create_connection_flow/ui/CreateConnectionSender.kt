@@ -72,7 +72,8 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
         ConnectStep.ShowConnectCode -> {
             BottomSheetShowConnectCode(title = "Connect Code",
                 subtitle = "Ask Receiver to Enter below code to connect",
-                code = vModel.connectCode, bottomLine = "") {
+                code = uiState.connectCode.toString(),
+                bottomLine = if(uiState.enterCodeTimer > 0) "Time out in ${uiState.enterCodeTimer} sec" else "") {
                 vModel.onEvent(CCSenderEvent.OnCancelProcess)
             }
         }
