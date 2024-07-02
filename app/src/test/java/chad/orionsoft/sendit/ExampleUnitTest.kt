@@ -11,11 +11,8 @@ import kotlin.random.Random
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        val charSequence = mutableListOf<Char>()
-        for(i in 0 until 32) {
-            val charInt = Random.nextInt(255)
-            charSequence.add(Char(charInt))
-        }
-        println(String(charSequence.toCharArray()))
+        val emptySet = mutableSetOf<Int>()
+        emptySet.add(6)
+        println(emptySet)
     }
 }

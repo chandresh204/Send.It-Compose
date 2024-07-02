@@ -79,8 +79,9 @@ class ReceiverConnectionProcess @Inject constructor(
                         val newPort = Random.nextInt(1000, 9999)
 
                         Log.d(tag, "r2_2 >>> sending device info")
+                        val myDeviceId = preferenceRepository.getMyUniqueId()
                         val res1 = dSocket.sendData(
-                            "$RECEIVER_SELECT_MESSAGE/*1234*/$newPort#250!%${FileIOOperations.getMyFreeSpace(context)}",
+                            "$RECEIVER_SELECT_MESSAGE/*$myDeviceId*/$newPort#${Constants.CURRENT_APP_SUPPORT_VERSION}!%${FileIOOperations.getMyFreeSpace(context)}",
                             res.partnerAddress, res.partnerPort
                         )
                         if(res1.success) {

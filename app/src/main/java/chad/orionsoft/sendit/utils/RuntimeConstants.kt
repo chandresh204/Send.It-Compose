@@ -14,11 +14,11 @@ object RuntimeConstants {
 
     var connectedDeviceDetails : ConnectedDeviceDetails? = null
 
-    fun generateRandomCode() : String {
-        val code1= Random.nextInt(10)
-        val code2=Random.nextInt(10)
-        val code3=Random.nextInt(10)
-        val code4=Random.nextInt(10)
-        return "$code1$code2$code3$code4"
+    fun generateRandomCode(digit: Int) : String {
+        val sb = StringBuilder()
+        for (i in 0 until digit) {
+            sb.append(Random.nextInt(10))
+        }
+        return sb.toString()
     }
 }

@@ -22,6 +22,7 @@ import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCSenderEvent
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ConnectStep
 import chad.orionsoft.sendit.ui.create_connection_flow.view_model.CCSenderViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun CreateConnectionSender(onFinish: () -> Unit) {
@@ -86,9 +87,13 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
                 title = "Connected to ${receiverDetails?.name}",
                 subtitle = "",
                 negativeButton = {
-                                 TextWithIcon(Icons.Default.Check, text = "Done")
+                    TextWithIcon(Icons.Default.Check, text = "Done")
                 }) {
-                vModel.onEvent(CCSenderEvent.OnCancelProcess)
+                onFinish()
+            }
+            LaunchedEffect(uiState.currentStep) {
+                delay(3000)
+                onFinish()
             }
         }
 

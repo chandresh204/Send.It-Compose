@@ -137,7 +137,7 @@ class SenderConnectionProcess @Inject constructor(
 
     private suspend fun moveProcessToNewPort(deviceId: String, freeSpace: Long, updateChannel: Channel<UDPResponse> ) = coroutineScope {
         Log.d(tag, "s6 >>> check if receiver is known or not")
-        val isKnown = false // TODO apply real logic
+        val isKnown = preferenceRepository.getKnownReceivers()?.contains(deviceId) ?: false
         delay(3000)
         if(isKnown) {
             opSocket?.sendData(
@@ -157,7 +157,7 @@ class SenderConnectionProcess @Inject constructor(
             )
             setConnectedDevice(selectedReceiver, freeSpace)
         } else {
-            val connectCode = RuntimeConstants.generateRandomCode()
+            val connectCode = RuntimeConstants.generateRandomCode(4)
             updateChannel.send(
                 UDPResponse(
                     success = true,
@@ -195,6 +195,7 @@ class SenderConnectionProcess @Inject constructor(
                         )
                     )
                     setConnectedDevice(selectedReceiver, freeSpace)
+                    preferenceRepository.addToKnownReceiver(deviceId)
                     "true"
                 } else {
                     updateChannel.send(

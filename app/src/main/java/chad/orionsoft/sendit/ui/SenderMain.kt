@@ -26,9 +26,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
 import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionSender
+import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
+import chad.orionsoft.sendit.utils.RuntimeConstants
 
 @Preview
 @Composable
@@ -41,8 +44,16 @@ fun SenderMainScreen(navTo: (String) -> Unit = {}) {
         createConnection = true
     }
 
+    var receiverDetails: ConnectedDeviceDetails? by remember {
+        mutableStateOf(RuntimeConstants.connectedDeviceDetails)
+    }
+
     Scaffold(topBar = {
-        AppBarWithMessage(stringResource(R.string.app_name))
+        AppBarWithMessage(stringResource(R.string.app_name),
+            message = if(receiverDetails == null) null else {
+                "Connected to : ${receiverDetails?.name}, " +
+                        "free space: ${Converters.formatDataString(receiverDetails?.freeSpace ?: -1)}"
+            })
     }) {
         LazyVerticalGrid(modifier = Modifier.padding(it), columns = GridCells.Adaptive(100.dp)) {
             this.item {
@@ -74,6 +85,7 @@ fun SenderMainScreen(navTo: (String) -> Unit = {}) {
     if(createConnection) {
         CreateConnectionSender {
             createConnection = false
+            receiverDetails = RuntimeConstants.connectedDeviceDetails
         }
     }
 }
