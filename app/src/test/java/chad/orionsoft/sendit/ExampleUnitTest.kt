@@ -1,7 +1,6 @@
 package chad.orionsoft.sendit
 
 import org.junit.Test
-import kotlin.random.Random
 
 /**
  * Example local unit test, which will execute on the development machine (host).
