@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -178,3 +179,9 @@ data class DropDownMenuData(
     val text: String,
     val onSelected: () -> Unit,
 )
+
+@Preview
+@Composable
+private fun Preview() {
+    AppBarWithMessage(title = "Send.It")
+}

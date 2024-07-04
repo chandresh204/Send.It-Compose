@@ -22,4 +22,6 @@
     <string name="an_error_occurred">An Error Occurred</string>
 
     <string name="change_sort_order">Change the sorting order of the list</string>
+
+    <string name="received_here">Received files will appear here</string>
 </resources>

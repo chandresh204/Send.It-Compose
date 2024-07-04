@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
+import chad.orionsoft.sendit.ui.receiver_main.ReceiverMainScreen
 import chad.orionsoft.sendit.ui.sender_audio.SenderAudio
 import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
