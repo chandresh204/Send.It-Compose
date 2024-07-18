@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.ui.create_connection_flow.view_model
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.domain.NetworkObserver
 import chad.orionsoft.sendit.domain.SenderConnectionProcess
@@ -12,7 +11,6 @@ import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Constants.CONNECT_NOW
 import chad.orionsoft.sendit.utils.Constants.ENTER_CODE_SIGNAL
 import chad.orionsoft.sendit.utils.Converters
-import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

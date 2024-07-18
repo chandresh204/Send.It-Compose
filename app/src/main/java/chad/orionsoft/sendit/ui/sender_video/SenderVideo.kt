@@ -1,16 +1,11 @@
 package chad.orionsoft.sendit.ui.sender_video
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,8 +19,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.bottom_sheets.OptionSelectBottomSheet
-import chad.orionsoft.sendit.ui.components.AppBarWithMessage
-import chad.orionsoft.sendit.ui.components.DropDownMenuData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
 import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Converters

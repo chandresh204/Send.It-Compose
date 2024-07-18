@@ -1,7 +1,6 @@
 package chad.orionsoft.sendit.domain
 
 import android.util.Log
-import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

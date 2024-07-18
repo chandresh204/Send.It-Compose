@@ -1,10 +1,9 @@
 package chad.orionsoft.sendit.ui.create_connection_flow.view_model
 
 import android.util.Log
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import chad.orionsoft.sendit.domain.ReceiverConnectionProcess
 import chad.orionsoft.sendit.domain.NetworkObserver
+import chad.orionsoft.sendit.domain.ReceiverConnectionProcess
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCReceiverEvent
 import chad.orionsoft.sendit.ui.create_connection_flow.state.CCReceiverState
@@ -20,7 +19,6 @@ import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

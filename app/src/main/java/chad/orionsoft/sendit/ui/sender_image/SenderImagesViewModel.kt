@@ -1,9 +1,7 @@
 package chad.orionsoft.sendit.ui.sender_image
 
 import androidx.lifecycle.ViewModel
-import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.repository.MediaRepository
-import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
