@@ -14,6 +14,7 @@ import chad.orionsoft.sendit.utils.Constants.RECEIVER_NOT_SUPPORTED
 import chad.orionsoft.sendit.utils.Constants.RECEIVER_SELECT_MESSAGE
 import chad.orionsoft.sendit.utils.DatagramSocketExtensions.getResponse
 import chad.orionsoft.sendit.utils.DatagramSocketExtensions.sendData
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.net.DatagramSocket
+import java.net.InetAddress
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -47,11 +49,11 @@ class ReceiverConnectionProcess @Inject constructor(
     val enterCodeTimerReceiver = _enterCodeTimeChannel.receiveAsFlow()
 
 
-    suspend fun cancelProcess() : Boolean {
+    suspend fun cancelProcess(result: Boolean) : Boolean {
         opSocket?.close()
         currentJob?.cancelAndJoin()
         Log.d(tag, "process finished")
-        return true
+        return result
     }
 
     suspend fun initProcess() : Flow<UDPResponse> {
@@ -67,7 +69,8 @@ class ReceiverConnectionProcess @Inject constructor(
                 val res = dSocket.getResponse()
                 if(res.success) {
                     if(res.response.contains(BROADCAST_MSG)) {
-                        dSocket.sendData("$BROADCAST_MSG/*${createMyUsername()}*/",
+                        // Check Constant file for data pattern
+                        dSocket.sendData("$BROADCAST_MSG((${Constants.DEVICE_TYPE_PHONE}))${RuntimeConstants.myColor}/*${createMyUsername()}*/",
                             res.partnerAddress, res.partnerPort, waitForResponse = false)
                         responseChannel.send(res)
                         Log.d(tag, "r2 >>> reply broadcast reply")
@@ -112,6 +115,7 @@ class ReceiverConnectionProcess @Inject constructor(
                     break
                 }
             }
+            dSocket.close()
             Log.d(tag, "r2 >>> exited the broadcast process")
             stillBroadcasting = false
         }
@@ -179,6 +183,13 @@ class ReceiverConnectionProcess @Inject constructor(
                     opSocket?.close()
                     break@main
                 }
+            } else {
+                responseChannel.send(
+                    UDPResponse(
+                        false, InetAddress.getLocalHost(), -1, "Timed out"
+                    )
+                )
+                break@main
             }
         }
     }

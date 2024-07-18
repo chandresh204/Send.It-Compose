@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.bottom_sheets.OptionSelectBottomSheet
 import chad.orionsoft.sendit.ui.components.AppBarWithMessage
 import chad.orionsoft.sendit.ui.components.DropDownMenuData
@@ -31,7 +32,7 @@ import chad.orionsoft.sendit.utils.Converters
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SenderVideo(onBack: () -> Unit) {
+fun SenderVideo(onSelectionChanged: (MediaData, Boolean) -> Unit) {
 
     val vModel = hiltViewModel<SenderVideoViewModel>()
     val uiState by vModel.avState.collectAsState()
@@ -40,7 +41,43 @@ fun SenderVideo(onBack: () -> Unit) {
         mutableStateOf(false)
     }
 
-    Scaffold(topBar = {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(100.dp)) {
+        val displayList = if(uiState.isSearching) {
+            uiState.searchedList
+        } else uiState.videoList
+        items(displayList, key = { vidData ->
+            vidData.videoData.id
+        }) { vid ->
+            MediaItemViewGrid(
+                modifier = Modifier.animateItemPlacement(),
+                isSelected = vid.selected,
+                thumbUri = vid.videoData.uri,
+                placeHolder = R.drawable.video_icon_small,
+                title = vid.videoData.title,
+                subtitle = "${Converters.formatDuration(vid.videoData.duration)}\n" +
+                        Converters.formatDataString(vid.videoData.size),
+                actionIconVector = Icons.Default.PlayArrow,
+                actionIconDrawableRes = null,
+                onActionClick = {  }) {
+                    onSelectionChanged(vid.videoData, !vid.selected)
+                    vModel.onEvent(SenderVideoEvent.OnSelectClick(vid.videoData.id))
+            }
+        }
+    }
+    if(isSortingChangeRequest) {
+        OptionSelectBottomSheet(
+            title = stringResource(R.string.change_sort_order),
+            options = SortOrder.entries,
+            selectedOption = uiState.selectedSortOrder,
+            onSelectOption = { order ->
+                vModel.onEvent(SenderVideoEvent.OnSortingChanged(order))
+            }) {
+            isSortingChangeRequest = false
+        }
+    }
+
+   /* Scaffold(topBar = {
         AppBarWithMessage(
             title = stringResource(id = R.string.app_name) + " - ${uiState.videoList.size} Files",
             message = "${uiState.selectedCount} selected, Total : ${uiState.selectedSizeToDisplay}, Free Space: 1.1 GB",
@@ -68,40 +105,6 @@ fun SenderVideo(onBack: () -> Unit) {
                 vModel.onEvent(SenderVideoEvent.OnSearch(null)) // null means exit from search
             })
     }) {
-        LazyVerticalGrid(
-            modifier = Modifier.padding(it),
-            columns = GridCells.Adaptive(100.dp)) {
-            val displayList = if(uiState.isSearching) {
-                uiState.searchedList
-            } else uiState.videoList
-            items(displayList, key = { vidData ->
-                vidData.videoData.id
-            }) { vid ->
-                MediaItemViewGrid(
-                    modifier = Modifier.animateItemPlacement(),
-                    isSelected = vid.selected,
-                    thumbUri = vid.videoData.uri,
-                    placeHolder = R.drawable.video_icon_small,
-                    title = vid.videoData.title,
-                    subtitle = "${Converters.formatDuration(vid.videoData.duration)}\n" +
-                            Converters.formatDataString(vid.videoData.size),
-                    actionIconVector = Icons.Default.PlayArrow,
-                    actionIconDrawableRes = null,
-                    onActionClick = {  }) {
-                    vModel.onEvent(SenderVideoEvent.OnSelectClick(vid.videoData.id))
-                }
-            }
-        }
-        if(isSortingChangeRequest) {
-            OptionSelectBottomSheet(
-                title = stringResource(R.string.change_sort_order),
-                options = SortOrder.entries,
-                selectedOption = uiState.selectedSortOrder,
-                onSelectOption = { order ->
-                    vModel.onEvent(SenderVideoEvent.OnSortingChanged(order))
-                }) {
-                isSortingChangeRequest = false
-            }
-        }
-    }
+
+    }*/
 }

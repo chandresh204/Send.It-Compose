@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.model.SortOrder
-import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -136,14 +135,14 @@ class SenderVideoViewModel @Inject constructor(
                     selectedCount = if(addOrRemove) {
                         it.selectedCount + 1
                     } else it.selectedCount - 1,
-                    selectedSize = if(addOrRemove) {
+                    /*selectedSize = if(addOrRemove) {
                         it.selectedSize + oldList[index].videoData.size
                     } else {
                         it.selectedSize - oldList[index].videoData.size
-                    },
+                    },*/
                 )
             }
-            updateTotalSelectedSize()
+//            updateTotalSelectedSize()
         }
     }
 
@@ -158,10 +157,10 @@ class SenderVideoViewModel @Inject constructor(
             it.copy(
                 videoList = oldList,
                 selectedCount = 0,
-                selectedSize = 0L
+//                selectedSize = 0L
             )
         }
-        updateTotalSelectedSize()
+//        updateTotalSelectedSize()
     }
 
     private fun selectAll() {
@@ -179,19 +178,19 @@ class SenderVideoViewModel @Inject constructor(
             it.copy(
                 videoList = oldList,
                 selectedCount = selectedCount,
-                selectedSize = totalSize
+//                selectedSize = totalSize
             )
         }
-        updateTotalSelectedSize()
+//        updateTotalSelectedSize()
     }
 
-    private fun updateTotalSelectedSize() {
-        _avState.update {
-            it.copy(
-                selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
-            )
-        }
-    }
+//    private fun updateTotalSelectedSize() {
+//        _avState.update {
+//            it.copy(
+//                selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
+//            )
+//        }
+//    }
 
     private fun createListBySearch(query: String) {
         _avState.update {

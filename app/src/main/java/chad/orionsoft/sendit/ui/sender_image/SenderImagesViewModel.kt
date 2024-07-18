@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui.sender_image
 
 import androidx.lifecycle.ViewModel
+import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,12 +36,12 @@ class SenderImagesViewModel @Inject constructor(
                 changeSelectionStateOfImage(event.id)
             }
 
-            SenderImagesEvent.OnClearAllSelection -> {
+            /*SenderImagesEvent.OnClearAllSelection -> {
                 clearAllSelection()
             }
             SenderImagesEvent.OnSelectAll -> {
                 selectAll()
-            }
+            }*/
         }
     }
 
@@ -56,18 +57,20 @@ class SenderImagesViewModel @Inject constructor(
                     selectedCount = if(addOrRemove) {
                         it.selectedCount + 1
                     } else it.selectedCount - 1,
-                    selectedSize = if(addOrRemove) {
+                /*    selectedSize = if(addOrRemove) {
+                        onItemSelectionChanged(oldList[index].imageData, true)
                         it.selectedSize + oldList[index].imageData.size
                     } else {
+                        onItemSelectionChanged(oldList[index].imageData, false)
                         it.selectedSize - oldList[index].imageData.size
-                    },
+                    },*/
                 )
             }
-            _uiState.update {
+            /*_uiState.update {
                 it.copy(
                     selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
                 )
-            }
+            }*/
         }
     }
 
@@ -77,7 +80,7 @@ class SenderImagesViewModel @Inject constructor(
         }
     }
 
-    private fun clearAllSelection() {
+   /* private fun clearAllSelection() {
         val oldList = uiState.value.images.toMutableList()
         for(i in oldList.indices) {
             oldList[i] = oldList[i].copy(
@@ -121,6 +124,6 @@ class SenderImagesViewModel @Inject constructor(
                 selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
             )
         }
-    }
+    } */
 
 }

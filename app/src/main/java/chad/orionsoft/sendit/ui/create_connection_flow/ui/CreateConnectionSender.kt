@@ -62,7 +62,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
         }
 
         ConnectStep.SearchReceiver -> {
-            BottomSheetSearching(title = "Searching For Receiver", searched = uiState.receiverListToDisplay,
+            BottomSheetSearching(title = "Searching For Receiver", searched = uiState.receiverList,
                 onOptionSelected = {
                     vModel.onEvent(CCSenderEvent.OnReceiverSelected(it))
                 }) {

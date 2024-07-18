@@ -14,6 +14,8 @@ object RuntimeConstants {
 
     var connectedDeviceDetails : ConnectedDeviceDetails? = null
 
+    var myColor : String = "0033EE"
+
     fun generateRandomCode(digit: Int) : String {
         val sb = StringBuilder()
         for (i in 0 until digit) {

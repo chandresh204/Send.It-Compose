@@ -81,7 +81,10 @@ fun ReceiverMainScreen(onBack: () -> Unit) {
     }
     if(!isConnected) {
         CreateConnectionReceiver {
-            if(it) isConnected = true
+            if(it) {
+                vModel.onEvent(ReceiverMainEvent.StartReceiver)
+                isConnected = true
+            }
             else onBack()
         }
     }
@@ -96,4 +99,3 @@ fun AnimatedLinearProgressBar(modifier: Modifier,
         trackColor = MaterialTheme.colorScheme.surface,
         modifier = modifier)
 }
-

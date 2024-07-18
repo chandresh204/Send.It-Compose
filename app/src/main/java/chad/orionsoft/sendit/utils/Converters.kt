@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.utils
 
+import androidx.compose.ui.graphics.Color
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -51,6 +52,30 @@ object Converters {
         val startIndex = response.indexOf("/*") + 2
         val endIndex = response.indexOf("*/")
         return response.substring(startIndex, endIndex)
+    }
+
+    fun extractTripleData(response: String) : Triple<String, String, String> {
+        val firstIndex = response.indexOf("((")
+        val secondIndex = response.indexOf("))")
+        val thirdIndex = response.indexOf("/*")
+        val finalIndex = response.indexOf("*/")
+        val data1 = response.substring(firstIndex+2, secondIndex)
+        val data2 = response.substring(secondIndex+2, thirdIndex)
+        val data3 = response.substring(thirdIndex+2, finalIndex)
+        return Triple(data1, data2, data3)
+    }
+
+    fun convertStringToColor(colorStr: String) : Color {
+        val red = colorStr.substring(0, 2)
+        val green = colorStr.substring(2,4)
+        val blue = colorStr.substring(4,6)
+        println(red.toInt(radix = 16)/255f)
+        return Color.Unspecified.copy(
+            alpha = 1f,
+            red = red.toInt(radix = 16)/255f,
+            green = green.toInt(radix = 16)/255f,
+            blue = blue.toInt(radix = 16)/255f
+        )
     }
 
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())

@@ -2,6 +2,7 @@ package chad.orionsoft.sendit.ui.sender_audio
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Converters
@@ -40,7 +41,7 @@ class SenderAudioViewModel @Inject constructor(
 
             }
             SortOrder.ByDate -> {
-                avState.value.audioList.sortedByDescending { it.audioData.modified }
+                avState.value.audioList.sortedByDescending { it.audioData.lastModified }
             }
         }
         _avState.update {
@@ -55,7 +56,7 @@ class SenderAudioViewModel @Inject constructor(
 
                 }
                 SortOrder.ByDate -> {
-                    avState.value.searchedList.sortedByDescending { it.audioData.modified }
+                    avState.value.searchedList.sortedByDescending { it.audioData.lastModified }
                 }
             }
             _avState.update {
@@ -136,15 +137,17 @@ class SenderAudioViewModel @Inject constructor(
                     audioList = oldList,
                     selectedCount = if(addOrRemove) {
                         it.selectedCount + 1
-                    } else it.selectedCount - 1,
-                    selectedSize = if(addOrRemove) {
-                        it.selectedSize + oldList[index].audioData.size
                     } else {
-                        it.selectedSize - oldList[index].audioData.size
+                        it.selectedCount - 1
                     },
+//                    selectedSize = if(addOrRemove) {
+//                        it.selectedSize + oldList[index].audioData.size
+//                    } else {
+//                        it.selectedSize - oldList[index].audioData.size
+//                    },
                 )
             }
-            updateTotalSelectedSize()
+//            updateTotalSelectedSize()
         }
     }
 
@@ -158,11 +161,10 @@ class SenderAudioViewModel @Inject constructor(
         _avState.update {
             it.copy(
                 audioList = oldList,
-                selectedCount = 0,
-                selectedSize = 0L
+                selectedCount = 0
             )
         }
-        updateTotalSelectedSize()
+//        updateTotalSelectedSize()
     }
 
     private fun selectAll() {
@@ -180,19 +182,18 @@ class SenderAudioViewModel @Inject constructor(
             it.copy(
                 audioList = oldList,
                 selectedCount = selectedCount,
-                selectedSize = totalSize
             )
         }
-        updateTotalSelectedSize()
+//        updateTotalSelectedSize()
     }
 
-    private fun updateTotalSelectedSize() {
+    /*private fun updateTotalSelectedSize() {
         _avState.update {
             it.copy(
                 selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
             )
         }
-    }
+    }*/
 
     private fun createListBySearch(query: String) {
         _avState.update {

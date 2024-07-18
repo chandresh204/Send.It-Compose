@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit
 
+import androidx.compose.ui.graphics.Color
 import org.junit.Test
 
 /**
@@ -10,8 +11,19 @@ import org.junit.Test
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        val emptySet = mutableSetOf<Int>()
-        emptySet.add(6)
-        println(emptySet)
+       convertStringToColor("FF2566")
+    }
+
+    fun convertStringToColor(colorStr: String) : Color {
+        val red = colorStr.substring(0, 2)
+        val green = colorStr.substring(2,4)
+        val blue = colorStr.substring(4,6)
+        println(red.toInt(radix = 16)/255f)
+        return Color.Unspecified.copy(
+            alpha = 1f,
+            red = red.toInt(radix = 16)/255f,
+            green = green.toInt(radix = 16)/255f,
+            blue = green.toInt(radix = 16)/255f
+        )
     }
 }

@@ -10,8 +10,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -23,11 +27,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.TextWithIcon
+import chad.orionsoft.sendit.ui.create_connection_flow.state.ReceiverData
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
 import kotlinx.coroutines.delay
@@ -36,8 +42,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetSearching(title:String,
-                         searched: List<String>,
-                         onOptionSelected: (String) -> Unit,
+                         searched: List<ReceiverData>,
+                         onOptionSelected: (ReceiverData) -> Unit,
                          onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(
         confirmValueChange = {false}
@@ -70,7 +76,7 @@ fun BottomSheetSearching(title:String,
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             LazyColumn {
                 items(searched) {
-                    SearchedItem(it) {
+                    SearchedItem(it.name, it.deviceType, it.color) {
                         hideAndCloseSheet { onOptionSelected(it) }
                     }
                 }
@@ -80,14 +86,30 @@ fun BottomSheetSearching(title:String,
 }
 
 @Composable
-private fun SearchedItem(title: String, onClick: () -> Unit) {
+private fun SearchedItem(
+    title: String,
+    deviceType: String,
+    color: Color,
+    onClick: () -> Unit) {
+    val icon = when(deviceType) {
+        Constants.DEVICE_TYPE_PHONE -> {
+            Icons.Default.Phone
+        }
+        Constants.DEVICE_TYPE_DESKTOP -> {
+            Icons.Default.DateRange
+        }
+        else -> Icons.Default.Face
+    }
     Card(modifier = Modifier
         .fillMaxWidth()
         .clickable(onClick = onClick)
-        .padding(vertical = 8.dp)) {
-        Text(text = title, modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp))
+        .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = color
+        )) {
+        TextWithIcon(
+            icon,
+            text = title, modifier = Modifier.padding(12.dp))
     }
 }
 
@@ -95,6 +117,12 @@ private fun SearchedItem(title: String, onClick: () -> Unit) {
 @Composable
 private fun Preview() {
     SendItTheme {
-        BottomSheetSearching("Searching for receiver", listOf("device 1", "Device 2", "device 3"), {}) {}
+//        BottomSheetSearching("Searching for receiver", listOf("device 1", "Device 2", "device 3"), {}) {}
+        SearchedItem(
+            title = "Hetal",
+            deviceType = Constants.DEVICE_TYPE_PHONE,
+            color =Color.Red) {
+            
+        }
     }
 }

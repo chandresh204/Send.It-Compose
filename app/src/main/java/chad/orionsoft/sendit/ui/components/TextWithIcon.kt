@@ -15,8 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TextWithIcon(imageVector: ImageVector,text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun TextWithIcon(imageVector: ImageVector,text: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically) {
         Icon(imageVector, contentDescription = null)
         Spacer(modifier = Modifier.padding(horizontal = 2.dp))
         Text(text = text)

@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.create_connection_flow.view_model
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.domain.NetworkObserver
 import chad.orionsoft.sendit.domain.SenderConnectionProcess
@@ -11,6 +12,7 @@ import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Constants.CONNECT_NOW
 import chad.orionsoft.sendit.utils.Constants.ENTER_CODE_SIGNAL
 import chad.orionsoft.sendit.utils.Converters
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.net.InetAddress
 import javax.inject.Inject
 
 @HiltViewModel
@@ -69,12 +72,7 @@ class CCSenderViewModel @Inject constructor(
                    if(udpResult.success) {
                        when {
                            udpResult.response.contains(Constants.BROADCAST_MSG) -> {
-                               addToReceiverList(
-                                   ReceiverData(
-                                       address = udpResult.partnerAddress,
-                                       name = Converters.extractDataInNormalCase(udpResult.response)
-                                   )
-                               )
+                               extractReceiverDataAndAddToList(udpResult.response, udpResult.partnerAddress)
                            }
                            udpResult.response.contains(CONNECT_NOW) -> {
                                _ccSenderState.update {
@@ -142,7 +140,7 @@ class CCSenderViewModel @Inject constructor(
 
             is CCSenderEvent.OnReceiverSelected -> {
                 receiverDetails = ccSenderState.value.receiverList.find {
-                    it.name == event.name
+                    it.name == event.receiverData.name
                 }
                 if(receiverDetails == null) {
                     setError("Receiver details not found")
@@ -158,16 +156,23 @@ class CCSenderViewModel @Inject constructor(
         }
     }
 
-    private fun addToReceiverList(receiverData: ReceiverData) {
+    private fun extractReceiverDataAndAddToList(msg: String, address: InetAddress) {
+        val infoTriple = Converters.extractTripleData(msg)
+        val receiverData = ReceiverData(
+            address,
+            name = infoTriple.third,
+            deviceType = infoTriple.first,
+            color = Converters.convertStringToColor(infoTriple.second),
+        )
         val oldList = ccSenderState.value.receiverList.toMutableList()
         val addToList = {
             oldList.add(receiverData)
             _ccSenderState.update {
                 it.copy(
                     receiverList = oldList,
-                    receiverListToDisplay = oldList.map { rData ->
-                        rData.name
-                    }
+//                    receiverListToDisplay = oldList.map { rData ->
+//                        rData.name
+//                    }
                 )
             }
         }

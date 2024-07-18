@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
+import chad.orionsoft.sendit.ui.main_screen.MainScreen
 import chad.orionsoft.sendit.ui.receiver_main.ReceiverMainScreen
 import chad.orionsoft.sendit.ui.sender_audio.SenderAudio
 import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
@@ -27,9 +28,10 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_HOME_SCREEN) {
-            HomeScreen {
+            MainScreen()
+            /*HomeScreen {
                 navController.navigate(it)
-            }
+            }*/
         }
         composable(NavigationConstants.NAV_EDIT) {
             EditScreen {
@@ -50,7 +52,7 @@ fun MainNavigation() {
             SenderImagesScreen({ pathInJson ->
                 val route1 = NavigationConstants.NAV_FULL_SCREEN_IMAGE + "/$pathInJson"
                 navController.navigate(route1)
-            }) {
+            }) { _ , _ ->
                 navController.popBackStack()
             }
         }
@@ -65,12 +67,12 @@ fun MainNavigation() {
             FullScreenImage(decodedPath)
         }
         composable(NavigationConstants.NAV_SENDER_AUDIO) {
-            SenderAudio {
+            SenderAudio { _, _ ->
                 navController.popBackStack()
             }
         }
         composable(NavigationConstants.NAV_SENDER_VIDEO) {
-            SenderVideo {
+            SenderVideo { _, _ ->
                 navController.popBackStack()
             }
         }

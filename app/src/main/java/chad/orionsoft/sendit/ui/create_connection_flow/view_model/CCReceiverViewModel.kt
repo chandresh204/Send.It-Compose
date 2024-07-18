@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui.create_connection_flow.view_model
 
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.domain.ReceiverConnectionProcess
 import chad.orionsoft.sendit.domain.NetworkObserver
@@ -42,8 +43,6 @@ class CCReceiverViewModel @Inject constructor(
     private val _onFinishChannel = Channel<Boolean>()
     val finishReceiver = _onFinishChannel.receiveAsFlow()
 
-    private var currentJob: Job? = null
-
     private var operationalPort = Constants.DEFAULT_BROADCAST_PORT
 
     var senderDetails : ReceiverData? = null
@@ -54,23 +53,23 @@ class CCReceiverViewModel @Inject constructor(
         ioScope.launch {
             networkObserver.wlanChangeReceiver.collect { connected ->
                 if (!connected) {
-                    currentJob?.cancel()
                     _ccReceiverState.update {
                         it.copy(
                             currentStep = ReceiverConnectStep.CheckIsWLAN
                         )
                     }
                 } else {
-                    currentJob?.cancel()
                     connectionProcess.initProcess().collect {
                         Log.d(tag, "onFlow: $it")
                         if(it.success) {
                             when {
                                 it.response.contains(RECEIVER_SELECT_MESSAGE) -> {
-                                    val senderName = Converters.extractDataInNormalCase(it.response)
+                                    val tripleData = Converters.extractTripleData(it.response) // check Constant file for pattern info
                                     senderDetails = ReceiverData(
-                                        it.partnerAddress, senderName,
-                                        operationalPort
+                                        it.partnerAddress, tripleData.third,
+                                        operationalPort,
+                                        tripleData.first,
+                                        Converters.convertStringToColor(tripleData.second)
                                     )
                                     _ccReceiverState.update { state ->
                                         state.copy(
@@ -145,7 +144,7 @@ class CCReceiverViewModel @Inject constructor(
 
             is CCReceiverEvent.OnCancelSearch -> {
                 ioScope.launch {
-                    _onFinishChannel.send(connectionProcess.cancelProcess())
+                    _onFinishChannel.send(connectionProcess.cancelProcess(true))
                 }
             }
         }
@@ -158,6 +157,9 @@ class CCReceiverViewModel @Inject constructor(
                 error = msg
             )
         }
+        ioScope.launch {
+            _onFinishChannel.send(connectionProcess.cancelProcess(false))
+        }
     }
 
     private fun setAsConnectedDevice() {
@@ -166,7 +168,9 @@ class CCReceiverViewModel @Inject constructor(
             return
         }
         RuntimeConstants.connectedDeviceDetails = ConnectedDeviceDetails(
-            senderDetails!!.name, senderDetails!!.address, -1
+            senderDetails!!.name, senderDetails!!.address, senderDetails!!.deviceType,
+            senderDetails!!.color,
+            -1
         )
     }
 }

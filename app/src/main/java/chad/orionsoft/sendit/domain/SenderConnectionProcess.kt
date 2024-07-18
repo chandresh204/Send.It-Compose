@@ -10,6 +10,7 @@ import chad.orionsoft.sendit.model.UDPResponse
 import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ReceiverData
 import chad.orionsoft.sendit.utils.Constants
+import chad.orionsoft.sendit.utils.Constants.RECEIVER_SELECT_MESSAGE
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.DatagramSocketExtensions.sendData
 import chad.orionsoft.sendit.utils.RuntimeConstants
@@ -79,9 +80,10 @@ class SenderConnectionProcess @Inject constructor(
             }
             if(selectedReceiver != null) {
                 Log.d(tag, "s4 >>> sending select signal")
-                val selectRes = opSocket?.sendData("${Constants.RECEIVER_SELECT_MESSAGE}/*${createMyUsername()}*/",
+                val selectRes = opSocket?.sendData(
+                    "$RECEIVER_SELECT_MESSAGE((${Constants.DEVICE_TYPE_PHONE}))${RuntimeConstants.myColor}/*${createMyUsername()}*/",
                     selectedReceiver!!.address, operationalPort)
-                if(selectRes?.success == true) {
+                if(selectRes?.success == true && selectRes.response.contains(RECEIVER_SELECT_MESSAGE)) {
                     val infoStr = selectRes.response
                     Log.d(tag, "s5 >>> received device info : $infoStr")
                     try {
@@ -135,7 +137,8 @@ class SenderConnectionProcess @Inject constructor(
         return channel.receiveAsFlow()
     }
 
-    private suspend fun moveProcessToNewPort(deviceId: String, freeSpace: Long, updateChannel: Channel<UDPResponse> ) = coroutineScope {
+    private suspend fun moveProcessToNewPort(deviceId: String, freeSpace: Long,
+                                             updateChannel: Channel<UDPResponse> ) = coroutineScope {
         Log.d(tag, "s6 >>> check if receiver is known or not")
         val isKnown = preferenceRepository.getKnownReceivers()?.contains(deviceId) ?: false
         delay(3000)
@@ -275,7 +278,8 @@ class SenderConnectionProcess @Inject constructor(
         return "$uName - ${Build.MANUFACTURER}:${Build.MODEL}"
     }
 
-    private fun setConnectedDevice(receiverData: ReceiverData?, freeSpace: Long) {
+    private fun setConnectedDevice(receiverData: ReceiverData?,
+                                   freeSpace: Long) {
         if(receiverData == null) {
             Log.e(tag, "can not set connected device, receiver data is null")
             return
@@ -284,6 +288,8 @@ class SenderConnectionProcess @Inject constructor(
             ConnectedDeviceDetails(
                 receiverData.name,
                 receiverData.address,
+                receiverData.deviceType,
+                receiverData.color,
                 freeSpace
             )
     }
