@@ -12,7 +12,7 @@ object RuntimeConstants {
 
     var BROAD_ADDR : String? = null
 
-    var connectedDeviceDetails : ConnectedDeviceDetails? = null
+//    var connectedDeviceDetails : ConnectedDeviceDetails? = null
 
     var myColor : String = "0033EE"
 

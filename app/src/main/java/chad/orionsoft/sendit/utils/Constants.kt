@@ -31,4 +31,21 @@ object Constants {
 
     const val MIN_SUPPORT_VERSION = 300
     const val CURRENT_APP_SUPPORT_VERSION = 300
+
+    const val TCP_MODE_STR = "sdc55drvxcvdsad23242" // + /*mode*/"
+
+    const val MODE_TYPE_FILE = "file"
+    const val MODE_TYPE_STOP = "stop"
+
+    const val TCP_FILE_CONTINUE = "smclkshdkjashduwid"
+    const val TCP_FILE_IGNORE = "dksjdlascnhlksadkhw"
+    const val TCP_FILE_FREE_SPACE_SIGNAL  = "sdnccop5d75sde398jfd%@^"
+
+    // const val TCP_FILE_INFO = TCP_FILE_CONTINUE((filename))type/*size*/
+
+    // file types
+    const val FILE_TYPE_IMAGE = "Image"
+    const val FILE_TYPE_AUDIO = "audio"
+    const val FILE_TYPE_VIDEO = "video"
+    const val FILE_TYPE_OTHER = "other"
 }

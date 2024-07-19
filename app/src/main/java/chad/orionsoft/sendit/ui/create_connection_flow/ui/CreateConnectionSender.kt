@@ -25,7 +25,7 @@ import chad.orionsoft.sendit.ui.create_connection_flow.view_model.CCSenderViewMo
 import kotlinx.coroutines.delay
 
 @Composable
-fun CreateConnectionSender(onFinish: () -> Unit) {
+fun CreateConnectionSender(onFinish: (Boolean) -> Unit) {
 
     val vModel = hiltViewModel<CCSenderViewModel>()
     val uiState by vModel.ccSenderState.collectAsState()
@@ -33,7 +33,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
 
     LaunchedEffect(true) {
         vModel.finishReceiver.collect {
-            onFinish()
+            onFinish(it)
         }
     }
 
@@ -46,7 +46,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
                 positiveButtonClick = {
                     vModel.onEvent(CCSenderEvent.OnStartConnectionProcess)
                 },
-                negativeButtonClick = onFinish
+                negativeButtonClick = { onFinish(false) }
             ) {
 
             }
@@ -54,7 +54,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
 
         ConnectStep.CheckIsWLAN -> {
             val context = LocalContext.current
-            WLANConnectionRequiredBottomSheet(onFinish, {
+            WLANConnectionRequiredBottomSheet({ onFinish(false) }, {
                 StartActivity.openWifiSettings(context)
             }) {
                 StartActivity.openTetherSettings(context)
@@ -89,11 +89,11 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
                 negativeButton = {
                     TextWithIcon(Icons.Default.Check, text = "Done")
                 }) {
-                onFinish()
+                onFinish(true)
             }
             LaunchedEffect(uiState.currentStep) {
                 delay(3000)
-                onFinish()
+                onFinish(true)
             }
         }
 
@@ -103,7 +103,7 @@ fun CreateConnectionSender(onFinish: () -> Unit) {
                 subtitle = "",
                 negativeButton = {
                     TextWithIcon(Icons.Default.Close, text = "Close")
-                }, { onFinish() })
+                }, { onFinish(false) })
         }
     }
 

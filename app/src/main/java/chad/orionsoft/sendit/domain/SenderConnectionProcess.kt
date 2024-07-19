@@ -7,6 +7,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.model.UDPResponse
+import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ReceiverData
 import chad.orionsoft.sendit.utils.Constants
@@ -32,6 +33,7 @@ import javax.inject.Inject
 
 class SenderConnectionProcess @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
+    private val connectionRepository: ConnectionRepository,
     @ApplicationContext private val context: Context
 ) {
 
@@ -284,7 +286,7 @@ class SenderConnectionProcess @Inject constructor(
             Log.e(tag, "can not set connected device, receiver data is null")
             return
         }
-        RuntimeConstants.connectedDeviceDetails =
+        connectionRepository.updateConnectionInfo(
             ConnectedDeviceDetails(
                 receiverData.name,
                 receiverData.address,
@@ -292,6 +294,15 @@ class SenderConnectionProcess @Inject constructor(
                 receiverData.color,
                 freeSpace
             )
+        )
+        /*RuntimeConstants.connectedDeviceDetails =
+            ConnectedDeviceDetails(
+                receiverData.name,
+                receiverData.address,
+                receiverData.deviceType,
+                receiverData.color,
+                freeSpace
+            )*/
     }
 
     companion object {

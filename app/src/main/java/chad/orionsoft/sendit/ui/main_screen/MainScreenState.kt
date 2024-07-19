@@ -1,7 +1,10 @@
 package chad.orionsoft.sendit.ui.main_screen
 
+import chad.orionsoft.sendit.model.ConnectedDeviceDetails
+
 data class MainScreenState(
-    val selectionModel : SelectionUiModel = SelectionUiModel()
+    val selectionModel : SelectionUiModel = SelectionUiModel(),
+    val connectedDeviceDetails: ConnectedDeviceDetails? = null
 )
 
 data class SelectionUiModel(

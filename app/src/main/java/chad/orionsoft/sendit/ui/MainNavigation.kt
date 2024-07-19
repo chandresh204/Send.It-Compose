@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionScreen
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
 import chad.orionsoft.sendit.ui.main_screen.MainScreen
 import chad.orionsoft.sendit.ui.receiver_main.ReceiverMainScreen
@@ -28,10 +29,17 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_HOME_SCREEN) {
-            MainScreen()
+            MainScreen {
+                navController.navigate(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN)
+            }
             /*HomeScreen {
                 navController.navigate(it)
             }*/
+        }
+        composable(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN) {
+            CreateConnectionScreen {
+                navController.popBackStack()
+            }
         }
         composable(NavigationConstants.NAV_EDIT) {
             EditScreen {

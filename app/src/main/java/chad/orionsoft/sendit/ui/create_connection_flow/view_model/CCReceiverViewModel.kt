@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.domain.NetworkObserver
 import chad.orionsoft.sendit.domain.ReceiverConnectionProcess
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
+import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.ui.create_connection_flow.event.CCReceiverEvent
 import chad.orionsoft.sendit.ui.create_connection_flow.state.CCReceiverState
 import chad.orionsoft.sendit.ui.create_connection_flow.state.ReceiverConnectStep
@@ -30,6 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CCReceiverViewModel @Inject constructor(
     private val networkObserver: NetworkObserver,
+    private val connectionRepository: ConnectionRepository,
     private val connectionProcess: ReceiverConnectionProcess,
 ) : ViewModel() {
 
@@ -165,10 +167,17 @@ class CCReceiverViewModel @Inject constructor(
             Log.e(tag, "Error setting connected device, sender details null")
             return
         }
-        RuntimeConstants.connectedDeviceDetails = ConnectedDeviceDetails(
+        connectionRepository.updateConnectionInfo(
+            ConnectedDeviceDetails(
+                senderDetails!!.name, senderDetails!!.address, senderDetails!!.deviceType,
+                senderDetails!!.color,
+                -1
+            )
+        )
+        /*RuntimeConstants.connectedDeviceDetails = ConnectedDeviceDetails(
             senderDetails!!.name, senderDetails!!.address, senderDetails!!.deviceType,
             senderDetails!!.color,
             -1
-        )
+        )*/
     }
 }
