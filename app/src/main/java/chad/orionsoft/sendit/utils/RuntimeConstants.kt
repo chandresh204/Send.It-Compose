@@ -2,7 +2,6 @@ package chad.orionsoft.sendit.utils
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import kotlin.random.Random
 
 object RuntimeConstants {

@@ -16,7 +16,6 @@ import chad.orionsoft.sendit.utils.Constants.CONNECT_NOW
 import chad.orionsoft.sendit.utils.Constants.ENTER_CODE_SIGNAL
 import chad.orionsoft.sendit.utils.Constants.RECEIVER_SELECT_MESSAGE
 import chad.orionsoft.sendit.utils.Converters
-import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
