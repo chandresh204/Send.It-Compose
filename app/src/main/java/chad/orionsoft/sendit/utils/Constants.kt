@@ -48,4 +48,8 @@ object Constants {
     const val FILE_TYPE_AUDIO = "audio"
     const val FILE_TYPE_VIDEO = "video"
     const val FILE_TYPE_OTHER = "other"
+
+    // work manager params
+    const val TCP_SERVER_WM_PORT = "receiverPort"
+    const val TCP_SERVER_WM_DEVICE = "deviceName"
 }

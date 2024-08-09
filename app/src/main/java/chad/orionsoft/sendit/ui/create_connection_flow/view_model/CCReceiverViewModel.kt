@@ -100,7 +100,7 @@ class CCReceiverViewModel @Inject constructor(
                                                 currentStep = ReceiverConnectStep.Connected
                                             )
                                         }
-                                        setAsConnectedDevice()
+                                        setAsConnectedDevice(operationalPort)
                                     } else {
                                         setError("You have entered wrong code!!")
                                     }
@@ -111,7 +111,10 @@ class CCReceiverViewModel @Inject constructor(
                                             currentStep = ReceiverConnectStep.Connected
                                         )
                                     }
-                                    setAsConnectedDevice()
+                                    setAsConnectedDevice(operationalPort)
+                                }
+                                it.response.contains("newPort") -> {
+                                    operationalPort = Converters.extractDataInNormalCase(it.response).toInt()
                                 }
                             }
                         } else {
@@ -161,7 +164,7 @@ class CCReceiverViewModel @Inject constructor(
         }
     }
 
-    private fun setAsConnectedDevice() {
+    private fun setAsConnectedDevice(serverPort : Int) {
         if(senderDetails == null) {
             Log.e(tag, "Error setting connected device, sender details null")
             return
@@ -170,7 +173,8 @@ class CCReceiverViewModel @Inject constructor(
             ConnectedDeviceDetails(
                 senderDetails!!.name, senderDetails!!.address, senderDetails!!.deviceType,
                 senderDetails!!.color,
-                -1
+                -1,
+                serverPort
             )
         )
         /*RuntimeConstants.connectedDeviceDetails = ConnectedDeviceDetails(

@@ -1,13 +1,19 @@
 package chad.orionsoft.sendit.ui.main_screen
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.domain.TcpServer
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.repository.ConnectionRepository
+import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
+import chad.orionsoft.sendit.work_manager.TcpServerWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +34,6 @@ class MainScreenViewModel @Inject constructor(
     val mainScreenState = _mainScreenState.asStateFlow()
 
     init {
-        notificationDomain.showNotification(12, "SendIt", "Test notification")
         viewModelScope.launch {
             connectionRepository.connectionUpdateReceiver.collectLatest {
                 _mainScreenState.update { state ->
@@ -37,19 +42,23 @@ class MainScreenViewModel @Inject constructor(
                     )
                 }
                 if(it != null) {
-                    TcpServer.start(5555, context.contentResolver)
-                    notificationDomain.showNotification(12, "TCP Server", "Started on 5555") // TODO move to work manager
+                    startTCPServer(it.serverPort, it.name)
                 }
             }
         }
     }
 
-    fun onEvent(onItemSelected: MainScreenEvent.OnItemSelected) {
-        _mainScreenState.update {
-            it.copy(
-                selectionModel = updateSelectionUiModel(onItemSelected.mData, onItemSelected.isSelected)
-            )
+    fun onEvent(event: MainScreenEvent) {
+        when(event) {
+            is MainScreenEvent.OnItemSelected -> {
+                _mainScreenState.update {
+                    it.copy(
+                        selectionModel = updateSelectionUiModel(event.mData, event.isSelected)
+                    )
+                }
+            }
         }
+
     }
 
     private fun updateSelectionUiModel(mediaData: MediaData, addOrRemoved: Boolean) : SelectionUiModel {
@@ -65,5 +74,19 @@ class MainScreenViewModel @Inject constructor(
         }
         val displaySize = Converters.formatDataString(newSize)
         return SelectionUiModel(newCount, newSize, displaySize)
+    }
+
+    private fun startTCPServer(serverPort: Int, deviceName: String) {
+        println("Trying to start server on $serverPort")
+        val wM = WorkManager.getInstance(context)
+        val tagF = "testWork"
+        wM.cancelAllWorkByTag(tagF)
+        val workRequest = OneTimeWorkRequestBuilder<TcpServerWorker>()
+            .setInputData(Data.Builder().apply {
+                putInt(Constants.TCP_SERVER_WM_PORT, serverPort)
+                putString(Constants.TCP_SERVER_WM_DEVICE, deviceName)
+            }.build())
+            .addTag(tagF).build()
+        wM.enqueue(workRequest)
     }
 }

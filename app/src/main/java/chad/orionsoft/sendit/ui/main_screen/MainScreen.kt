@@ -57,7 +57,8 @@ fun MainScreen(gotoConnectScreen: () -> Unit) {
                 .align(Alignment.BottomEnd)
                 .padding(16.dp))
             ConnectionButton(modifier = Modifier
-                .align(Alignment.BottomStart).widthIn(max = 200.dp)
+                .align(Alignment.BottomStart)
+                .widthIn(max = 200.dp)
                 .padding(16.dp), uiState.connectedDeviceDetails ,gotoConnectScreen)
         }
     }
@@ -80,7 +81,8 @@ private fun SelectionInfoUi(selectionUiModel: SelectionUiModel, modifier: Modifi
 }
 
 @Composable
-private fun ConnectionButton(modifier: Modifier, connectionDetails: ConnectedDeviceDetails?,gotoConnect: () -> Unit) {
+private fun ConnectionButton(modifier: Modifier, connectionDetails: ConnectedDeviceDetails?,
+                             gotoConnect: () -> Unit) {
     Card(modifier.clickable(onClick = gotoConnect)) {
         Row(modifier = Modifier.padding(8.dp)) {
             Column {
@@ -92,6 +94,7 @@ private fun ConnectionButton(modifier: Modifier, connectionDetails: ConnectedDev
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.primary)
+                    Text(text = connectionDetails.serverPort.toString())
                 }
             }
             Image(

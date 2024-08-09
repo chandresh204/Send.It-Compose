@@ -106,6 +106,10 @@ class ReceiverConnectionProcess @Inject constructor(
                         }
                         dSocket.close()
                         launch {
+                            responseChannel.send(res1.copy(
+                                success = true,
+                                response = "newPort/*$newPort*/"
+                            ))
                             startConnectionOnNewSocket(newPort, responseChannel)
                         }
                         break
@@ -198,5 +202,4 @@ class ReceiverConnectionProcess @Inject constructor(
         val uName = preferenceRepository.getUserNameFromPreferences()
         return "$uName - ${Build.MANUFACTURER}:${Build.MODEL}"
     }
-
 }

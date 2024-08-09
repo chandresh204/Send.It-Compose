@@ -34,21 +34,23 @@ class NotificationDomain @Inject constructor(
         nId: Int,
         title: String,
         content: String,
-    ) {
+    ) : Notification {
         val notificationBuilder = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, channelId)
         } else {
             Notification.Builder(context)
         }
+        val notification = notificationBuilder
+            .setSmallIcon(R.drawable.send_icon1_small)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setOngoing(true)
+            .build()
         nManager.notify(
-            nId,
-            notificationBuilder
-                .setSmallIcon(R.drawable.send_icon1_small)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setOngoing(true)
-                .build()
+            nId, notification
+
         )
+        return notification
     }
 
     @TargetApi(Build.VERSION_CODES.O)

@@ -8,5 +8,6 @@ data class ConnectedDeviceDetails(
     val address: InetAddress,
     val deviceType: String,
     val color: Color,
-    val freeSpace: Long
+    val freeSpace: Long,
+    val serverPort: Int
 )

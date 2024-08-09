@@ -37,7 +37,8 @@ fun MainNavigation() {
             }*/
         }
         composable(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN) {
-            CreateConnectionScreen {
+            CreateConnectionScreen { isSuccess ->
+                println("Connection success: $isSuccess")
                 navController.popBackStack()
             }
         }

@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.hilt.compose)
     implementation(libs.androidx.hilt.android)
     implementation(libs.io.coil.kt)
+    implementation(libs.androidx.work.runtime.ktx)
     kapt(libs.androidx.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

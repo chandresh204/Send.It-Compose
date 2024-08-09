@@ -160,7 +160,7 @@ class SenderConnectionProcess @Inject constructor(
                     response = Constants.CONNECT_NOW
                 )
             )
-            setConnectedDevice(selectedReceiver, freeSpace)
+            setConnectedDevice(selectedReceiver, freeSpace, operationalPort)
         } else {
             val connectCode = RuntimeConstants.generateRandomCode(4)
             updateChannel.send(
@@ -199,7 +199,7 @@ class SenderConnectionProcess @Inject constructor(
                             response = Constants.CONNECT_NOW
                         )
                     )
-                    setConnectedDevice(selectedReceiver, freeSpace)
+                    setConnectedDevice(selectedReceiver, freeSpace, operationalPort)
                     preferenceRepository.addToKnownReceiver(deviceId)
                     "true"
                 } else {
@@ -281,7 +281,7 @@ class SenderConnectionProcess @Inject constructor(
     }
 
     private fun setConnectedDevice(receiverData: ReceiverData?,
-                                   freeSpace: Long) {
+                                   freeSpace: Long, serverPort: Int) {
         if(receiverData == null) {
             Log.e(tag, "can not set connected device, receiver data is null")
             return
@@ -292,7 +292,8 @@ class SenderConnectionProcess @Inject constructor(
                 receiverData.address,
                 receiverData.deviceType,
                 receiverData.color,
-                freeSpace
+                freeSpace,
+                serverPort
             )
         )
         /*RuntimeConstants.connectedDeviceDetails =
