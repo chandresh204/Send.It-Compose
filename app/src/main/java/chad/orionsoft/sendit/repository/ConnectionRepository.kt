@@ -6,8 +6,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
 
 object ConnectionRepository  {
 
@@ -25,5 +23,5 @@ object ConnectionRepository  {
         }
     }
 
-    fun getConnectedDevice() : ConnectedDeviceDetails? = connectedDeviceDetails
+//    fun getConnectedDevice() : ConnectedDeviceDetails? = connectedDeviceDetails
 }

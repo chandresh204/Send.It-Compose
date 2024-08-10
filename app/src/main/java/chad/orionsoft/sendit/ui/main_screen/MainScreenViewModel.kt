@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.utils.Constants
