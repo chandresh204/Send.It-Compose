@@ -34,6 +34,7 @@ class NotificationDomain @Inject constructor(
         nId: Int,
         title: String,
         content: String,
+        isSticky: Boolean = true
     ) : Notification {
         val notificationBuilder = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, channelId)
@@ -44,7 +45,7 @@ class NotificationDomain @Inject constructor(
             .setSmallIcon(R.drawable.send_icon1_small)
             .setContentTitle(title)
             .setContentText(content)
-            .setOngoing(true)
+            .setOngoing(isSticky)
             .build()
         nManager.notify(
             nId, notification

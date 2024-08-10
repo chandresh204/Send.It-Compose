@@ -9,15 +9,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class ConnectionRepository @Inject constructor() {
+object ConnectionRepository  {
 
     private val repoScope = CoroutineScope(Dispatchers.IO)
 
+    private var connectedDeviceDetails : ConnectedDeviceDetails? = null
+
     private val _connectionUpdateChannel = Channel<ConnectedDeviceDetails?>()
     val connectionUpdateReceiver = _connectionUpdateChannel.receiveAsFlow()
-
-    private var connectedDeviceDetails : ConnectedDeviceDetails? = null
 
     fun updateConnectionInfo(deviceInfo: ConnectedDeviceDetails?) {
         connectedDeviceDetails = deviceInfo

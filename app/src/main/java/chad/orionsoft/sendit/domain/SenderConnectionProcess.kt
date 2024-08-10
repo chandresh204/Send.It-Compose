@@ -33,7 +33,6 @@ import javax.inject.Inject
 
 class SenderConnectionProcess @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
-    private val connectionRepository: ConnectionRepository,
     @ApplicationContext private val context: Context
 ) {
 
@@ -286,7 +285,7 @@ class SenderConnectionProcess @Inject constructor(
             Log.e(tag, "can not set connected device, receiver data is null")
             return
         }
-        connectionRepository.updateConnectionInfo(
+        ConnectionRepository.updateConnectionInfo(
             ConnectedDeviceDetails(
                 receiverData.name,
                 receiverData.address,

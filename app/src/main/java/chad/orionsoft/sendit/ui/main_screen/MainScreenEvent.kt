@@ -4,4 +4,5 @@ import chad.orionsoft.sendit.model.MediaData
 
 sealed class MainScreenEvent {
     data class OnItemSelected(val mData: MediaData, val isSelected: Boolean) : MainScreenEvent()
+    data object OnItemSendClick : MainScreenEvent()
 }

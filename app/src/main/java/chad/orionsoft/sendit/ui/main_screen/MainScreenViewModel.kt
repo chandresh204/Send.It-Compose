@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui.main_screen
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Data
@@ -11,6 +12,7 @@ import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
+import chad.orionsoft.sendit.work_manager.TcpSenderWorker
 import chad.orionsoft.sendit.work_manager.TcpServerWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,9 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val connectionRepository: ConnectionRepository,
     @ApplicationContext private val context: Context,
-    notificationDomain: NotificationDomain
 ) : ViewModel() {
 
     private val _mainScreenState = MutableStateFlow(MainScreenState())
@@ -33,7 +33,7 @@ class MainScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            connectionRepository.connectionUpdateReceiver.collectLatest {
+            ConnectionRepository.connectionUpdateReceiver.collectLatest {
                 _mainScreenState.update { state ->
                     state.copy(
                         connectedDeviceDetails = it
@@ -53,6 +53,14 @@ class MainScreenViewModel @Inject constructor(
                     it.copy(
                         selectionModel = updateSelectionUiModel(event.mData, event.isSelected)
                     )
+                }
+            }
+
+            MainScreenEvent.OnItemSendClick -> {
+                if(mainScreenState.value.connectedDeviceDetails == null) {
+                    Toast.makeText(context, "Not connected", Toast.LENGTH_LONG).show()
+                } else {
+                    startTCPSender(mainScreenState.value.connectedDeviceDetails!!.serverPort)
                 }
             }
         }
@@ -77,14 +85,25 @@ class MainScreenViewModel @Inject constructor(
     private fun startTCPServer(serverPort: Int, deviceName: String) {
         println("Trying to start server on $serverPort")
         val wM = WorkManager.getInstance(context)
-        val tagF = "testWork"
-        wM.cancelAllWorkByTag(tagF)
+        wM.cancelAllWorkByTag(Constants.SERVER_WM_TAG)
         val workRequest = OneTimeWorkRequestBuilder<TcpServerWorker>()
             .setInputData(Data.Builder().apply {
                 putInt(Constants.TCP_SERVER_WM_PORT, serverPort)
                 putString(Constants.TCP_SERVER_WM_DEVICE, deviceName)
             }.build())
-            .addTag(tagF).build()
+            .addTag(Constants.SERVER_WM_TAG).build()
+        wM.enqueue(workRequest)
+    }
+
+    private fun startTCPSender(serverPort: Int) {
+        println("Trying to start sender")
+        val wM = WorkManager.getInstance(context)
+        wM.cancelAllWorkByTag(Constants.SENDER_WM_TAG)
+        val workRequest = OneTimeWorkRequestBuilder<TcpSenderWorker>()
+            .setInputData(Data.Builder().apply {
+                putInt(Constants.TCP_SERVER_WM_PORT, serverPort)
+            }.build())
+            .addTag(Constants.SENDER_WM_TAG).build()
         wM.enqueue(workRequest)
     }
 }

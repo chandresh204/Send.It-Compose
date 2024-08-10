@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui.main_screen
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -19,11 +20,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +49,13 @@ fun MainScreen(gotoConnectScreen: () -> Unit) {
     val vModel = hiltViewModel<MainScreenViewModel>()
     val uiState by vModel.mainScreenState.collectAsState()
 
+    val context = LocalContext.current
+    LaunchedEffect(uiState.connectedDeviceDetails) {
+        if(uiState.connectedDeviceDetails == null) {
+            Toast.makeText(context, "You're not connected to any device", Toast.LENGTH_LONG).show()
+        }
+    }
+
     Scaffold(topBar = {
         AppBarWithMessage(title = "Send.It")
     }) { paddings ->
@@ -55,7 +65,10 @@ fun MainScreen(gotoConnectScreen: () -> Unit) {
             }
             SelectionInfoUi(selectionUiModel = uiState.selectionModel, modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp))
+                .padding(16.dp),
+                sendNow = {
+                    vModel.onEvent(MainScreenEvent.OnItemSendClick)
+                })
             ConnectionButton(modifier = Modifier
                 .align(Alignment.BottomStart)
                 .widthIn(max = 200.dp)
@@ -65,8 +78,8 @@ fun MainScreen(gotoConnectScreen: () -> Unit) {
 }
 
 @Composable
-private fun SelectionInfoUi(selectionUiModel: SelectionUiModel, modifier: Modifier) {
-    Card(modifier) {
+private fun SelectionInfoUi(selectionUiModel: SelectionUiModel, sendNow: () -> Unit, modifier: Modifier) {
+    Card(modifier.clickable(onClick = sendNow)) {
         Row(modifier = Modifier.padding(8.dp)) {
             Column {
                 Text(text = "${selectionUiModel.selectedCount} Files")

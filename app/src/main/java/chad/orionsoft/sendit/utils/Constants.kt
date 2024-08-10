@@ -50,6 +50,8 @@ object Constants {
     const val FILE_TYPE_OTHER = "other"
 
     // work manager params
+    const val SERVER_WM_TAG = "tcpServer"
+    const val SENDER_WM_TAG = "tcpSender"
     const val TCP_SERVER_WM_PORT = "receiverPort"
     const val TCP_SERVER_WM_DEVICE = "deviceName"
 }

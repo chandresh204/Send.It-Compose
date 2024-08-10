@@ -13,6 +13,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import chad.orionsoft.sendit.domain.NotificationDomain
+import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import kotlinx.coroutines.CoroutineScope
@@ -37,31 +38,32 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
     private val connectionName = params.inputData.getString(Constants.TCP_SERVER_WM_DEVICE)
     private val _updateChannel = Channel<String>()
     val updateFlow = _updateChannel.receiveAsFlow()
+    private val notificationId = 25
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
         println("TCPServerWorker >>> Running")
+        val connectionText = "Started on $onPort, Connected to: $connectionName"
         val notification = notificationDomain.showNotification(
-            10, "TcpServer",
-            "Started on $onPort, Connected to: $connectionName"
+            notificationId, "TcpServer",
+            connectionText
         )
-        setForegroundAsync(ForegroundInfo(10, notification,
+        setForegroundAsync(ForegroundInfo(notificationId, notification,
             FOREGROUND_SERVICE_TYPE_DATA_SYNC))
-        for (i in 0 until 20) {
+        /*for (i in 0 until 20) {
             delay(1000)
             notificationDomain.showNotification(
                 10, "TCPServer $i",
                 "Started on $onPort, Connected to: $connectionName"
             )
         }
-        return Result.success()
-        // TODO implement below code
+        return Result.success()*/
         withContext(Dispatchers.IO) {
             try {
                 Log.d(tag, "Starting tcp server on port: $onPort")
                 serverSocket = ServerSocket(onPort)
+                serverSocket.soTimeout = 60000
                 recSocket = serverSocket.accept()
-                recSocket.soTimeout = 60000
                 Log.d(tag, "Receiving on tcp")
                 val inStream = recSocket.getInputStream()
                 val outStream = recSocket.getOutputStream()
@@ -73,6 +75,10 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                     val read = inStream.read(buff)
                     val msg = String(buff, 0, read)
                     Log.d(tag, "Received: $msg")
+                    notificationDomain.showNotification(
+                        notificationId, "TCP Server",
+                        "$connectionText - received: $msg"
+                    )
                     _updateChannel.send("Received: $msg")
                     if (msg.contains(Constants.TCP_MODE_STR)) {
                         val modeStr = Converters.extractDataInNormalCase(msg)
@@ -93,6 +99,8 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                 }
             } catch (e: Exception) {
                 Log.e(tag, "Exception in start: $e")
+                showErrorNotification("Error: $e")
+                ConnectionRepository.updateConnectionInfo(null)
                 return@withContext Result.failure()
             }
         }
@@ -156,6 +164,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
             Log.d(tag, "Finished: $totalReceived Bytes")
         } catch (e:Exception) {
             updateChannel.send("An Error occurred while writing file: $e")
+            showErrorNotification("Error Writing File : $e")
             Log.e(tag, "error $e")
         }
     }
@@ -212,4 +221,10 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
         return itemUri
     }
 
+    private suspend fun showErrorNotification(text: String) {
+        delay(3000)
+        notificationDomain.showNotification(
+            notificationId +1, "TCP Server Stopped", text, false
+        )
+    }
 }

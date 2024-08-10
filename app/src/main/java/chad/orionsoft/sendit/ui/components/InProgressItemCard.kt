@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
-import chad.orionsoft.sendit.ui.receiver_main.AnimatedLinearProgressBar
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 
 @Composable

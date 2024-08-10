@@ -30,7 +30,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CCReceiverViewModel @Inject constructor(
     private val networkObserver: NetworkObserver,
-    private val connectionRepository: ConnectionRepository,
     private val connectionProcess: ReceiverConnectionProcess,
 ) : ViewModel() {
 
@@ -169,7 +168,7 @@ class CCReceiverViewModel @Inject constructor(
             Log.e(tag, "Error setting connected device, sender details null")
             return
         }
-        connectionRepository.updateConnectionInfo(
+        ConnectionRepository.updateConnectionInfo(
             ConnectedDeviceDetails(
                 senderDetails!!.name, senderDetails!!.address, senderDetails!!.deviceType,
                 senderDetails!!.color,

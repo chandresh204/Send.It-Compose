@@ -9,11 +9,7 @@ import androidx.navigation.navArgument
 import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionScreen
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
 import chad.orionsoft.sendit.ui.main_screen.MainScreen
-import chad.orionsoft.sendit.ui.receiver_main.ReceiverMainScreen
-import chad.orionsoft.sendit.ui.sender_audio.SenderAudio
-import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
-import chad.orionsoft.sendit.ui.sender_video.SenderVideo
 import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
@@ -32,9 +28,6 @@ fun MainNavigation() {
             MainScreen {
                 navController.navigate(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN)
             }
-            /*HomeScreen {
-                navController.navigate(it)
-            }*/
         }
         composable(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN) {
             CreateConnectionScreen { isSuccess ->
@@ -44,16 +37,6 @@ fun MainNavigation() {
         }
         composable(NavigationConstants.NAV_EDIT) {
             EditScreen {
-                navController.popBackStack()
-            }
-        }
-        composable(NavigationConstants.NAV_SENDER_MAIN) {
-            SenderMainScreen {
-                navController.navigate(it)
-            }
-        }
-        composable(NavigationConstants.NAV_RECEIVER_MAIN) {
-            ReceiverMainScreen {
                 navController.popBackStack()
             }
         }
@@ -74,19 +57,6 @@ fun MainNavigation() {
             val arg = it.arguments?.getString(NavigationConstants.FULL_SCREEN_IMG_URI)
             val decodedPath = Converters.decodeUriPath(arg ?: "")
             FullScreenImage(decodedPath)
-        }
-        composable(NavigationConstants.NAV_SENDER_AUDIO) {
-            SenderAudio { _, _ ->
-                navController.popBackStack()
-            }
-        }
-        composable(NavigationConstants.NAV_SENDER_VIDEO) {
-            SenderVideo { _, _ ->
-                navController.popBackStack()
-            }
-        }
-        composable(NavigationConstants.NAV_SENDER_FILES_SELECT) {
-            SenderFileSelect()
         }
     }
 }
