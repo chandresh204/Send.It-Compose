@@ -1,6 +1,8 @@
 package chad.orionsoft.sendit.utils
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
+import chad.orionsoft.sendit.model.FileType
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -54,6 +56,9 @@ object Converters {
         return response.substring(startIndex, endIndex)
     }
 
+    fun createTripleData(header: String, first: Any, second: Any, third: Any) : String =
+        "$header(($first))$second/*$third*/"
+
     fun extractTripleData(response: String) : Triple<String, String, String> {
         val firstIndex = response.indexOf("((")
         val secondIndex = response.indexOf("))")
@@ -76,6 +81,16 @@ object Converters {
             green = green.toInt(radix = 16)/255f,
             blue = blue.toInt(radix = 16)/255f
         )
+    }
+
+    fun convertToFileType(typeString: String) : FileType {
+        var type = FileType.FileTypeOther
+        FileType.entries.forEach {
+            if(typeString == it.title) {
+                type = it
+            }
+        }
+        return type
     }
 
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())

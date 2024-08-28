@@ -2,6 +2,7 @@ package chad.orionsoft.sendit
 
 import androidx.compose.ui.graphics.Color
 import org.junit.Test
+import kotlin.random.Random
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -12,6 +13,7 @@ class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
        convertStringToColor("FF2566")
+        println("new Random: ${generateRandomString()}")
     }
 
     fun convertStringToColor(colorStr: String) : Color {
@@ -25,5 +27,13 @@ class ExampleUnitTest {
             green = green.toInt(radix = 16)/255f,
             blue = green.toInt(radix = 16)/255f
         )
+    }
+
+    private fun generateRandomString() : String {
+        var randomStr = ""
+        for (i in 0 until 32) {
+            randomStr += Random.nextInt(300).toChar()
+        }
+        return randomStr
     }
 }

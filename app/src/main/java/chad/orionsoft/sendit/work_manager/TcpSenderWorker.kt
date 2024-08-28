@@ -3,28 +3,128 @@ package chad.orionsoft.sendit.work_manager
 import android.content.Context
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
+import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import chad.orionsoft.sendit.domain.NotificationDomain
+import chad.orionsoft.sendit.model.MediaData
+import chad.orionsoft.sendit.repository.ConnectionRepository
+import chad.orionsoft.sendit.utils.Constants
+import chad.orionsoft.sendit.utils.Converters
+import chad.orionsoft.sendit.utils.receiveData
+import chad.orionsoft.sendit.utils.sendData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import java.io.OutputStream
+import java.net.Socket
 
 class TcpSenderWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     private val notificationId = 99
     private val notificationDomain = NotificationDomain(context)
+    private val tag = "TCPSenderWorker"
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
         val notification =  notificationDomain.showNotification(
-            notificationId, "TCPSender", "Running"
+            notificationId, "TCPSender", "Total ${ConnectionRepository.selectedItemsToSend.size} items to send. "
         )
         setForegroundAsync(ForegroundInfo(notificationId, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC))
-        for (i in 0 until 20) {
-            delay(1000)
-        }
-        return Result.success()
+        return startFileSend()
     }
 
+    private suspend fun startFileSend() : Result  {
+        return withContext(Dispatchers.IO) {
+            val connectedDevice = ConnectionRepository.getConnectedDevice()
+            if (connectedDevice == null) {
+                showErrorNotification("Connected Device details not found")
+                return@withContext Result.failure()
+            }
+            val totalSizeToSend = ConnectionRepository.selectedItemsToSend.fold(0L) { acc, mData ->
+                acc.plus(
+                    mData.size
+                )
+            }
+            notificationDomain.showNotification(
+                notificationId, "TCPSender", "Total ${ConnectionRepository.selectedItemsToSend.size} items to send. " +
+                        "Total ${Converters.formatDataString(totalSizeToSend)}"
+            )
+            val modeStr = "${Constants.TCP_MODE_STR}((${Constants.MODE_TYPE_FILE}))${ConnectionRepository.selectedItemsToSend.size}" +
+                    "/*$totalSizeToSend*/"
+            Log.d(tag, "s1 >>> mode str sending $modeStr")
+            val tcpSocket = Socket(connectedDevice.address, connectedDevice.serverPort)
+            val reply = tcpSocket.sendData(modeStr)
+            Log.d(tag, "s1_1 >>> mode str sent")
+            if(reply.success && reply.resMsg?.contains(Constants.TCP_CONTINUE) == true) {
+                val totalCount = ConnectionRepository.selectedItemsToSend.size
+                Log.d(tag, "s2 >>> entering in loop to send $totalCount items")
+                var success = 0
+                for ((count, file) in ConnectionRepository.selectedItemsToSend.withIndex()) {
+                    val fileInfo = Converters.createTripleData(Constants.TCP_FILE_INFO, file.title, file.mediaType.title, file.size)
+                    Log.d(tag, "s3 >>> sending file info for: ${file.title}")
+                    notificationDomain.showNotification(
+                        notificationId, file.title, "${count + 1}/$totalCount", false,
+                        progress = (count+1)*100/totalCount
+                    )
+                    val reply2 = tcpSocket.sendData(fileInfo)
+                    if(reply2.success && reply2.resMsg?.contains(Constants.TCP_CONTINUE) == true) {
+                        // start sending file
+                        Log.d(tag, "s5 >>> sending file over tcp ${file.title}")
+                        if(startSendingFile(tcpSocket.getOutputStream(), file)) {
+                            success++
+                        }
+                        // wait for continue signal
+                        Log.d(tag, "s7 >>> wait for continue signal")
+                        val resp1 = tcpSocket.receiveData()
+                        Log.d(tag, "s7_1 >>> continue response received $resp1")
+                        if(!resp1.success) {
+                            Log.d(tag, "s7_2 >>> failed to get continue signal , stopping process")
+                            break
+                        }
+                    }
+                }
+                showErrorNotification(
+                    "Sent $success/$totalCount successfully"
+                )
+            }
+            tcpSocket.close()
+            return@withContext Result.success()
+        }
+    }
+
+    private suspend fun startSendingFile(outStream: OutputStream, fileData: MediaData) : Boolean {
+        return withContext(Dispatchers.IO) {
+            var totalSent = 0L
+            val fileInputStream = context.contentResolver.openInputStream(fileData.uri)
+            if(fileInputStream == null) {
+                Log.e(tag, "${fileData.title} >>> input stream is null")
+                return@withContext false
+            }
+            try {
+                do {
+                    val buff = ByteArray(4096)
+                    val read = fileInputStream.read(buff)
+                    outStream.write(buff, 0, read)
+                    totalSent += read
+                } while (totalSent < fileData.size)
+                Log.d(tag, "${fileData.title} >>> $totalSent Bytes Success")
+                fileInputStream.close()
+                return@withContext true
+            } catch (e:Exception) {
+                Log.e(tag, "${fileData.title} >>> $totalSent Bytes Failed >>> $e")
+                return@withContext false
+            }
+        }
+    }
+
+    private suspend fun showErrorNotification(text: String) {
+        delay(3000)
+        notificationDomain.showNotification(
+            notificationId +1, "Sender Stopped", text, false
+        )
+    }
 }

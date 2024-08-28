@@ -11,5 +11,5 @@ data class MediaData(
     val thumbnail: Uri,
     val size: Long,
     val lastModified: Long,
-    val mediaType: MediaTypes
+    val mediaType: FileType
 )

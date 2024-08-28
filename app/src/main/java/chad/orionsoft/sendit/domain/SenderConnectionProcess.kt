@@ -13,8 +13,8 @@ import chad.orionsoft.sendit.ui.create_connection_flow.state.ReceiverData
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Constants.RECEIVER_SELECT_MESSAGE
 import chad.orionsoft.sendit.utils.Converters
-import chad.orionsoft.sendit.utils.DatagramSocketExtensions.sendData
 import chad.orionsoft.sendit.utils.RuntimeConstants
+import chad.orionsoft.sendit.utils.sendData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

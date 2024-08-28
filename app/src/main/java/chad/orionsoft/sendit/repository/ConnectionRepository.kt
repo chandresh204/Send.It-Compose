@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.repository
 
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
+import chad.orionsoft.sendit.model.MediaData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -23,5 +24,6 @@ object ConnectionRepository  {
         }
     }
 
-//    fun getConnectedDevice() : ConnectedDeviceDetails? = connectedDeviceDetails
+    val selectedItemsToSend : MutableList<MediaData> = mutableListOf()
+    fun getConnectedDevice() : ConnectedDeviceDetails? = connectedDeviceDetails
 }

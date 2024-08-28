@@ -14,9 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,15 +33,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
-import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetSearching
-import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith2Buttons
-import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.NavigationConstants
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import kotlinx.coroutines.delay
 
-
+// TODO remove if not required
 @Composable
 fun HomeScreen(navToScreen: (String) -> Unit) {
     Scaffold {

@@ -12,9 +12,9 @@ import chad.orionsoft.sendit.utils.Constants.CONNECT_NOW
 import chad.orionsoft.sendit.utils.Constants.ENTER_CODE_SIGNAL
 import chad.orionsoft.sendit.utils.Constants.RECEIVER_NOT_SUPPORTED
 import chad.orionsoft.sendit.utils.Constants.RECEIVER_SELECT_MESSAGE
-import chad.orionsoft.sendit.utils.DatagramSocketExtensions.getResponse
-import chad.orionsoft.sendit.utils.DatagramSocketExtensions.sendData
 import chad.orionsoft.sendit.utils.RuntimeConstants
+import chad.orionsoft.sendit.utils.getResponse
+import chad.orionsoft.sendit.utils.sendData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -151,13 +151,13 @@ class ReceiverConnectionProcess @Inject constructor(
                     Log.d("CreateConnection", "r5_a1_1 -> Need to enter code")
                     responseChannel.send(res)
                     var waitingForCodeSince = 0
-                    var succes = false
+                    var success = false
                     do {
                         if(connectCode != null) {
                             val reply = "$ENTER_CODE_SIGNAL/*$connectCode*/"
                             opSocket?.sendData(reply,
                                 res.partnerAddress, res.partnerPort, waitForResponse = false)
-                            succes = true
+                            success = true
                             break
                         }
                         delay(100)
@@ -168,7 +168,7 @@ class ReceiverConnectionProcess @Inject constructor(
                         }
                         waitingForCodeSince += 100
                     } while (waitingForCodeSince < Constants.ENTER_CODE_TIME_OUT * 1000)
-                    if(!succes) {
+                    if(!success) {
                         responseChannel.send(
                             res.copy(
                                 success = false,

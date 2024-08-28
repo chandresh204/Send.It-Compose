@@ -30,6 +30,7 @@ class MainScreenViewModel @Inject constructor(
     private val _mainScreenState = MutableStateFlow(MainScreenState())
     val mainScreenState = _mainScreenState.asStateFlow()
 
+
     init {
         viewModelScope.launch {
             ConnectionRepository.connectionUpdateReceiver.collectLatest {
@@ -48,9 +49,10 @@ class MainScreenViewModel @Inject constructor(
     fun onEvent(event: MainScreenEvent) {
         when(event) {
             is MainScreenEvent.OnItemSelected -> {
+                updateSelectedItems(event.mData, event.isSelected)
                 _mainScreenState.update {
                     it.copy(
-                        selectionModel = updateSelectionUiModel(event.mData, event.isSelected)
+                        selectionModel = updateSelectionUiModel(event.mData, event.isSelected),
                     )
                 }
             }
@@ -104,5 +106,14 @@ class MainScreenViewModel @Inject constructor(
             }.build())
             .addTag(Constants.SENDER_WM_TAG).build()
         wM.enqueue(workRequest)
+    }
+
+    @Synchronized
+    private fun updateSelectedItems(mData: MediaData, isSelected: Boolean) {
+        if(isSelected) {
+            ConnectionRepository.selectedItemsToSend.add(mData)
+        } else {
+            ConnectionRepository.selectedItemsToSend.remove(mData)
+        }
     }
 }

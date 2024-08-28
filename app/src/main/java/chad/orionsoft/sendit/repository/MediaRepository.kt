@@ -4,8 +4,8 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
-import chad.orionsoft.sendit.model.MediaTypes
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -67,7 +67,7 @@ class MediaRepository @Inject constructor(
                             size = iStream?.available()?.toLong() ?: 0L
                             iStream?.close()
                         }
-                        imagesList.add(MediaData(id, uri, title, null, -1, uri, size, modified, MediaTypes.Image))
+                        imagesList.add(MediaData(id, uri, title, null, -1, uri, size, modified, FileType.FileTypeImage))
                     } while (iCursor.moveToNext())
                 }
             }
@@ -117,7 +117,7 @@ class MediaRepository @Inject constructor(
                 audioList.add(
                     MediaData(
                         id, uri, name ?: "Unknown", artist ?: "Unknown", duration,
-                        artUri, size, modified, MediaTypes.Audio
+                        artUri, size, modified, FileType.FileTypeAudio
                     )
                 )
             } while (aCursor.moveToNext())
@@ -196,7 +196,7 @@ class MediaRepository @Inject constructor(
                     val duration = vCursor.getInt(durationIndex)
                     val size = vCursor.getLong(sizeIndex)
                     val modified = vCursor.getLong(lastModifiedIndex)
-                    videosList.add(MediaData(id, uri, title, null, duration, uri, size, modified, MediaTypes.Video))
+                    videosList.add(MediaData(id, uri, title, null, duration, uri, size, modified, FileType.FileTypeVideo))
                 } while (vCursor.moveToNext())
             }
         }

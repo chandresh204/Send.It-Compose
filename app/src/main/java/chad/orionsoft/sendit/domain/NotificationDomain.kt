@@ -34,22 +34,29 @@ class NotificationDomain @Inject constructor(
         nId: Int,
         title: String,
         content: String,
-        isSticky: Boolean = true
+        isSticky: Boolean = true,
+        progress: Int? = null
     ) : Notification {
         val notificationBuilder = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, channelId)
         } else {
             Notification.Builder(context)
         }
-        val notification = notificationBuilder
+        notificationBuilder
             .setSmallIcon(R.drawable.send_icon1_small)
             .setContentTitle(title)
             .setContentText(content)
             .setOngoing(isSticky)
-            .build()
+        progress?.let {
+            if(it > 0) {
+                notificationBuilder.setProgress(100, it, false)
+            } else {
+                notificationBuilder.setProgress(100, 0, true)
+            }
+        }
+        val notification = notificationBuilder.build()
         nManager.notify(
             nId, notification
-
         )
         return notification
     }
