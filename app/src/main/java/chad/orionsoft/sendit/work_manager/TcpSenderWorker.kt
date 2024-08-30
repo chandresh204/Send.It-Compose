@@ -43,7 +43,6 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
                 showErrorNotification("Connected Device details not found")
                 return@withContext Result.failure()
             }
-            // Todo clear static selected item list and
             val selectedItemsToSend = ConnectionRepository.getSelectedItems().toList()
             ConnectionRepository.clearAllSelection()
             val totalSizeToSend = selectedItemsToSend.fold(0L) { acc, mData ->
