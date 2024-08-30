@@ -44,7 +44,12 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
-        println("TCPServerWorker >>> Running")
+        Log.d(tag, ">>> Starting")
+        if(ConnectionRepository.getConnectedDevice() == null) {
+            Log.d(tag, ">>> Stopping due to not connected")
+            showErrorNotification("TCPServer : Not connected to any device")
+            return Result.failure()
+        }
         val connectionText = "Started on $onPort, Connected to: $connectionName"
         val notification = notificationDomain.showNotification(
             notificationId, "TcpServer",

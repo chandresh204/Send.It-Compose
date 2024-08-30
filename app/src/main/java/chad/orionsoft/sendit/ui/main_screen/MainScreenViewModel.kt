@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,6 +43,11 @@ class MainScreenViewModel @Inject constructor(
                 if(it != null) {
                     startTCPServer(it.serverPort, it.name)
                 }
+            }
+        }
+        viewModelScope.launch {
+            ConnectionRepository.clearAllSelectionReceiver.collect {
+                if(it) clearAllSelection()
             }
         }
     }
@@ -111,9 +117,17 @@ class MainScreenViewModel @Inject constructor(
     @Synchronized
     private fun updateSelectedItems(mData: MediaData, isSelected: Boolean) {
         if(isSelected) {
-            ConnectionRepository.selectedItemsToSend.add(mData)
+            ConnectionRepository.addToSelected(mData)
         } else {
-            ConnectionRepository.selectedItemsToSend.remove(mData)
+            ConnectionRepository.removeFromSelected(mData)
+        }
+    }
+
+    private fun clearAllSelection() {
+        _mainScreenState.update {
+            it.copy(
+                selectionModel = SelectionUiModel()
+            )
         }
     }
 }

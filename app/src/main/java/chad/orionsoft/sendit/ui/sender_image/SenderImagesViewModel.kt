@@ -1,11 +1,14 @@
 package chad.orionsoft.sendit.ui.sender_image
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.repository.MediaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +26,13 @@ class SenderImagesViewModel @Inject constructor(
             it.copy(
                 images = getAllImages().toMutableList()
             )
+        }
+        viewModelScope.launch {
+            ConnectionRepository.clearAllSelectionReceiver.collect {
+                if(it) {
+                    clearAllSelection()
+                }
+            }
         }
     }
 
@@ -75,6 +85,18 @@ class SenderImagesViewModel @Inject constructor(
     private fun getAllImages() : List<ImageUiData> {
         return mediaRepository.getImages().map {
             ImageUiData(it, false, null)
+        }
+    }
+
+    private fun clearAllSelection() {
+        val imageList = _uiState.value.images
+        imageList.forEach {
+            it.isSelected = false
+        }
+        _uiState.update {
+            it.copy(
+                images = imageList
+            )
         }
     }
 

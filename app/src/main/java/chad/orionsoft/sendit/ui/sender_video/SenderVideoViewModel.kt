@@ -2,12 +2,15 @@ package chad.orionsoft.sendit.ui.sender_video
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.model.SortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,6 +33,13 @@ class SenderVideoViewModel @Inject constructor(
             )
         }
         sortTheList(avState.value.selectedSortOrder)
+        viewModelScope.launch {
+            ConnectionRepository.clearAllSelectionReceiver.collect {
+                if(it) {
+                    clearAllSelection()
+                }
+            }
+        }
     }
 
     private fun sortTheList(sortOrder: SortOrder) {

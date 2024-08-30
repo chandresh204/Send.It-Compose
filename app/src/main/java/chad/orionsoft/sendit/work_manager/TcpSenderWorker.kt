@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.model.MediaData
@@ -31,7 +30,7 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
         val notification =  notificationDomain.showNotification(
-            notificationId, "TCPSender", "Total ${ConnectionRepository.selectedItemsToSend.size} items to send. "
+            notificationId, "TCPSender", "Sending"
         )
         setForegroundAsync(ForegroundInfo(notificationId, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC))
         return startFileSend()
@@ -44,26 +43,29 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
                 showErrorNotification("Connected Device details not found")
                 return@withContext Result.failure()
             }
-            val totalSizeToSend = ConnectionRepository.selectedItemsToSend.fold(0L) { acc, mData ->
+            // Todo clear static selected item list and
+            val selectedItemsToSend = ConnectionRepository.getSelectedItems().toList()
+            ConnectionRepository.clearAllSelection()
+            val totalSizeToSend = selectedItemsToSend.fold(0L) { acc, mData ->
                 acc.plus(
                     mData.size
                 )
             }
             notificationDomain.showNotification(
-                notificationId, "TCPSender", "Total ${ConnectionRepository.selectedItemsToSend.size} items to send. " +
+                notificationId, "TCPSender", "Total ${selectedItemsToSend.size} items to send. " +
                         "Total ${Converters.formatDataString(totalSizeToSend)}"
             )
-            val modeStr = "${Constants.TCP_MODE_STR}((${Constants.MODE_TYPE_FILE}))${ConnectionRepository.selectedItemsToSend.size}" +
+            val modeStr = "${Constants.TCP_MODE_STR}((${Constants.MODE_TYPE_FILE}))${selectedItemsToSend.size}" +
                     "/*$totalSizeToSend*/"
             Log.d(tag, "s1 >>> mode str sending $modeStr")
             val tcpSocket = Socket(connectedDevice.address, connectedDevice.serverPort)
             val reply = tcpSocket.sendData(modeStr)
             Log.d(tag, "s1_1 >>> mode str sent")
             if(reply.success && reply.resMsg?.contains(Constants.TCP_CONTINUE) == true) {
-                val totalCount = ConnectionRepository.selectedItemsToSend.size
+                val totalCount = selectedItemsToSend.size
                 Log.d(tag, "s2 >>> entering in loop to send $totalCount items")
                 var success = 0
-                for ((count, file) in ConnectionRepository.selectedItemsToSend.withIndex()) {
+                for ((count, file) in selectedItemsToSend.withIndex()) {
                     val fileInfo = Converters.createTripleData(Constants.TCP_FILE_INFO, file.title, file.mediaType.title, file.size)
                     Log.d(tag, "s3 >>> sending file info for: ${file.title}")
                     notificationDomain.showNotification(
