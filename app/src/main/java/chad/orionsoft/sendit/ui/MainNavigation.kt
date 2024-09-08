@@ -10,6 +10,7 @@ import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionScreen
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
 import chad.orionsoft.sendit.ui.main_screen.MainScreen
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
+import chad.orionsoft.sendit.ui.transfer_process_screen.TransferMain
 import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
@@ -25,8 +26,8 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_HOME_SCREEN) {
-            MainScreen {
-                navController.navigate(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN)
+            MainScreen { route ->
+                navController.navigate(route)
             }
         }
         composable(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN) {
@@ -57,6 +58,13 @@ fun MainNavigation() {
             val arg = it.arguments?.getString(NavigationConstants.FULL_SCREEN_IMG_URI)
             val decodedPath = Converters.decodeUriPath(arg ?: "")
             FullScreenImage(decodedPath)
+        }
+        composable(
+            route = NavigationConstants.NAV_TRANSFER_PROGRESS_SCREEN,
+        ) {
+            TransferMain {
+                navController.popBackStack()
+            }
         }
     }
 }

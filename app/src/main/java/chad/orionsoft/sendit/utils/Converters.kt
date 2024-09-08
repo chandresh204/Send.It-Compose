@@ -2,6 +2,7 @@ package chad.orionsoft.sendit.utils
 
 import android.util.Log
 import androidx.compose.ui.graphics.Color
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.FileType
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -91,6 +92,27 @@ object Converters {
             }
         }
         return type
+    }
+
+    fun getPlaceHolderIconsAsPerMediaType(mediaType : FileType) : Int {
+        return when(mediaType) {
+           FileType.FileTypeImage -> {
+               R.drawable.image_icon_small
+           }
+            FileType.FileTypeAudio -> {
+                R.drawable.music_icon_small
+            }
+            FileType.FileTypeVideo -> {
+                R.drawable.video_icon_small
+            }
+            FileType.FileTypeOther -> {
+                R.drawable.file_unknown_icon_small
+            }
+        }
+    }
+
+    fun getPlaceHolderIconsAsPerFileName(filename: String) : Int {
+        return R.drawable.file_unknown_icon_small
     }
 
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())

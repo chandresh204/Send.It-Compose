@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.utils.Constants
@@ -63,6 +64,7 @@ class MainScreenViewModel @Inject constructor(
             }
 
             MainScreenEvent.OnItemSendClick -> {
+                TransferProcessDomain.addToSendingList(ConnectionRepository.getSelectedItems())
                 if(mainScreenState.value.connectedDeviceDetails == null) {
                     Toast.makeText(context, "Not connected", Toast.LENGTH_LONG).show()
                 } else {
@@ -104,13 +106,21 @@ class MainScreenViewModel @Inject constructor(
     private fun startTCPSender(serverPort: Int) {
         println("Trying to start sender")
         val wM = WorkManager.getInstance(context)
-        wM.cancelAllWorkByTag(Constants.SENDER_WM_TAG)
-        val workRequest = OneTimeWorkRequestBuilder<TcpSenderWorker>()
-            .setInputData(Data.Builder().apply {
-                putInt(Constants.TCP_SERVER_WM_PORT, serverPort)
-            }.build())
-            .addTag(Constants.SENDER_WM_TAG).build()
-        wM.enqueue(workRequest)
+        val wInfo = wM.getWorkInfosByTag(Constants.SENDER_WM_TAG)
+        wInfo.isDone
+        wInfo.isCancelled
+        wInfo.get().forEach {
+            println("workInfo: $it")
+        }
+        if(wInfo.isDone || wInfo.isCancelled) {
+            wM.cancelAllWorkByTag(Constants.SENDER_WM_TAG)
+            val workRequest = OneTimeWorkRequestBuilder<TcpSenderWorker>()
+                .setInputData(Data.Builder().apply {
+                    putInt(Constants.TCP_SERVER_WM_PORT, serverPort)
+                }.build())
+                .addTag(Constants.SENDER_WM_TAG).build()
+            wM.enqueue(workRequest)
+        }
     }
 
     @Synchronized

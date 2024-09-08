@@ -9,7 +9,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import chad.orionsoft.sendit.domain.NotificationDomain
+import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.MediaData
+import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
@@ -41,9 +43,13 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
             val connectedDevice = ConnectionRepository.getConnectedDevice()
             if (connectedDevice == null) {
                 showErrorNotification("Connected Device details not found")
-                return@withContext Result.failure()
+                return@withContext Result.success()
             }
             val selectedItemsToSend = ConnectionRepository.getSelectedItems().toList()
+            if(selectedItemsToSend.isEmpty()) {
+                Log.d(tag, "Nothing selected, stopping TCPSender")
+                return@withContext Result.success()
+            }
             ConnectionRepository.clearAllSelection()
             val totalSizeToSend = selectedItemsToSend.fold(0L) { acc, mData ->
                 acc.plus(
@@ -71,6 +77,7 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
                         notificationId, file.title, "${count + 1}/$totalCount", false,
                         progress = (count+1)*100/totalCount
                     )
+                    TransferProcessDomain.updateSendingItemCount(count+1)
                     val reply2 = tcpSocket.sendData(fileInfo)
                     if(reply2.success && reply2.resMsg?.contains(Constants.TCP_CONTINUE) == true) {
                         // start sending file
@@ -100,23 +107,32 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
     private suspend fun startSendingFile(outStream: OutputStream, fileData: MediaData) : Boolean {
         return withContext(Dispatchers.IO) {
             var totalSent = 0L
+            var loops = 0
             val fileInputStream = context.contentResolver.openInputStream(fileData.uri)
             if(fileInputStream == null) {
                 Log.e(tag, "${fileData.title} >>> input stream is null")
                 return@withContext false
             }
             try {
+                TransferProcessDomain.updateItemTransferStatus(fileData.id, ProgressStatus.Sending, true)
                 do {
+                    loops++
                     val buff = ByteArray(4096)
                     val read = fileInputStream.read(buff)
                     outStream.write(buff, 0, read)
                     totalSent += read
+                    if(loops % Constants.UPDATE_TRANSFER_STATUS_AFTER_LOOPS == 0) {
+                        TransferProcessDomain.updateItemSentProgress(fileData.id, totalSent)
+                        Log.d(tag, "Sending update : Sending ${fileData.id} -> $totalSent")
+                    }
                 } while (totalSent < fileData.size)
                 Log.d(tag, "${fileData.title} >>> $totalSent Bytes Success")
                 fileInputStream.close()
+                TransferProcessDomain.updateItemTransferStatus(fileData.id, ProgressStatus.Success, true)
                 return@withContext true
             } catch (e:Exception) {
                 Log.e(tag, "${fileData.title} >>> $totalSent Bytes Failed >>> $e")
+                TransferProcessDomain.updateItemTransferStatus(fileData.id, ProgressStatus.Failed, true)
                 return@withContext false
             }
         }

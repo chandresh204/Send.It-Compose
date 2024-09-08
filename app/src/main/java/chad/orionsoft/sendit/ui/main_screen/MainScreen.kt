@@ -42,10 +42,11 @@ import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
 import chad.orionsoft.sendit.ui.sender_video.SenderVideo
 import chad.orionsoft.sendit.ui.theme.SendItTheme
+import chad.orionsoft.sendit.utils.NavigationConstants
 import kotlinx.coroutines.launch
 
 @Composable
-fun MainScreen(gotoConnectScreen: () -> Unit) {
+fun MainScreen(gotoScreen: (screenRoute: String) -> Unit) {
     val vModel = hiltViewModel<MainScreenViewModel>()
     val uiState by vModel.mainScreenState.collectAsState()
 
@@ -67,12 +68,14 @@ fun MainScreen(gotoConnectScreen: () -> Unit) {
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
                 sendNow = {
+                    gotoScreen(NavigationConstants.NAV_TRANSFER_PROGRESS_SCREEN)
                     vModel.onEvent(MainScreenEvent.OnItemSendClick)
                 })
             ConnectionButton(modifier = Modifier
                 .align(Alignment.BottomStart)
                 .widthIn(max = 200.dp)
-                .padding(16.dp), uiState.connectedDeviceDetails ,gotoConnectScreen)
+                .padding(16.dp), uiState.connectedDeviceDetails
+            ) { gotoScreen(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN) }
         }
     }
 }

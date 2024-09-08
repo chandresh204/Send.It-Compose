@@ -12,16 +12,16 @@ import androidx.work.WorkerParameters
 import chad.orionsoft.sendit.domain.ContentResolverDomain
 import chad.orionsoft.sendit.domain.FileIOOperations.provideFile
 import chad.orionsoft.sendit.domain.NotificationDomain
+import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.FileType
+import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
-import kotlinx.coroutines.CoroutineScope
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.net.ServerSocket
@@ -34,12 +34,9 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
     private val contentResolverDomain : ContentResolverDomain = ContentResolverDomain(context)
     private lateinit var serverSocket: ServerSocket
     private lateinit var recSocket : Socket
-    private val ioScope = CoroutineScope(Dispatchers.IO)
     private val tag = "TcpServerWorker"
     private val onPort = params.inputData.getInt(Constants.TCP_SERVER_WM_PORT, 4848)
     private val connectionName = params.inputData.getString(Constants.TCP_SERVER_WM_DEVICE)
-    private val _updateChannel = Channel<String>()
-    val updateFlow = _updateChannel.receiveAsFlow()
     private val notificationId = 25
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -89,8 +86,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                             Constants.MODE_TYPE_FILE -> {
                                 Log.d(tag, "File will be received here")
 //                                _updateChannel.send("waiting for file to receive")
-                                receiveFileOverTCP(recSocket, modeStr.second.toInt(),
-                                    modeStr.second.toLong(),_updateChannel)
+                                receiveFileOverTCP(recSocket, modeStr.second.toInt())
                             }
 
                             Constants.MODE_TYPE_DISCONNECT -> {
@@ -114,9 +110,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private suspend fun receiveFileOverTCP(recSocket: Socket, count: Int,
-                                           totalSize: Long,
-                                           updateChannel: Channel<String>) = coroutineScope {
+    private suspend fun receiveFileOverTCP(recSocket: Socket, count: Int) = coroutineScope {
         notificationDomain.showNotification(
             notificationId, "Preparing", "0/$count", false , progress = -1
         )
@@ -128,7 +122,6 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
         // enter loop to receive files
         var success = 0
         for (i in 0 until count) {
-
             while (inStream.available() == 0) {
                 delay(100)
             }
@@ -225,6 +218,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
     ) : Boolean {
         // start file write process
         return withContext(Dispatchers.IO) {
+            val fileId = TransferProcessDomain.addToReceivingList(filename, size)
             try {
                 val contentResolver = context.contentResolver
                 var newFileUri: Uri? = null
@@ -245,7 +239,8 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                     val read1 = inStream.read(buff)
                     fileOut?.write(buff, 0, read1)
                     totalReceived += read1
-                    if (loops % 1000 == 0) {
+                    if (loops % Constants.UPDATE_TRANSFER_STATUS_AFTER_LOOPS == 0) {
+                        TransferProcessDomain.updateItemReceivedProgress(fileId, totalReceived)
                         Log.d(tag, "Received: $totalReceived Bytes")
                     }
                 } while (totalReceived < size)
@@ -260,10 +255,16 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                     }
                 }
                 Log.d(tag, "Finished: $totalReceived Bytes")
+                TransferProcessDomain.updateItemTransferStatus(
+                    fileId, ProgressStatus.Success, false
+                )
                 return@withContext true
             } catch (e: Exception) {
                 showErrorNotification("Error Writing File : $e")
                 Log.e(tag, "error $e")
+                TransferProcessDomain.updateItemTransferStatus(
+                    fileId, ProgressStatus.Failed, false
+                )
                 return@withContext false
             }
         }

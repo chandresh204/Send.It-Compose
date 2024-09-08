@@ -58,5 +58,5 @@ object Constants {
     const val TCP_SERVER_WM_PORT = "receiverPort"
     const val TCP_SERVER_WM_DEVICE = "deviceName"
 
-
+    const val UPDATE_TRANSFER_STATUS_AFTER_LOOPS = 300
 }
