@@ -21,9 +21,6 @@ object TransferProcessDomain {
     private val transferSendingList = mutableListOf<TransferringMediaItem>()
     private val transferReceivingList = mutableListOf<TransferringMediaItem>()
 
-    private val _transferSendingListFlow = Channel<List<TransferringMediaItem>>()
-    val transferSendingListFlow = _transferSendingListFlow.receiveAsFlow()
-
     private val _transferReceivingListFlow = Channel<TransferringMediaItem>()
     val transferReceivingListFlow = _transferReceivingListFlow.receiveAsFlow()
 
@@ -52,9 +49,6 @@ object TransferProcessDomain {
     private val _receivingItemStatusFlow = Channel<Pair<Long, ProgressStatus>>()
     val receivingItemStatusFlow = _receivingItemStatusFlow.receiveAsFlow()
 
-    private val _receivingSpeedFlow = MutableSharedFlow<Long>()
-    val receivingSpeedFlow = _receivingSpeedFlow.asSharedFlow()
-
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private var totalSent = 0L
@@ -66,9 +60,6 @@ object TransferProcessDomain {
 
     fun addToSendingList(mediaList: List<MediaData>) {
         transferSendingList.addAll(mapToTransferringMediaItems(mediaList))
-        ioScope.launch {
-            _transferSendingListFlow.send(transferSendingList)
-        }
     }
 
     fun addToReceivingList(filename: String, size: Long) : Long { // returns the id of new file

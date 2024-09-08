@@ -1,0 +1,32 @@
+assuming there are x files to send 
+const mode_str
+const tcp_file_str
+const tcp_continue/*ok*/
+
+tcp_s1 = send mode string with all files info
+mode_str((files))countOfx/*totalSizeOfx*/
+
+wait for tcp continue
+
+tcp_s2 = enter into loop of x files
+
+tcp_s3 = send file info 
+ tcp_file_str((name))type/*size*/
+or stop or skip
+
+wait for tcp continue 
+if recived ok continue process or if recived stop exit the loop
+
+tcp_s4 = accept stop or skip event
+if stop exit loop
+if skip , skip current file
+
+tcp_s5 = send file over tcp
+
+tcp_s6 = catch exception
+
+tcp_s7 = wait for continue signal
+if recived ok continue process or if recived stop exit the loop
+
+tcp_s8 = complete process
+

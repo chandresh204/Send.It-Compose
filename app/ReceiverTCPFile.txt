@@ -1,0 +1,16 @@
+tcp_r1 = open connection
+
+tcp_r2 = receive mode string,
+extract count and size, send continue signal
+
+tcp_r3 = enter loop to receive files
+
+tcp_r4 = receive file info or stop or skip
+if stop exit Loop
+if skip then continue loop by skipping this
+
+tcp_r5 = start file receiving
+
+tcp_r6 = send continue on finish or
+send stop event if requested
+

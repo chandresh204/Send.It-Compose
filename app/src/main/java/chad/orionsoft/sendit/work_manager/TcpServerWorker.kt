@@ -18,7 +18,6 @@ import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
-import chad.orionsoft.sendit.utils.RuntimeConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
