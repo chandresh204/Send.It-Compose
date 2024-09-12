@@ -57,12 +57,11 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
             try {
                 Log.d(tag, "Starting tcp server on port: $onPort")
                 serverSocket = ServerSocket(onPort)
-                serverSocket.soTimeout = 300000
-                recSocket = serverSocket.accept()
-                Log.d(tag, "r1 >>> Receiving on tcp")
-                val inStream = recSocket.getInputStream()
-                val outStream = recSocket.getOutputStream()
                 while (true) {
+                    serverSocket.soTimeout = 300000
+                    recSocket = serverSocket.accept()
+                    Log.d(tag, "r1 >>> Receiving on tcp")
+                    val inStream = recSocket.getInputStream()
                     notificationDomain.showNotification(
                         notificationId, "TCP Server",
                         connectionText
@@ -83,14 +82,15 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                         val modeStr = Converters.extractTripleData(msg)
                         when (modeStr.first) {
                             Constants.MODE_TYPE_FILE -> {
-                                Log.d(tag, "File will be received here")
+                                Log.d(tag, "r3 >>> File will be received here")
 //                                _updateChannel.send("waiting for file to receive")
                                 receiveFileOverTCP(recSocket, modeStr.second.toInt())
+                                Log.d(tag, "r7 >>> All file received")
                             }
 
                             Constants.MODE_TYPE_DISCONNECT -> {
                                 recSocket.close()
-                                serverSocket.close()
+                       //         serverSocket.close()
                                 throw Exception("Stopped by sender")
                             }
                         }
@@ -157,7 +157,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
         showErrorNotification(
             "Received $success/$count succeed"
         )
-
+        inStream.close()
         return@coroutineScope
 
        /* if(!reply.contains(Constants.TCP_CONTINUE)) {
@@ -253,14 +253,14 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                         )
                     }
                 }
-                Log.d(tag, "Finished: $totalReceived Bytes")
+                Log.d(tag, "r6 >>> Finished: $totalReceived Bytes")
                 TransferProcessDomain.updateItemTransferStatus(
                     fileId, ProgressStatus.Success, false
                 )
                 return@withContext true
             } catch (e: Exception) {
                 showErrorNotification("Error Writing File : $e")
-                Log.e(tag, "error $e")
+                Log.e(tag, "r6 >>> error $e")
                 TransferProcessDomain.updateItemTransferStatus(
                     fileId, ProgressStatus.Failed, false
                 )

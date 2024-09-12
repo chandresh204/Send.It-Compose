@@ -62,7 +62,7 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
             )
             val modeStr = "${Constants.TCP_MODE_STR}((${Constants.MODE_TYPE_FILE}))${selectedItemsToSend.size}" +
                     "/*$totalSizeToSend*/"
-            Log.d(tag, "s1 >>> mode str sending $modeStr")
+            Log.d(tag, "s1 >>> mode str sending $modeStr to ${connectedDevice.address} : ${connectedDevice.serverPort}")
             val tcpSocket = Socket(connectedDevice.address, connectedDevice.serverPort)
             val reply = tcpSocket.sendData(modeStr)
             Log.d(tag, "s1_1 >>> mode str sent")
@@ -99,6 +99,8 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
                     "Sent $success/$totalCount successfully"
                 )
             }
+            //
+            Log.d(tag, "s8 >>> disconnect signal sent")
             tcpSocket.close()
             return@withContext Result.success()
         }

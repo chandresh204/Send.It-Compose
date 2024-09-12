@@ -4,8 +4,11 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.BackoffPolicy
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.MediaData
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -100,7 +104,7 @@ class MainScreenViewModel @Inject constructor(
                 putString(Constants.TCP_SERVER_WM_DEVICE, deviceName)
             }.build())
             .addTag(Constants.SERVER_WM_TAG).build()
-        wM.enqueue(workRequest)
+        wM.enqueueUniqueWork(Constants.SERVER_WM_TAG, ExistingWorkPolicy.REPLACE, workRequest)
     }
 
     private fun startTCPSender(serverPort: Int) {
@@ -118,8 +122,13 @@ class MainScreenViewModel @Inject constructor(
                 .setInputData(Data.Builder().apply {
                     putInt(Constants.TCP_SERVER_WM_PORT, serverPort)
                 }.build())
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL,
+                    1L,
+                    TimeUnit.MINUTES
+                ).setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .addTag(Constants.SENDER_WM_TAG).build()
-            wM.enqueue(workRequest)
+            wM.enqueueUniqueWork(Constants.SENDER_WM_TAG, ExistingWorkPolicy.REPLACE, workRequest)
         }
     }
 
