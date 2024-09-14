@@ -53,7 +53,6 @@ class TransferReceivingViewModel : ViewModel() {
                 iToUpdate?.let {
                     val newList = _transferReceivingState.value.receiveList.toMutableList()
                     val index = newList.indexOf(it)
-                    // TODO if status success then generate the thumbnail
                     newList[index] = newList[index].copy(
                         status = statusPair.second
                     )
