@@ -27,7 +27,11 @@ class TransferMainViewModel : ViewModel() {
                 _tMainState.update {
                     it.copy(
                         sendingSpeed = Converters.formatDataString(sentBytes.first),
-                        receivingItemSpeed = Converters.formatDataString(sentBytes.second)
+                        receivingItemSpeed = Converters.formatDataString(sentBytes.second),
+                        totalSentAndReceived = Pair(
+                            Converters.formatDataString(TransferProcessDomain.getTotalSentInSession()),
+                            Converters.formatDataString(TransferProcessDomain.getTotalReceivedInSession())
+                        )
                     )
                 }
             }

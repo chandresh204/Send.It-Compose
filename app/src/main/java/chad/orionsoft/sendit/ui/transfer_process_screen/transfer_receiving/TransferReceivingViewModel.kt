@@ -19,8 +19,10 @@ class TransferReceivingViewModel : ViewModel() {
 
     init {
         receiveCurrentList()
+        observeList()
         receiveProgressData()
         receiveStatusChange()
+        receiveThumbnailUpdate()
     }
 
     private fun receiveProgressData() {
@@ -51,6 +53,7 @@ class TransferReceivingViewModel : ViewModel() {
                 iToUpdate?.let {
                     val newList = _transferReceivingState.value.receiveList.toMutableList()
                     val index = newList.indexOf(it)
+                    // TODO if status success then generate the thumbnail
                     newList[index] = newList[index].copy(
                         status = statusPair.second
                     )
@@ -60,35 +63,73 @@ class TransferReceivingViewModel : ViewModel() {
         }
     }
 
-    private fun receiveCurrentList() {
+    private fun observeList() {
         viewModelScope.launch {
             TransferProcessDomain.transferReceivingListFlow.collect { newItem ->
                 val newList = _transferReceivingState.value.receiveList.toMutableList()
                 if(newList.find {
-                    it.transferringMediaItem.id == newItem.id
+                        it.transferringMediaItem.id == newItem.id
                     } == null) {
-                    newList.add(0,
-                        TransferItemUi(
-                            TransferringMediaItem(
-                                newItem.id,
-                                newItem.title,
-                                newItem.uri,
-                                null,
-                                newItem.thumbnailPlaceHolder,
-                                newItem.size,
-                                newItem.mediaType,
-                                newItem.status,
-                            ),
-                            progressText = "",
-                            sizeReadable = Converters.formatDataString(newItem.size),
-                            status = newItem.status,
-                            progress = 0f
-                        )
-                    )
-                    updateList(newList)
+                    newList.add(0, mapNewToUiModel(newItem))
+                    updateList(newList.distinct())
                 }
             }
         }
+    }
+
+    private fun receiveThumbnailUpdate() {
+        viewModelScope.launch {
+            TransferProcessDomain.receivingItemThumbnailFlow.collect { thumbPair ->
+                val newList = _transferReceivingState.value.receiveList.toMutableList()
+                val iToUpdate = newList.find { it.transferringMediaItem.id == thumbPair.first }
+                iToUpdate?.let {
+                    val index = newList.indexOf(it)
+                    val newMediaItem = it.transferringMediaItem.copy(
+                        thumbnailUri = thumbPair.second
+                    )
+                    newList[index] = newList[index].copy(
+                        transferringMediaItem = newMediaItem
+                    )
+                    _transferReceivingState.update { state ->
+                        state.copy(
+                            receiveList = newList
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun receiveCurrentList() {
+        val itemList = TransferProcessDomain.getTheCurrentTransferReceivingList().map {
+                mapNewToUiModel(it)
+            }
+        val newList = _transferReceivingState.value.receiveList.toMutableList()
+        newList.addAll(itemList.sortedBy { it.status })
+        _transferReceivingState.update {
+            it.copy(
+                receiveList = newList.distinct()
+            )
+        }
+    }
+
+    private fun mapNewToUiModel(newItem: TransferringMediaItem) : TransferItemUi {
+        return TransferItemUi(
+                TransferringMediaItem(
+                    newItem.id,
+                    newItem.title,
+                    newItem.uri,
+                    newItem.thumbnailUri,
+                    newItem.thumbnailPlaceHolder,
+                    newItem.size,
+                    newItem.mediaType,
+                    newItem.status,
+                ),
+                progressText = "",
+                sizeReadable = Converters.formatDataString(newItem.size),
+                status = newItem.status,
+                progress = 0f
+            )
     }
 
     private fun updateList(newList: List<TransferItemUi>) {

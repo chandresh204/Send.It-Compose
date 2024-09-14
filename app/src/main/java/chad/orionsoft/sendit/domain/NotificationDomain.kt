@@ -8,6 +8,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Build
+import androidx.annotation.RequiresApi
 import chad.orionsoft.sendit.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -20,12 +21,15 @@ class NotificationDomain @Inject constructor(
 
     private val channelId = "Send_It_Channel_Id"
     private val channelName = "Send_it_channel"
+    private val silentChannelId = "Send_It_Silent_Id"
+    private val silentChannelName = "Send_it_silent_channel"
     private var nManager : NotificationManager =
         context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
     init {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
+            createSilentNotificationChannel()
         }
     }
 
@@ -35,10 +39,20 @@ class NotificationDomain @Inject constructor(
         title: String,
         content: String,
         isSticky: Boolean = true,
-        progress: Int? = null
+        progress: Int? = null,
+        type: NotificationType = NotificationType.Normal
     ) : Notification {
         val notificationBuilder = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(context, channelId)
+            when (type) {
+                NotificationType.Normal -> {
+                    Notification.Builder(context, channelId)
+                }
+                NotificationType.Silent -> {
+                    Notification.Builder(context, silentChannelId)
+                }
+                NotificationType.Floating -> TODO()
+            }
+
         } else {
             Notification.Builder(context)
         }
@@ -47,6 +61,9 @@ class NotificationDomain @Inject constructor(
             .setContentTitle(title)
             .setContentText(content)
             .setOngoing(isSticky)
+        if(type == NotificationType.Silent) {
+            notificationBuilder.setSound(null)
+        }
         progress?.let {
             if(it > 0) {
                 notificationBuilder.setProgress(100, it, false)
@@ -66,5 +83,16 @@ class NotificationDomain @Inject constructor(
         nManager.createNotificationChannel(
             NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
         )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createSilentNotificationChannel() {
+        nManager.createNotificationChannel(
+            NotificationChannel(silentChannelId, silentChannelName, NotificationManager.IMPORTANCE_LOW)
+        )
+    }
+
+    enum class NotificationType {
+        Normal, Silent, Floating
     }
 }

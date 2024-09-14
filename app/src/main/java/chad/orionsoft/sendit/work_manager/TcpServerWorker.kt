@@ -242,10 +242,13 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                     val read1 = inStream.read(buff)
                     fileOut?.write(buff, 0, read1)
                     totalReceived += read1
+                    TransferProcessDomain.addToTotalReceivedInSession(read1)
                     if (loops % Constants.UPDATE_TRANSFER_STATUS_AFTER_LOOPS == 0) {
                         TransferProcessDomain.updateItemReceivedProgress(fileId, totalReceived)
                         notificationDomain.showNotification(
-                            notificationId, "Receiving", filename, false , progress = (totalReceived*100/size).toInt()
+                            notificationId, "Receiving", filename, false ,
+                            progress = (totalReceived*100/size).toInt(),
+                            type = NotificationDomain.NotificationType.Silent
                         )
                         Log.d(tag, "Received: $totalReceived Bytes")
                     }
@@ -256,9 +259,14 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                     // update contentResolver
                     newFileUri?.let {
                         contentResolverDomain.updateValueInContentResolver(
-                            type, newFileUri
+                            type, it
+                        )
+                        TransferProcessDomain.itsTimeToUpdateThumbnailUri(
+                            it, fileId
                         )
                     }
+                } else {
+                    // TODO need to update the thumbnail directly from file
                 }
                 Log.d(tag, "r6 >>> Finished: $totalReceived Bytes")
                 TransferProcessDomain.updateItemTransferStatus(

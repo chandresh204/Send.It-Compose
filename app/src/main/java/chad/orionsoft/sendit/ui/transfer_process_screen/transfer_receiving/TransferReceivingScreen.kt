@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -43,8 +47,17 @@ fun TransferReceivingScreen(vModel : TransferReceivingViewModel = hiltViewModel(
                             it.transferringMediaItem.title,
                             it.sizeReadable,
                             it.transferringMediaItem.thumbnailUri,
-                            it.status
-                        )
+                            it.status,
+                            removeIcon = {
+                                IconButton(onClick = {
+                                    // TODO delete received Item
+                                }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "delete")
+                                }
+                            }
+                        ) {
+                            // TODO open item in supported app
+                        }
                     }
                 }
             }

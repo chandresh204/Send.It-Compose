@@ -3,6 +3,7 @@ package chad.orionsoft.sendit.ui.components
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,9 +43,11 @@ fun SteadyItemCard(
     title: String,
     size: String,
     thumbnail: Uri?,
-    progressStatus: ProgressStatus? = null
+    progressStatus: ProgressStatus? = null,
+    removeIcon : @Composable (() -> Unit)? = null,
+    onClick: () -> Unit
 ) {
-    Card(modifier = Modifier.padding(bottom = 8.dp)) {
+    Card(modifier = Modifier.padding(bottom = 8.dp).clickable(onClick = onClick)) {
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
@@ -54,7 +57,9 @@ fun SteadyItemCard(
                 AsyncThumbnail(
                     placeholder = thumbnailPlaceholder,
                     imageUri = thumbnail ?: Uri.parse(""),
-                    modifier = Modifier.size(50.dp).clip(CircleShape))
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape))
                 progressStatus?.let {
                     val icon = when(it) {
                         ProgressStatus.Sending -> Icons.Default.KeyboardArrowUp
@@ -69,9 +74,11 @@ fun SteadyItemCard(
                             .size(50.dp)
                             .align(Alignment.Center)
                             .clip(CircleShape)
-                            .background(color = MaterialTheme.colorScheme.background.copy(
-                                alpha = 0.5f
-                            ))
+                            .background(
+                                color = MaterialTheme.colorScheme.background.copy(
+                                    alpha = 0.5f
+                                )
+                            )
                             .padding(8.dp),
                         contentDescription = null
                     )
@@ -96,6 +103,7 @@ fun SteadyItemCard(
                     Icon(Icons.Default.Clear, contentDescription = "remove")
                 }
             }
+            removeIcon?.let { it() }
         }
     }
 }
@@ -107,6 +115,11 @@ private fun Preview() {
         SteadyItemCard(thumbnailPlaceholder = R.drawable.music_icon,
             title = "Cool Weather", size = "11 MB",
             thumbnail = Uri.parse(""),
-            progressStatus = ProgressStatus.Success)
+            removeIcon = {
+                IconButton(onClick = { }) {
+                    Icon(Icons.Default.Clear, null)
+                }
+            },
+            progressStatus = ProgressStatus.Success) {}
     }
 }

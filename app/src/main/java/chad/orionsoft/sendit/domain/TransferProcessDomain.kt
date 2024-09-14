@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.domain
 
+import android.net.Uri
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.model.ReceivingItemProgressData
@@ -52,6 +53,8 @@ object TransferProcessDomain {
     private val _receivingItemStatusFlow = Channel<Pair<Long, ProgressStatus>>()
     val receivingItemStatusFlow = _receivingItemStatusFlow.receiveAsFlow()
 
+    private val _receivingItemThumbnailFlow = Channel<Pair<Long, Uri>>()
+    val receivingItemThumbnailFlow = _receivingItemThumbnailFlow.receiveAsFlow()
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private var totalSent = 0L
@@ -123,14 +126,24 @@ object TransferProcessDomain {
     }
 
     fun updateItemSentProgress(id: Long, sent: Long) {
-        totalSent = sent
         ioScope.launch {
             _sendingItemProgressFlow.send(SendingItemProgressData(id, sent))
         }
     }
 
+    fun addToTotalSentInSession(sent: Int) {
+        totalSent += sent
+    }
+
+    fun getTotalSentInSession() : Long = totalSent
+
+    fun addToTotalReceivedInSession(received: Int) {
+        totalReceived += received
+    }
+
+    fun getTotalReceivedInSession() : Long = totalReceived
+
     fun updateItemReceivedProgress(id: Long, received: Long) {
-        totalReceived = received
         ioScope.launch {
             _receivingItemProgressFlow.send(ReceivingItemProgressData(id, received))
         }
@@ -154,6 +167,20 @@ object TransferProcessDomain {
             }
         }
     }
+
+    fun itsTimeToUpdateThumbnailUri(thumbUri: Uri, id: Long) {
+        val itemInList = transferReceivingList.find { it.id == id }
+        itemInList?.let {
+            val index = transferReceivingList.indexOf(it)
+            transferReceivingList[index] = transferReceivingList[index].copy(
+                thumbnailUri = thumbUri
+            )
+            ioScope.launch {
+                _receivingItemThumbnailFlow.send(Pair(id, thumbUri))
+            }
+        }
+    }
+
 
     fun updateSendingItemCount(completed: Int) {
         ioScope.launch {

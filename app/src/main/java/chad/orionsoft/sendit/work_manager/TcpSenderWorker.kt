@@ -169,6 +169,7 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
                     val read = fileInputStream.read(buff)
                     outStream.write(buff, 0, read)
                     totalSent += read
+                    TransferProcessDomain.addToTotalSentInSession(read)
                     if(loops % Constants.UPDATE_TRANSFER_STATUS_AFTER_LOOPS == 0) {
                         TransferProcessDomain.updateItemSentProgress(fileData.id, totalSent)
                         Log.d(tag, "Sending update : Sending ${fileData.id} -> $totalSent")
