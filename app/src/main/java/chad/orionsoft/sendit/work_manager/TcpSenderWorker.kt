@@ -11,7 +11,6 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.domain.TransferProcessDomain
-import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.model.TransferringMediaItem
 import chad.orionsoft.sendit.repository.ConnectionRepository

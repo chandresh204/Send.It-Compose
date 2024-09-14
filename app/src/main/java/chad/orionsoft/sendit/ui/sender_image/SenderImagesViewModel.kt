@@ -2,7 +2,6 @@ package chad.orionsoft.sendit.ui.sender_image
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import chad.orionsoft.sendit.repository.ConnectionRepository
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

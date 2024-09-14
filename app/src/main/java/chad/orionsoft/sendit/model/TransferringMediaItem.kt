@@ -5,7 +5,7 @@ import android.net.Uri
 data class TransferringMediaItem(
     val id: Long,
     val title: String,
-    val uri: Uri?, // TODO not required for receiving files
+    val uri: Uri?, //  not required for receiving files
     val thumbnailUri: Uri?,
     val thumbnailPlaceHolder: Int,
     val size: Long,

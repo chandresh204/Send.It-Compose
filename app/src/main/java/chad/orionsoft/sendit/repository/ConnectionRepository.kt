@@ -1,8 +1,6 @@
 package chad.orionsoft.sendit.repository
 
-import android.util.Log
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
-import chad.orionsoft.sendit.model.MediaData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow

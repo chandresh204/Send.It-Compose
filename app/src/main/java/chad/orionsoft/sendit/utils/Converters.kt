@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.utils
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.FileType
