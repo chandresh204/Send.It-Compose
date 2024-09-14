@@ -19,6 +19,8 @@ import kotlin.random.Random
 object TransferProcessDomain {
 
     private val transferSendingList = mutableListOf<TransferringMediaItem>()
+    private val sentHistoryList = mutableListOf<TransferringMediaItem>()
+
     private val transferReceivingList = mutableListOf<TransferringMediaItem>()
 
     private val _transferReceivingListFlow = Channel<TransferringMediaItem>()
@@ -35,6 +37,7 @@ object TransferProcessDomain {
     val sendingItemCountFlow = _sendingItemCountFlow.asSharedFlow()
 
     private val _transferSpeedFlow = MutableSharedFlow<Pair<Long, Long>>()
+
 
     /**
      * Sends the flow of transfer rate in Pair, first element represents sent Bytes in 1 sec while
@@ -53,6 +56,12 @@ object TransferProcessDomain {
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private var totalSent = 0L
     private var totalReceived = 0L
+    var totalSentCount = 0
+
+    /**
+     * Shows the current status of the sending process, true means sending is currently in progress
+     */
+    var isSending = false
 
     init {
         startCalculatingTransferSpeed()
@@ -68,8 +77,10 @@ object TransferProcessDomain {
             newId,
             filename,
             null,
+            null,
             Converters.getPlaceHolderIconsAsPerFileName(filename),
             size,
+            Converters.getFileTypeFromFileName(filename),
             ProgressStatus.Receiving
         )
         transferReceivingList.add(newReceivingItem)
@@ -84,9 +95,11 @@ object TransferProcessDomain {
             TransferringMediaItem(
                id = it.id,
                 title = it.title,
+                uri = it.uri,
                 thumbnailUri = it.thumbnail,
                 thumbnailPlaceHolder = Converters.getPlaceHolderIconsAsPerMediaType(it.mediaType),
                 size = it.size,
+                it.mediaType,
                 status = ProgressStatus.InQueue
             )
         }
@@ -144,10 +157,17 @@ object TransferProcessDomain {
 
     fun updateSendingItemCount(completed: Int) {
         ioScope.launch {
-            _sendingItemCountFlow.emit(Pair(completed, transferSendingList.size))
+            _sendingItemCountFlow.emit(Pair(completed, transferSendingList.size + sentHistoryList.size))
         }
+    }
+
+    fun clearQueueAndMoveToFinish() {
+        sentHistoryList.addAll(transferSendingList)
+        transferSendingList.clear()
     }
 
     fun getTheCurrentTransferSendingList() : List<TransferringMediaItem> = transferSendingList
     fun getTheCurrentTransferReceivingList() : List<TransferringMediaItem> = transferReceivingList
+
+    fun getSentHistoryList() = sentHistoryList
 }

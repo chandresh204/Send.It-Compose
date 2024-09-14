@@ -39,7 +39,7 @@ object Constants {
 
     const val TCP_CONTINUE = ",brÃDr½çÈlĐē'÷"
     const val TCP_OKAY = "d%@^"
-    const val TCP_STOP = "¹ÙÒ:ÿ"
+    const val TCP_DONE = "¹ÙÒ:ÿ"
     const val TCP_FILE_INFO = "e398jfd%@^"
     const val TCP_FILE_IGNORE = "dksjdlascnhlksadkhw"
     const val TCP_FILE_FREE_SPACE_SIGNAL  = "sdnccop5d75sde398jfd%@^"

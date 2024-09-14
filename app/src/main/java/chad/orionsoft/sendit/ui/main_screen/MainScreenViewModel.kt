@@ -19,7 +19,9 @@ import chad.orionsoft.sendit.work_manager.TcpSenderWorker
 import chad.orionsoft.sendit.work_manager.TcpServerWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -35,6 +37,7 @@ class MainScreenViewModel @Inject constructor(
     private val _mainScreenState = MutableStateFlow(MainScreenState())
     val mainScreenState = _mainScreenState.asStateFlow()
 
+    private val selectedItemsToSend : MutableList<MediaData> = mutableListOf()
 
     init {
         viewModelScope.launch {
@@ -47,11 +50,6 @@ class MainScreenViewModel @Inject constructor(
                 if(it != null) {
                     startTCPServer(it.serverPort, it.name)
                 }
-            }
-        }
-        viewModelScope.launch {
-            ConnectionRepository.clearAllSelectionReceiver.collect {
-                if(it) clearAllSelection()
             }
         }
     }
@@ -68,11 +66,14 @@ class MainScreenViewModel @Inject constructor(
             }
 
             MainScreenEvent.OnItemSendClick -> {
-                TransferProcessDomain.addToSendingList(ConnectionRepository.getSelectedItems())
                 if(mainScreenState.value.connectedDeviceDetails == null) {
                     Toast.makeText(context, "Not connected", Toast.LENGTH_LONG).show()
                 } else {
-                    startTCPSender(mainScreenState.value.connectedDeviceDetails!!.serverPort)
+                    TransferProcessDomain.addToSendingList(selectedItemsToSend)
+                    clearAllSelection()
+                    if(!TransferProcessDomain.isSending) {
+                        startTCPSender(mainScreenState.value.connectedDeviceDetails!!.serverPort)
+                    }
                 }
             }
         }
@@ -135,17 +136,34 @@ class MainScreenViewModel @Inject constructor(
     @Synchronized
     private fun updateSelectedItems(mData: MediaData, isSelected: Boolean) {
         if(isSelected) {
-            ConnectionRepository.addToSelected(mData)
+            addToSelected(mData)
         } else {
-            ConnectionRepository.removeFromSelected(mData)
+            removeFromSelected(mData)
         }
     }
 
+    private fun addToSelected(mediaData: MediaData) {
+        selectedItemsToSend.add(mediaData)
+    }
+
+    private fun removeFromSelected(mediaData: MediaData) {
+        selectedItemsToSend.remove(mediaData)
+    }
+
     private fun clearAllSelection() {
+        selectedItemsToSend.clear()
+        viewModelScope.launch {
+            _clearAllSelectionFlow.emit(true)
+        }
         _mainScreenState.update {
             it.copy(
                 selectionModel = SelectionUiModel()
             )
         }
+    }
+
+    companion object {
+        private val _clearAllSelectionFlow = MutableSharedFlow<Boolean>()
+        val clearAllSelectionReceiver = _clearAllSelectionFlow.asSharedFlow()
     }
 }

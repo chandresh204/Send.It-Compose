@@ -115,6 +115,10 @@ object Converters {
         return R.drawable.file_unknown_icon_small
     }
 
+    fun getFileTypeFromFileName(filename: String) : FileType {
+        return FileType.FileTypeOther
+    }
+
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
 
     fun decodeUriPath(encoded: String) : String = URLDecoder.decode(encoded, StandardCharsets.UTF_8.toString())

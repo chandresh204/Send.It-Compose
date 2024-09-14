@@ -18,10 +18,6 @@ object ConnectionRepository  {
     private val _connectionUpdateChannel = MutableSharedFlow<ConnectedDeviceDetails?>()
     val connectionUpdateReceiver = _connectionUpdateChannel.asSharedFlow()
 
-    private val _clearAllSelectionChannel = MutableSharedFlow<Boolean>()
-    val clearAllSelectionReceiver = _clearAllSelectionChannel.asSharedFlow()
-
-    private val selectedItemsToSend : MutableList<MediaData> = mutableListOf()
 
     fun updateConnectionInfo(deviceInfo: ConnectedDeviceDetails?) {
         connectedDeviceDetails = deviceInfo
@@ -31,22 +27,4 @@ object ConnectionRepository  {
     }
 
     fun getConnectedDevice() : ConnectedDeviceDetails? = connectedDeviceDetails
-
-    fun addToSelected(mediaData: MediaData) {
-        selectedItemsToSend.add(mediaData)
-    }
-
-    fun removeFromSelected(mediaData: MediaData) {
-        selectedItemsToSend.remove(mediaData)
-    }
-
-    fun getSelectedItems() = selectedItemsToSend
-
-    fun clearAllSelection() {
-        Log.d(tag, "SelectedItemList: ${selectedItemsToSend.size} cleared")
-        selectedItemsToSend.clear()
-        CoroutineScope(Dispatchers.IO).launch {
-            _clearAllSelectionChannel.emit(true)
-        }
-    }
 }

@@ -23,7 +23,10 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
     private val tag = "TransferSendingViewModel"
 
     init {
-        updateSendingList(TransferProcessDomain.getTheCurrentTransferSendingList())
+        updateSendingList(
+            TransferProcessDomain.getTheCurrentTransferSendingList(),
+            TransferProcessDomain.getSentHistoryList()
+        )
         receiveSendingProgressUpdate()
         receiveSendingStatusChanges()
     }
@@ -130,7 +133,13 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
         )
     }*/
 
-    private fun updateSendingList(list : List<TransferringMediaItem>) {
+    private fun updateSendingList(
+        queue : List<TransferringMediaItem>,
+        history: List<TransferringMediaItem>
+    ) {
+        val list = mutableListOf<TransferringMediaItem>()
+        list.addAll(queue)
+        list.addAll(history)
         _transferSendingState.update {
             it.copy(
                 sentList = list.map { mItem ->

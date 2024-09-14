@@ -89,7 +89,8 @@ private fun TransferTabs(
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         tabList.forEachIndexed { index, it ->
             val countAndSpeedText = if(index == 0) {
-                "($sendCount) $sendSpeed/s"
+                if(sendCount.isEmpty()) "$sendSpeed/s"
+                else "($sendCount) $sendSpeed/s"
             } else {
                 receiveSpeed
             }

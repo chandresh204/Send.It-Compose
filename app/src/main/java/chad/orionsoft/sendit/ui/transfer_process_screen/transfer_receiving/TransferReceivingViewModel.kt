@@ -72,9 +72,11 @@ class TransferReceivingViewModel : ViewModel() {
                             TransferringMediaItem(
                                 newItem.id,
                                 newItem.title,
+                                newItem.uri,
                                 null,
                                 newItem.thumbnailPlaceHolder,
                                 newItem.size,
+                                newItem.mediaType,
                                 newItem.status,
                             ),
                             progressText = "",

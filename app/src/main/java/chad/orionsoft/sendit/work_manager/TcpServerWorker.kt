@@ -38,6 +38,12 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
     private val connectionName = params.inputData.getString(Constants.TCP_SERVER_WM_DEVICE)
     private val notificationId = 25
 
+    private lateinit var foregroundInfo: ForegroundInfo
+
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return foregroundInfo
+    }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
         Log.d(tag, ">>> Starting")
@@ -51,8 +57,9 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
             notificationId, "TcpServer",
             connectionText
         )
-        setForegroundAsync(ForegroundInfo(notificationId, notification,
-            FOREGROUND_SERVICE_TYPE_DATA_SYNC))
+        foregroundInfo = ForegroundInfo(notificationId, notification,
+            FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        setForegroundAsync(foregroundInfo)
         withContext(Dispatchers.IO) {
             try {
                 Log.d(tag, "Starting tcp server on port: $onPort")
@@ -77,15 +84,14 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                         notificationId, "TCP Server",
                         "$connectionText - received: $msg"
                     )
-//                    _updateChannel.send("Received: $msg")
                     if (msg.contains(Constants.TCP_MODE_STR)) {
                         val modeStr = Converters.extractTripleData(msg)
                         when (modeStr.first) {
                             Constants.MODE_TYPE_FILE -> {
                                 Log.d(tag, "r3 >>> File will be received here")
-//                                _updateChannel.send("waiting for file to receive")
-                                receiveFileOverTCP(recSocket, modeStr.second.toInt())
+                                receiveFileOverTCP(recSocket)
                                 Log.d(tag, "r7 >>> All file received")
+                                recSocket.close()
                             }
 
                             Constants.MODE_TYPE_DISCONNECT -> {
@@ -109,9 +115,9 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private suspend fun receiveFileOverTCP(recSocket: Socket, count: Int) = coroutineScope {
+    private suspend fun receiveFileOverTCP(recSocket: Socket) = coroutineScope {
         notificationDomain.showNotification(
-            notificationId, "Preparing", "0/$count", false , progress = -1
+            notificationId, "Preparing", "----", false , progress = -1
         )
         // send continue signal or ignore signal
         val outStream = recSocket.getOutputStream()
@@ -120,7 +126,8 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
 
         // enter loop to receive files
         var success = 0
-        for (i in 0 until count) {
+        var count = 0
+        while (true) {
             while (inStream.available() == 0) {
                 delay(100)
             }
@@ -128,8 +135,8 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
             val read = inStream.read(readInfoBuff)
             val msg = String(readInfoBuff, 0, read)
 
-            if(msg.contains(Constants.TCP_STOP)) {
-                Log.d(tag, "r4 >>> received stop")
+            if(msg.contains(Constants.TCP_DONE)) {
+                Log.d(tag, "r4 >>> received completed")
                 break
             }
 
@@ -139,9 +146,6 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                 val filename = fileInfo.first
                 val type = Converters.convertToFileType(fileInfo.second)
                 val size = fileInfo.third
-                notificationDomain.showNotification(
-                    notificationId, filename, "${i + 1}/$count", false , progress = (i+1)*100/count
-                )
                 // send continue signal
                 outStream.write(Constants.TCP_CONTINUE.toByteArray())
                 // start receiving file
@@ -152,7 +156,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                 // send continue signal
                 outStream.write(Constants.TCP_CONTINUE.toByteArray())
             }
-
+            count++
         }
         showErrorNotification(
             "Received $success/$count succeed"
@@ -240,6 +244,9 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                     totalReceived += read1
                     if (loops % Constants.UPDATE_TRANSFER_STATUS_AFTER_LOOPS == 0) {
                         TransferProcessDomain.updateItemReceivedProgress(fileId, totalReceived)
+                        notificationDomain.showNotification(
+                            notificationId, "Receiving", filename, false , progress = (totalReceived*100/size).toInt()
+                        )
                         Log.d(tag, "Received: $totalReceived Bytes")
                     }
                 } while (totalReceived < size)
