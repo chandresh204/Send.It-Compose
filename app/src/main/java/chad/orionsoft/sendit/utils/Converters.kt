@@ -3,7 +3,6 @@ package chad.orionsoft.sendit.utils
 import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.FileType
-import java.io.File
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets

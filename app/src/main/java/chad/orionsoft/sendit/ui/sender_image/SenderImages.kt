@@ -14,7 +14,6 @@ import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
-import chad.orionsoft.sendit.utils.Converters
 
 @Composable
 fun SenderImagesScreen(onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
