@@ -7,20 +7,22 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
 import chad.orionsoft.sendit.utils.Converters
 
 @Composable
-fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
+fun SenderImagesScreen(onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
 
     val vModel = hiltViewModel<SenderImagesViewModel>()
     val uiState by vModel.uiState.collectAsState()
     val gridState = rememberLazyGridState()
-
+    val context = LocalContext.current
     LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Adaptive(100.dp)) {
@@ -36,7 +38,7 @@ fun SenderImagesScreen(viewFullScreen: (path: String) -> Unit, onItemSelectedCha
                 actionIconVector = null,
                 actionIconDrawableRes = R.drawable.eye_icon_small,
                 onActionClick = {
-                    viewFullScreen(Converters.encodeUriPath(img.imageData.uri.path.toString()))
+                    StartActivity.openFile(context, img.imageData.title, img.imageData.uri)
                 }) {
                 onItemSelectedChanged(img.imageData, !img.isSelected)
                 vModel.onEvent(SenderImagesEvent.OnSelectClick(img.imageData.id))

@@ -12,9 +12,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.bottom_sheets.OptionSelectBottomSheet
 import chad.orionsoft.sendit.ui.components.MediaItemViewBar
@@ -31,6 +33,7 @@ fun SenderAudio(onSelectionChanged: (MediaData, Boolean) -> Unit) {
     var isSortingChangeRequest by remember {
         mutableStateOf(false)
     }
+    val context = LocalContext.current
 
     LazyColumn {
         val displayList = if(uiState.isSearching) {
@@ -49,7 +52,9 @@ fun SenderAudio(onSelectionChanged: (MediaData, Boolean) -> Unit) {
                         Converters.formatDataString(aud.audioData.size),
                 actionIconVector = Icons.Default.PlayArrow,
                 actionIconDrawableRes = null,
-                onActionClick = {  }) {
+                onActionClick = {
+                    StartActivity.openFile(context, aud.audioData.title, aud.audioData.uri)
+                }) {
                     onSelectionChanged(aud.audioData, !aud.selected)
                     vModel.onEvent(SenderAudioEvent.OnSelectClick(aud.audioData.id)
                 )

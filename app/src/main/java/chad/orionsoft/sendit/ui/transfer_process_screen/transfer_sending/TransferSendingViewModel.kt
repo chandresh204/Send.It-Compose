@@ -31,6 +31,23 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
         receiveSendingStatusChanges()
     }
 
+    fun removeItemFromQueue(id: Long) {
+        val isRemoved = TransferProcessDomain.removeItemFromQueue(id)
+        if(isRemoved) {
+            // remove from UI List too
+            val removeItem = _transferSendingState.value.sentList.find { it.transferringMediaItem.id == id }
+            removeItem?.let {
+                val newList = _transferSendingState.value.sentList.toMutableList()
+                newList.remove(it)
+                _transferSendingState.update { state ->
+                    state.copy(
+                        sentList = newList
+                    )
+                }
+            }
+        }
+    }
+
     private fun receiveSendingProgressUpdate() {
         viewModelScope.launch {
             TransferProcessDomain.sendingItemProgressFlow.collectLatest { progressData ->

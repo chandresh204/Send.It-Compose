@@ -14,8 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.ui.components.InProgressItemCard
 import chad.orionsoft.sendit.ui.components.SteadyItemCard
@@ -26,6 +28,7 @@ fun TransferSendingScreen() {
 
     val vModel = hiltViewModel<TransferSendingViewModel>()
     val uiState by vModel.transferSendingState.collectAsState()
+    val context = LocalContext.current
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -53,14 +56,18 @@ fun TransferSendingScreen() {
                             removeIcon = if(it.status == ProgressStatus.InQueue) {
                                 {
                                     IconButton(onClick = {
-                                        // TODO remove item from the quque
+                                        vModel.removeItemFromQueue(it.transferringMediaItem.id)
                                     }) {
                                         Icon(Icons.Default.Clear, contentDescription = null)
                                     }
                                 }
                             } else null
                         ) {
-                            // TODO open item in supported app
+                            StartActivity.openFile(
+                                context,
+                                it.transferringMediaItem.title,
+                                it.transferringMediaItem.uri
+                            )
                         }
                     }
                 }

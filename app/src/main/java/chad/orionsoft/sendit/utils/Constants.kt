@@ -59,4 +59,8 @@ object Constants {
     const val TCP_SERVER_WM_DEVICE = "deviceName"
 
     const val UPDATE_TRANSFER_STATUS_AFTER_LOOPS = 300
+
+    val imageExtensions = listOf(".jpg", ".jpeg", ".png", ".gif", ".heic", ".svg")
+    val audioExtensions = listOf(".mp3", ".m4a", ".aac")
+    val videoExtensions = listOf(".mp4", ".avi", ".mkv", ".m4v")
 }

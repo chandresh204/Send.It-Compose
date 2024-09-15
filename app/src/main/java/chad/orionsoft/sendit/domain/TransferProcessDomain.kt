@@ -35,6 +35,12 @@ object TransferProcessDomain {
     val sendingItemStatusFlow = _sendingItemStatusFlow.receiveAsFlow()
 
     private val _sendingItemCountFlow = MutableSharedFlow<Pair<Int,Int>>()
+
+    /**
+     * Sends the flow of items count update, first element represents completed count (whether
+     * success or failed), second element represents total number of items (in queue + finished).
+     * if first element is [-1] then there is no update in completed count
+     */
     val sendingItemCountFlow = _sendingItemCountFlow.asSharedFlow()
 
     private val _transferSpeedFlow = MutableSharedFlow<Pair<Long, Long>>()
@@ -188,6 +194,7 @@ object TransferProcessDomain {
         }
     }
 
+
     fun clearQueueAndMoveToFinish() {
         sentHistoryList.addAll(transferSendingList)
         transferSendingList.clear()
@@ -197,4 +204,23 @@ object TransferProcessDomain {
     fun getTheCurrentTransferReceivingList() : List<TransferringMediaItem> = transferReceivingList
 
     fun getSentHistoryList() = sentHistoryList
+
+    fun removeItemFromQueue(id: Long): Boolean {
+        val foundItem = transferSendingList.find { it.id == id }
+        return if(foundItem == null) false
+        else {
+            if (foundItem.status == ProgressStatus.InQueue) {
+                transferSendingList.remove(foundItem)
+                ioScope.launch {
+                    _sendingItemCountFlow.emit(
+                        Pair(
+                            totalSentCount + 1,
+                            transferSendingList.size + sentHistoryList.size
+                        )
+                    )
+                }
+                true
+            } else false
+        }
+    }
 }

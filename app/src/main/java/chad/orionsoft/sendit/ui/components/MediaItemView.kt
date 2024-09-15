@@ -51,7 +51,7 @@ fun MediaItemViewBar(
     actionIconVector: ImageVector?,
     @DrawableRes actionIconDrawableRes: Int?,
     onActionClick: () -> Unit,
-    onViewClick:() -> Unit
+    onCardClick:() -> Unit
 ) {
     Card(modifier = modifier
         .fillMaxWidth()
@@ -59,7 +59,7 @@ fun MediaItemViewBar(
             horizontal = Constants.PAGE_PADDING.dp,
             vertical = 6.dp
         )
-        .clickable(onClick = onViewClick),
+        .clickable(onClick = onCardClick),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )) {

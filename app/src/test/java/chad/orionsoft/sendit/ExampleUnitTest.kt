@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit
 
 import androidx.compose.ui.graphics.Color
+import chad.orionsoft.sendit.utils.Converters
 import org.junit.Test
 import kotlin.random.Random
 
@@ -12,8 +13,8 @@ import kotlin.random.Random
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-       convertStringToColor("FF2566")
-        println("new Random: ${generateRandomString()}")
+       val fileName = "thisIsMYFile.file.jpg"
+        println("mimeType >>>> ${Converters.getMimeTypeFromFileName(fileName)}")
     }
 
     fun convertStringToColor(colorStr: String) : Color {

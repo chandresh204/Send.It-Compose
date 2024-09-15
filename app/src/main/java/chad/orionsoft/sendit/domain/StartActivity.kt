@@ -3,9 +3,11 @@ package chad.orionsoft.sendit.domain
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.utils.Converters
 
 object StartActivity {
 
@@ -19,5 +21,12 @@ object StartActivity {
 
     fun openWifiSettings(context: Context) {
         context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+    }
+
+    fun openFile(context: Context, filename: String, uri: Uri?) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, Converters.getMimeTypeFromFileName(filename))
+        }
+        context.startActivity(intent)
     }
 }

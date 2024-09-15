@@ -3,6 +3,7 @@ package chad.orionsoft.sendit.utils
 import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.FileType
+import java.io.File
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -111,11 +112,33 @@ object Converters {
     }
 
     fun getPlaceHolderIconsAsPerFileName(filename: String) : Int {
-        return R.drawable.file_unknown_icon_small
+        val extension = filename.substring(filename.lastIndexOf(".")).lowercase()
+        return when {
+            Constants.audioExtensions.contains(extension) -> R.drawable.music_icon_small
+            Constants.imageExtensions.contains(extension) -> R.drawable.image_icon_small
+            Constants.videoExtensions.contains(extension) -> R.drawable.video_icon_small
+            else -> R.drawable.file_unknown_icon_small
+        }
     }
 
     fun getFileTypeFromFileName(filename: String) : FileType {
-        return FileType.FileTypeOther
+        val extension = filename.substring(filename.lastIndexOf(".")).lowercase()
+        return when {
+            Constants.audioExtensions.contains(extension) -> FileType.FileTypeAudio
+            Constants.imageExtensions.contains(extension) -> FileType.FileTypeImage
+            Constants.videoExtensions.contains(extension) -> FileType.FileTypeVideo
+            else -> FileType.FileTypeOther
+        }
+    }
+
+    fun getMimeTypeFromFileName(filename: String) : String {
+        val extension = filename.substring(filename.lastIndexOf(".")).lowercase()
+        return when {
+            Constants.audioExtensions.contains(extension) -> "audio/*"
+            Constants.imageExtensions.contains(extension) -> "image/*"
+            Constants.videoExtensions.contains(extension) -> "video/*"
+            else -> "*/*"
+        }
     }
 
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())

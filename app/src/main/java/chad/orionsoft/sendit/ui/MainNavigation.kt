@@ -42,10 +42,7 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_SENDER_IMAGES) {
-            SenderImagesScreen({ pathInJson ->
-                val route1 = NavigationConstants.NAV_FULL_SCREEN_IMAGE + "/$pathInJson"
-                navController.navigate(route1)
-            }) { _ , _ ->
+            SenderImagesScreen { _ , _ ->
                 navController.popBackStack()
             }
         }

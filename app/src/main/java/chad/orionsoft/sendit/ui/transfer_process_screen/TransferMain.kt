@@ -118,7 +118,7 @@ private fun TransferTabs(
                 if(sendCount.isEmpty()) "$sendSpeed/s"
                 else "($sendCount) $sendSpeed/s"
             } else {
-                receiveSpeed
+                "$receiveSpeed/s"
             }
             Text(
                 text = it.name + "\n$countAndSpeedText",

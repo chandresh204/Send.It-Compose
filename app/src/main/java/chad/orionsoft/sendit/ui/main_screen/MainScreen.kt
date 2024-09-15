@@ -140,7 +140,7 @@ private fun ScreenContent(modifier: Modifier = Modifier, onMediaSelected : (Medi
             ) {
             when (it) {
                 0 -> {
-                    SenderImagesScreen(viewFullScreen = {}) { mediaData, selected ->
+                    SenderImagesScreen { mediaData, selected ->
                         onMediaSelected(mediaData, selected)
                     }
                 }

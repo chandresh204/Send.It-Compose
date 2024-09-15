@@ -13,10 +13,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.bottom_sheets.OptionSelectBottomSheet
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
@@ -33,6 +35,7 @@ fun SenderVideo(onSelectionChanged: (MediaData, Boolean) -> Unit) {
     var isSortingChangeRequest by remember {
         mutableStateOf(false)
     }
+    val context = LocalContext.current
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(100.dp)) {
@@ -52,7 +55,9 @@ fun SenderVideo(onSelectionChanged: (MediaData, Boolean) -> Unit) {
                         Converters.formatDataString(vid.videoData.size),
                 actionIconVector = Icons.Default.PlayArrow,
                 actionIconDrawableRes = null,
-                onActionClick = {  }) {
+                onActionClick = {
+                    StartActivity.openFile(context, vid.videoData.title, vid.videoData.uri)
+                }) {
                     onSelectionChanged(vid.videoData, !vid.selected)
                     vModel.onEvent(SenderVideoEvent.OnSelectClick(vid.videoData.id))
             }

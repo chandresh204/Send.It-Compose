@@ -24,4 +24,6 @@
     <string name="change_sort_order">Change the sorting order of the list</string>
 
     <string name="received_here">Received files will appear here</string>
+
+    <string name="delete_file">Are you sure to delete this file?</string>
 </resources>
