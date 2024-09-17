@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.ui.transfer_process_screen.transfer_receiving
 
-import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

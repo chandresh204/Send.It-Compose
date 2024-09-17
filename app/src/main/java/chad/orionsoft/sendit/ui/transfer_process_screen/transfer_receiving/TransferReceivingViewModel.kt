@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chad.orionsoft.sendit.domain.TransferProcessDomain
-import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.model.TransferringMediaItem
 import chad.orionsoft.sendit.ui.transfer_process_screen.model.TransferItemUi
 import chad.orionsoft.sendit.utils.Converters
