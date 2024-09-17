@@ -27,12 +27,13 @@ import chad.orionsoft.sendit.ui.theme.SendItTheme
 @Composable
 fun InProgressItemCard(
     @DrawableRes placeHolder: Int,
+    modifier: Modifier,
     title:String,
     subTitle: String,
     thumbnail: Uri?,
     progressInFloat: Float
 ) {
-    Card(modifier = Modifier.padding(bottom = 8.dp)) {
+    Card(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
@@ -69,6 +70,7 @@ private fun Preview() {
     SendItTheme {
         InProgressItemCard(
             placeHolder = R.drawable.sendit_icon_graphics,
+            modifier = Modifier.padding(8.dp),
             title = "debian 15",
             subTitle = "12M/123M",
             progressInFloat = 0.5f,

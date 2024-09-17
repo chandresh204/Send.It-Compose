@@ -51,8 +51,7 @@ fun TransferReceivingScreen(vModel : TransferReceivingViewModel = hiltViewModel(
                 TextWithIcon(Icons.Default.Close, text = "No, Keep")
             },
             positiveButtonClick = {
-                // TODO delete file
-                Toast.makeText(context, "Yet to be implemented", Toast.LENGTH_LONG).show()
+                vModel.deleteFile(deleteRequestForId, context)
                 deleteRequestForId = -1
             },
             negativeButtonClick = {
@@ -73,6 +72,7 @@ fun TransferReceivingScreen(vModel : TransferReceivingViewModel = hiltViewModel(
                     if (it.status == ProgressStatus.Receiving) {
                         InProgressItemCard(
                             placeHolder = it.transferringMediaItem.thumbnailPlaceHolder,
+                            modifier = Modifier.padding(8.dp),
                             title = it.transferringMediaItem.title,
                             subTitle = it.progressText,
                             thumbnail = it.transferringMediaItem.thumbnailUri,
@@ -81,10 +81,12 @@ fun TransferReceivingScreen(vModel : TransferReceivingViewModel = hiltViewModel(
                     } else {
                         SteadyItemCard(
                             it.transferringMediaItem.thumbnailPlaceHolder,
+                            modifier = Modifier.padding(8.dp),
                             it.transferringMediaItem.title,
                             it.sizeReadable,
                             it.transferringMediaItem.thumbnailUri,
                             it.status,
+                            disabled = it.status == ProgressStatus.Deleted,
                             removeIcon = {
                                 IconButton(onClick = {
                                     deleteRequestForId = it.transferringMediaItem.id

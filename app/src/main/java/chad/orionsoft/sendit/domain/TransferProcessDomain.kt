@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.domain
 
+import android.content.Context
 import android.net.Uri
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.model.ProgressStatus
@@ -174,15 +175,16 @@ object TransferProcessDomain {
         }
     }
 
-    fun itsTimeToUpdateThumbnailUri(thumbUri: Uri, id: Long) {
+    fun itsTimeToUpdateUri(uri: Uri, id: Long) {
         val itemInList = transferReceivingList.find { it.id == id }
         itemInList?.let {
             val index = transferReceivingList.indexOf(it)
             transferReceivingList[index] = transferReceivingList[index].copy(
-                thumbnailUri = thumbUri
+                uri = uri,
+                thumbnailUri = uri
             )
             ioScope.launch {
-                _receivingItemThumbnailFlow.send(Pair(id, thumbUri))
+                _receivingItemThumbnailFlow.send(Pair(id, uri))
             }
         }
     }
@@ -221,6 +223,17 @@ object TransferProcessDomain {
                 }
                 true
             } else false
+        }
+    }
+
+    fun deleteReceivedFile(id: Long, context: Context) : Boolean {
+        val iToDelete = transferReceivingList.find { it.id == id }
+        if(iToDelete == null) return false
+        else {
+            if(FileIOOperations.deleteFile(iToDelete.uri, context)) {
+                updateItemTransferStatus(id, ProgressStatus.Deleted, false)
+                return true
+            } else return false
         }
     }
 }

@@ -261,7 +261,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                         contentResolverDomain.updateValueInContentResolver(
                             type, it
                         )
-                        TransferProcessDomain.itsTimeToUpdateThumbnailUri(
+                        TransferProcessDomain.itsTimeToUpdateUri(
                             it, fileId
                         )
                     }

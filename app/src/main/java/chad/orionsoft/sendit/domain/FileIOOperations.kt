@@ -2,9 +2,11 @@ package chad.orionsoft.sendit.domain
 
 import android.app.usage.StorageStatsManager
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.storage.StorageManager
+import android.util.Log
 import java.io.File
 
 object FileIOOperations {
@@ -39,5 +41,12 @@ object FileIOOperations {
         } else {
             File(saveDir,filename)
         }
+    }
+
+    fun deleteFile(uri: Uri?, context: Context) : Boolean {
+        if(uri == null) return false
+        // TODO delete file
+        Log.e("Delete file", "Operation not implemented")
+        return false
     }
 }

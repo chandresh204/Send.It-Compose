@@ -41,6 +41,7 @@ fun TransferSendingScreen() {
                     if (it.status == ProgressStatus.Sending) {
                         InProgressItemCard(
                             placeHolder = it.transferringMediaItem.thumbnailPlaceHolder,
+                            modifier = Modifier.padding(8.dp),
                             title = it.transferringMediaItem.title,
                             subTitle = it.progressText,
                             thumbnail = it.transferringMediaItem.thumbnailUri,
@@ -49,6 +50,7 @@ fun TransferSendingScreen() {
                     } else {
                         SteadyItemCard(
                             it.transferringMediaItem.thumbnailPlaceHolder,
+                            modifier = Modifier.padding(8.dp),
                             it.transferringMediaItem.title,
                             it.sizeReadable,
                             it.transferringMediaItem.thumbnailUri,
