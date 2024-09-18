@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import chad.orionsoft.sendit.ui.create_connection_flow.ui.CreateConnectionScreen
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
 import chad.orionsoft.sendit.ui.main_screen.MainScreen
+import chad.orionsoft.sendit.ui.qr_connect.QrConnectScreen
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
 import chad.orionsoft.sendit.ui.transfer_process_screen.TransferMain
 import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
@@ -62,6 +63,11 @@ fun MainNavigation() {
             TransferMain {
                 navController.popBackStack()
             }
+        }
+        composable(
+            route = NavigationConstants.NAV_QR_SHOW_SCREEN
+        ) {
+            QrConnectScreen()
         }
     }
 }

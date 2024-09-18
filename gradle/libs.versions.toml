@@ -13,6 +13,7 @@ composeNavigation = "2.7.7"
 hiltNavigationCompose = "1.2.0"
 coil = "2.6.0"
 workRuntimeKtx = "2.9.1"
+zxing = "3.5.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ androidx-hilt-android = { group = "com.google.dagger", name= "hilt-android", ver
 androidx-hilt-compiler = { group = "com.google.dagger", name= "hilt-android-compiler", version.ref = "hilt"}
 io-coil-kt = { group = "io.coil-kt", name="coil-compose", version.ref = "coil"}
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

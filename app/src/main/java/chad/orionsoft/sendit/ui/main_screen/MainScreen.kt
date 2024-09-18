@@ -75,7 +75,7 @@ fun MainScreen(gotoScreen: (screenRoute: String) -> Unit) {
                 .align(Alignment.BottomStart)
                 .widthIn(max = 200.dp)
                 .padding(16.dp), uiState.connectedDeviceDetails
-            ) { gotoScreen(NavigationConstants.NAV_CREATE_CONNECTION_SCREEN) }
+            ) { gotoScreen(NavigationConstants.NAV_QR_SHOW_SCREEN) }
         }
     }
 }

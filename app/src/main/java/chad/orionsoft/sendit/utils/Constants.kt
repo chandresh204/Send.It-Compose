@@ -44,6 +44,8 @@ object Constants {
     const val TCP_FILE_IGNORE = "dksjdlascnhlksadkhw"
     const val TCP_FILE_FREE_SPACE_SIGNAL  = "sdnccop5d75sde398jfd%@^"
 
+    const val QR_CODE_SIZE = 512
+
     // const val TCP_FILE_INFO = TCP_FILE_CONTINUE((filename))type/*size*/
 
 //    // file types
