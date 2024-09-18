@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.io.coil.kt)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.zxing.core)
+    implementation(libs.zxing.android.embedded)
     kapt(libs.androidx.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

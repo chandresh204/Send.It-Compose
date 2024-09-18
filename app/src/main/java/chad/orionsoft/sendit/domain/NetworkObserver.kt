@@ -74,6 +74,21 @@ class NetworkObserver @Inject constructor(
         }
     }
 
+    fun getWifiAddress() : String? {
+        val wm = context.getSystemService(WIFI_SERVICE) as WifiManager
+        var connInfo = wm.connectionInfo.ipAddress
+        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
+            connInfo = Integer.reverseBytes(connInfo)
+        }
+        val ipByteArray = BigInteger.valueOf(connInfo.toLong()).toByteArray()
+        return try {
+            InetAddress.getByAddress(ipByteArray).hostAddress
+        } catch (e: UnknownHostException) {
+            Log.e("NetworkObserver", "getting broadcast address on wifi: $e")
+            null
+        }
+    }
+
     private fun getBroadcastAddressOfWifi() {
         val wm = context.getSystemService(WIFI_SERVICE) as WifiManager
         var connInfo = wm.connectionInfo.ipAddress
