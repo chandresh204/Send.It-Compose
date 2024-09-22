@@ -65,8 +65,7 @@ class QrConnectViewModel @Inject constructor(
             ConnectStatus.OnWifi -> {
                 val wifiAdd = qrConnectDomain.openQRServerAndShowQR()
                 println("wifi address >>> $wifiAdd")
-                val sampleQr = wifiAdd ?: "could not found IP"
-                val bitmap = QRDomain.getQRBitmap(sampleQr, Constants.QR_CODE_SIZE)
+                val bitmap = QRDomain.getQRBitmap(wifiAdd, Constants.QR_CODE_SIZE)
                 bitmap?.let { bMap ->
                     _qrState.update { state ->
                         state.copy(
