@@ -3,6 +3,7 @@ package chad.orionsoft.sendit.repository
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import chad.orionsoft.sendit.utils.SharedPreferencesConstants
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -46,5 +47,12 @@ class PreferenceRepository @Inject constructor(
             sharedPreferences.edit().putString(SharedPreferencesConstants.PREFS_MY_UNIQUE_ID, newId).apply()
             newId
         } else myId
+    }
+
+    fun getMyColorCode() : Color {
+        return Color.Unspecified.copy(
+            red = 0.8f, green = 0.2f,
+            blue = 0.4f
+        )
     }
 }

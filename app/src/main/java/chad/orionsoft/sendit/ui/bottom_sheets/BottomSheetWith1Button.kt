@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetWith1Button(
+    modifier: Modifier = Modifier,
     title: String,
     subtitle: String,
     negativeButton: @Composable () -> Unit,
@@ -43,7 +44,7 @@ fun BottomSheetWith1Button(
         }
     }
     ModalBottomSheet(onDismissRequest = negativeButtonClick, sheetState = sheetState) {
-        Column(modifier = Modifier
+        Column(modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -62,7 +63,7 @@ fun BottomSheetWith1Button(
 @Composable
 private fun Preview() {
     SendItTheme {
-        BottomSheetWith1Button("Connected To", "on 12544.154.545",
+        BottomSheetWith1Button(Modifier,"Connected To", "on 12544.154.545",
             negativeButton = { TextWithIcon(Icons.Default.Close, text = "Close")  },
             {})
     }

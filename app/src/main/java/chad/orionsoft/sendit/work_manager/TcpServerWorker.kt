@@ -15,7 +15,7 @@ import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.ProgressStatus
-import chad.orionsoft.sendit.repository.ConnectionRepository
+import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +47,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
         Log.d(tag, ">>> Starting")
-        if(ConnectionRepository.getConnectedDevice() == null) {
+        if(ConnectProcessRepository.getPairingDeviceDetails() == null) {
             Log.d(tag, ">>> Stopping due to not connected")
             showErrorNotification("TCPServer : Not connected to any device")
             return Result.failure()
@@ -107,7 +107,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
             } catch (e: Exception) {
                 Log.e(tag, "Exception in start: $e")
                 showErrorNotification("Error: $e")
-                ConnectionRepository.updateConnectionInfo(null)
+                ConnectProcessRepository.updateAndEmitConnectedDeviceDetails(null)
                 return@withContext Result.failure()
             }
         }
@@ -163,54 +163,6 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
         )
         inStream.close()
         return@coroutineScope
-
-       /* if(!reply.contains(Constants.TCP_CONTINUE)) {
-            Log.d(tag, "TCP file continue signal not received")
-            updateChannel.send("TCP file continue signal not received")
-            return@coroutineScope
-        }
-        val fileInfoTriple = try {
-            Converters.extractTripleData(reply)
-        } catch (e: Exception) {
-            Log.e(tag, "error extracting file info")
-            updateChannel.send("error extracting file info")
-            return@coroutineScope
-        }
-        val fileName = fileInfoTriple.first
-        val type = fileInfoTriple.second
-        val fileSize = fileInfoTriple.third
-        Log.d(tag, "TCP file info : $fileName size >>> $fileSize")
-        updateChannel.send("TCP file info : $fileName size >>> $fileSize")
-        // start file write process
-        try {
-            val newFileUri = getNewFileUri(fileName, type, contentResolver)
-            val fileOut = contentResolver.openOutputStream(newFileUri!!)
-            outStream.write(Constants.TCP_CONTINUE.toByteArray())
-            updateChannel.send("ready to receive: $fileName")
-            Log.d(tag, "ready to receive: opened file out stream")
-            var totalReceived = 0L
-            var loops = 0
-            do {
-                loops++
-                val buff = ByteArray(4096)
-                while (inStream.available() == 0) {
-                    delay(100)
-                }
-                val read1 = inStream.read(buff)
-                fileOut?.write(buff, 0, read1)
-                totalReceived += read1
-                if (loops % 100 == 0) {
-                    updateChannel.send("Received: $totalReceived Bytes")
-                    Log.d(tag, "Received: $totalReceived Bytes")
-                }
-            } while (totalReceived < fileSize.toLong())
-            updateChannel.send("Finished: $totalReceived Bytes")
-            Log.d(tag, "Finished: $totalReceived Bytes")
-        } catch (e:Exception) {
-            updateChannel.send("An Error occurred while writing file: $e")
-            showErrorNotification("Error Writing File : $e")
-            Log.e(tag, "error $e")
-        }*/
     }
 
     private suspend fun startReceivingFile(

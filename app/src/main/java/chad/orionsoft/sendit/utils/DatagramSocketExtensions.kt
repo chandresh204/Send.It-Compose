@@ -15,7 +15,6 @@ fun DatagramSocket.getResponse(): UDPResponse {
         val senderAddress = receivePacket.address
         val senderPort = receivePacket.port
         val response = String(buff, 0, receivePacket.length)
-        Log.d("DatagramSocket", "received : $response --> on ${this.port}")
         UDPResponse(true, senderAddress, senderPort, response)
     } catch (e: Exception) {
         Log.e("DatagramSocket", "exception while receiving: $e")

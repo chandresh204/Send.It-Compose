@@ -13,7 +13,7 @@ import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.model.TransferringMediaItem
-import chad.orionsoft.sendit.repository.ConnectionRepository
+import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.receiveData
@@ -54,7 +54,7 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
 
     private suspend fun startFileSend() : Result  {
         return withContext(Dispatchers.IO) {
-            val connectedDevice = ConnectionRepository.getConnectedDevice()
+            val connectedDevice = ConnectProcessRepository.getPairingDeviceDetails()
             if (connectedDevice == null) {
                 showErrorNotification("Connected Device details not found")
                 return@withContext Result.success()

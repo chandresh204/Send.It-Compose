@@ -10,9 +10,10 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
+import chad.orionsoft.sendit.domain.QRConnectDomain
 import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.MediaData
-import chad.orionsoft.sendit.repository.ConnectionRepository
+import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.work_manager.TcpSenderWorker
@@ -32,6 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val qrConnectDomain: QRConnectDomain
 ) : ViewModel() {
 
     private val _mainScreenState = MutableStateFlow(MainScreenState())
@@ -41,7 +43,7 @@ class MainScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            ConnectionRepository.connectionUpdateReceiver.collectLatest {
+            ConnectProcessRepository.connectionUpdateReceiver.collectLatest {
                 _mainScreenState.update { state ->
                     state.copy(
                         connectedDeviceDetails = it
@@ -51,6 +53,16 @@ class MainScreenViewModel @Inject constructor(
                     startTCPServer(it.serverPort, it.name)
                 }
             }
+        }
+        val pairedDevice = qrConnectDomain.getPairingDeviceDetails()
+        if(pairedDevice != null) {
+            startTCPServer(pairedDevice.serverPort, pairedDevice.name)
+            _mainScreenState.update { state ->
+                state.copy(
+                    connectedDeviceDetails = qrConnectDomain.getPairingDeviceDetails()
+                )
+            }
+
         }
     }
 

@@ -140,6 +140,12 @@ object Converters {
         }
     }
 
+    fun separateAddressAndPort(addressWithPort: String) : Pair<String, Int> {
+        val address = addressWithPort.split(":")[0]
+        val port = addressWithPort.split(":")[1].toInt()
+        return Pair(address, port)
+    }
+
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
 
     fun decodeUriPath(encoded: String) : String = URLDecoder.decode(encoded, StandardCharsets.UTF_8.toString())
