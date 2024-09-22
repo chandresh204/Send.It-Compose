@@ -12,26 +12,17 @@ import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.util.Log
 import chad.orionsoft.sendit.model.ConnectStatus
-import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.math.BigInteger
-import java.net.InetAddress
-import java.net.UnknownHostException
-import java.nio.ByteOrder
 import javax.inject.Inject
 
 class NetworkObserver @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-
-    // TODO remove this
-    private val isWLANPossible = Channel<Boolean>()
-    val wlanChangeReceiver = isWLANPossible.receiveAsFlow()
 
     private val tag = "NetworkObserver"
     private val ioScope = CoroutineScope(Dispatchers.IO)
@@ -57,9 +48,6 @@ class NetworkObserver @Inject constructor(
                 }.toString()
                 Log.d("Link Properties", "Link Address: $linkAddress")
                 }
-            ioScope.launch {
-                isWLANPossible.send(true)
-            }
             ioScope.launch {
                 _networkStatus.send(ConnectStatus.OnWifi)
             }
@@ -89,9 +77,6 @@ class NetworkObserver @Inject constructor(
             true
         } else false
         ioScope.launch {
-            isWLANPossible.send(isOnHotSpot)
-        }
-        ioScope.launch {
             if(isOnHotSpot) {
                 _networkStatus.send(ConnectStatus.OnHotspot)
             } else {
@@ -101,38 +86,6 @@ class NetworkObserver @Inject constructor(
     }
 
     fun getWifiAddress() = linkAddress
-
-    /*fun getWifiAddress() : String? {
-        val wm = context.getSystemService(WIFI_SERVICE) as WifiManager
-        var connInfo = wm.connectionInfo.ipAddress
-        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-            connInfo = Integer.reverseBytes(connInfo)
-        }
-        val ipByteArray = BigInteger.valueOf(connInfo.toLong()).toByteArray()
-        return try {
-            InetAddress.getByAddress(ipByteArray).hostAddress
-        } catch (e: UnknownHostException) {
-            Log.e("NetworkObserver", "getting broadcast address on wifi: $e")
-            null
-        }
-    }*/
-
-    private fun getBroadcastAddressOfWifi() {
-        val wm = context.getSystemService(WIFI_SERVICE) as WifiManager
-        var connInfo = wm.connectionInfo.ipAddress
-        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-            connInfo = Integer.reverseBytes(connInfo)
-        }
-        val ipByteArray = BigInteger.valueOf(connInfo.toLong()).toByteArray()
-        try {
-            val ipString = InetAddress.getByAddress(ipByteArray).hostAddress
-            val lastIndexOfDot = ipString?.lastIndexOf('.') ?: 0
-            val broadAddress = ipString?.substring(0, lastIndexOfDot) + ".255"
-            RuntimeConstants.BROAD_ADDR = broadAddress
-        } catch (e: UnknownHostException) {
-            Log.e("NetworkObserver", "getting broadcast address on wifi: $e")
-        }
-    }
 
     init {
         val linkProperties = connectivityManager.getLinkProperties(connectivityManager.activeNetwork)
