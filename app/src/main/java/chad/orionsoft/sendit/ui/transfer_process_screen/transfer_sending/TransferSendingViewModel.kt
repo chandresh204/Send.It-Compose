@@ -29,6 +29,7 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
         )
         receiveSendingProgressUpdate()
         receiveSendingStatusChanges()
+        receiveSessionCleared()
     }
 
     fun removeItemFromQueue(id: Long) {
@@ -69,34 +70,11 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
                         )
                     }
                 }
-                /*val inProgressItem = if(_transferSendingState.value.inProgressItem == null) {
-                    moveItemFromQueueToInProgress(progressData.id)
-                } else {
-                    if(_transferSendingState.value.inProgressItem?.transferringMediaItem?.id == progressData.id) {
-                        _transferSendingState.value.inProgressItem
-                    } else {
-                        moveItemFromQueueToInProgress(progressData.id)
-                    }
-                }
-                inProgressItem?.let {
-                    val newProgress = progressData.sent.toFloat()/inProgressItem.transferringMediaItem.size
-                    val progressText = "${ Converters.formatDataString(progressData.sent) } / ${inProgressItem.transferringMediaItem.sizeReadable}"
-                    val updatedItem = it.copy(
-                        progress = newProgress,
-                        progressText = progressText
-                    )
-                    _transferSendingState.update { state ->
-                        state.copy(
-                            inProgressItem = updatedItem
-                        )
-                    }
-                }*/
             }
         }
     }
 
     private fun receiveSendingStatusChanges() {
-//        updateSendingList(TransferProcessDomain.getTheCurrentTransferSendingList())
         viewModelScope.launch {
             TransferProcessDomain.sendingItemStatusFlow.collect { newStatus ->
                 val itemToUpdate = _transferSendingState.value.sentList.find {
@@ -116,39 +94,19 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
                 }
             }
         }
-        /*viewModelScope.launch {
-            TransferProcessDomain.sendingItemStatusFlow.collect { newStatus ->
-                val itemList = _transferSendingState.value.sentList.toMutableList()
-                val iToUpdate = itemList.find { it.id == newStatus.first }
-                iToUpdate?.let {
-                    val iIndex = itemList.indexOf(iToUpdate)
-                    itemList[iIndex] = itemList[iIndex].copy(
-                        status = newStatus.second
-                    )
-                    _transferSendingState.update { state ->
-                        state.copy(
-                            sentList = itemList,
-                            inProgressItem = null
-                        )
-                    }
-                }
-            }
-        }*/
     }
 
-    /*private fun moveItemFromQueueToInProgress(id: Long) : TransferItemUi? {
-        val sendItemMain = _transferSendingState.value.sentList.find {
-            it.transferringMediaItem.id == id
+    private fun receiveSessionCleared() {
+        viewModelScope.launch {
+            TransferProcessDomain.clearEverythingFlow.collect {
+                _transferSendingState.update {
+                    it.copy(
+                        sentList = emptyList()
+                    )
+                }
+            }
         }
-        if(sendItemMain == null) {
-            Log.e(tag, "moving item in progress, id: $id not found in list. all Ids: ${_transferSendingState.value.sentList.joinToString("\n")}")
-            return null
-        }
-        return TransferItemUi(
-            sendItemMain,
-
-        )
-    }*/
+    }
 
     private fun updateSendingList(
         queue : List<TransferringMediaItem>,

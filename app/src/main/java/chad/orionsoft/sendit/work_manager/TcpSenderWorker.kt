@@ -76,7 +76,14 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
             val modeStr = "${Constants.TCP_MODE_STR}((${Constants.MODE_TYPE_FILE}))${selectedItemsToSend.size}" +
                     "/*$totalSizeToSend*/"
             Log.d(tag, "s1 >>> mode str sending $modeStr to ${connectedDevice.address} : ${connectedDevice.serverPort}")
-            val tcpSocket = Socket(connectedDevice.address, connectedDevice.serverPort)
+            val tcpSocket =try {
+                Socket(connectedDevice.address, connectedDevice.serverPort)
+            } catch (e: Exception) {
+                ConnectProcessRepository.markAsDisconnected()
+                TransferProcessDomain.clearSession()
+                Log.e(tag, "could not create socket, probably device disconnected")
+                return@withContext Result.success()
+            }
             val reply = tcpSocket.sendData(modeStr)
             Log.d(tag, "s1_1 >>> mode str sent")
             if(reply.success && reply.resMsg?.contains(Constants.TCP_CONTINUE) == true) {

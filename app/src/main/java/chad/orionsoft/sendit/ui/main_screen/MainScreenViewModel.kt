@@ -108,16 +108,18 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun startTCPServer(serverPort: Int, deviceName: String) {
-        println("Trying to start server on $serverPort")
-        val wM = WorkManager.getInstance(context)
-        wM.cancelAllWorkByTag(Constants.SERVER_WM_TAG)
-        val workRequest = OneTimeWorkRequestBuilder<TcpServerWorker>()
-            .setInputData(Data.Builder().apply {
-                putInt(Constants.TCP_SERVER_WM_PORT, serverPort)
-                putString(Constants.TCP_SERVER_WM_DEVICE, deviceName)
-            }.build())
-            .addTag(Constants.SERVER_WM_TAG).build()
-        wM.enqueueUniqueWork(Constants.SERVER_WM_TAG, ExistingWorkPolicy.REPLACE, workRequest)
+        if(!TcpServerWorker.isTCPServerRunning) {
+            println("Trying to start server on $serverPort")
+            val wM = WorkManager.getInstance(context)
+            wM.cancelAllWorkByTag(Constants.SERVER_WM_TAG)
+            val workRequest = OneTimeWorkRequestBuilder<TcpServerWorker>()
+                .setInputData(Data.Builder().apply {
+                    putInt(Constants.TCP_SERVER_WM_PORT, serverPort)
+                    putString(Constants.TCP_SERVER_WM_DEVICE, deviceName)
+                }.build())
+                .addTag(Constants.SERVER_WM_TAG).build()
+            wM.enqueueUniqueWork(Constants.SERVER_WM_TAG, ExistingWorkPolicy.REPLACE, workRequest)
+        }
     }
 
     private fun startTCPSender(serverPort: Int) {

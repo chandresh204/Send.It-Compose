@@ -44,6 +44,10 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
         return foregroundInfo
     }
 
+    companion object {
+        var isTCPServerRunning = false
+    }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
         Log.d(tag, ">>> Starting")
@@ -65,6 +69,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                 Log.d(tag, "Starting tcp server on port: $onPort")
                 serverSocket = ServerSocket(onPort)
                 while (true) {
+                    isTCPServerRunning = true
                     serverSocket.soTimeout = 300000
                     recSocket = serverSocket.accept()
                     Log.d(tag, "r1 >>> Receiving on tcp")
@@ -105,6 +110,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                     }
                 }
             } catch (e: Exception) {
+                isTCPServerRunning = false
                 Log.e(tag, "Exception in start: $e")
                 showErrorNotification("Error: $e")
                 ConnectProcessRepository.updateAndEmitConnectedDeviceDetails(null)

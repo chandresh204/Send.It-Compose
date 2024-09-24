@@ -27,7 +27,7 @@ class QRConnectDomain @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-
+    private val udpServerPortForThisSession = RuntimeConstants.generateRandomCode(4)
 
     private val _failedCauseFlow = MutableSharedFlow<Pair<String,String>>()
     val failedCauseFlow = _failedCauseFlow.asSharedFlow()
@@ -54,19 +54,10 @@ class QRConnectDomain @Inject constructor(
     }
 
     private fun generateRandomPortAndStartServer() : String {
-        val randomPort = RuntimeConstants.generateRandomCode(4)
+        val randomPort = udpServerPortForThisSession
         CoroutineScope(Dispatchers.IO).launch {
             connectProcessRepository
-                .startUDPServer(randomPort.toInt(), FileIOOperations.getMyFreeSpace(context)
-                ).collect { newStatus ->
-                    if(newStatus == null) {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "Device failed to Connect", Toast.LENGTH_LONG).show()
-                        }
-                    } else {
-                        connectProcessRepository.updateConnectStatus(newStatus)
-                    }
-            }
+                .startUDPServerIfNotRunning(randomPort.toInt())
         }
         return randomPort
     }

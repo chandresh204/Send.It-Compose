@@ -1,7 +1,9 @@
 package chad.orionsoft.sendit.repository
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.ui.graphics.Color
+import chad.orionsoft.sendit.domain.FileIOOperations
 import chad.orionsoft.sendit.domain.NetworkObserver
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
@@ -9,15 +11,13 @@ import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.getResponse
 import chad.orionsoft.sendit.utils.sendData
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.DatagramPacket
@@ -28,14 +28,15 @@ import javax.inject.Singleton
 
 @Singleton
 class ConnectProcessRepository @Inject constructor(
-    private val networkObserver: NetworkObserver
+    private val networkObserver: NetworkObserver,
+    @ApplicationContext private val context: Context
 ){
 
     private val tag = "ConnectProcessRepository"
 
     private var theirUdpServerAddress : InetAddress? = null
     private var theirUdpServerPort : Int? = null
-    private var keepUdpServer: Boolean  = false
+    private var serverOnPort : Int = -1
     private var serverRunning : Boolean = false
 
     private var connectStatus : ConnectStatus = ConnectStatus.NoNetwork
@@ -57,15 +58,27 @@ class ConnectProcessRepository @Inject constructor(
         }
     }
 
-    fun startUDPServer(port: Int, myFreeSpace: Long) : Flow<ConnectStatus?> {
-        val statusFlow = Channel<ConnectStatus?>()
-        CoroutineScope(Dispatchers.IO).launch {
-            while(serverRunning) {
-                Log.d(tag, "old server process still running")
-                delay(100)
+    fun startUDPServerIfNotRunning(port: Int) {
+        Log.d(tag, "Starting udp server on port >>> $port")
+        if(serverOnPort == port) {
+            Log.d(tag, "Udp server already running on $serverOnPort")
+            return
+        } else {
+            serverOnPort = -1
+            CoroutineScope(Dispatchers.IO).launch {
+                while (serverRunning) {
+                    Log.d(tag, "Waiting for server to stop on Port: $serverOnPort")
+                    delay(200)
+                }
+                startUDPServer(port)
             }
-            keepUdpServer = true
-            while (keepUdpServer) {
+        }
+    }
+
+    private suspend fun startUDPServer(port: Int) {
+        withContext(Dispatchers.IO) {
+            serverOnPort = port
+            while (serverOnPort > 0) {
                 val dSocket = DatagramSocket(port)
                 dSocket.soTimeout = 30000
                 Log.d(tag, "UDPServer >>> Running")
@@ -73,7 +86,7 @@ class ConnectProcessRepository @Inject constructor(
                 val res = dSocket.getResponse()
                 if(res.success) {
                     Log.d(tag,"received : $${res.response}")
-                    statusFlow.send(ConnectStatus.ConnectingDevice)
+                    _connectStatusFlow.emit(ConnectStatus.ConnectingDevice)
                     if(res.response.contains(Constants.APP_CODE)) {
                         val resAddress = res.partnerAddress
                         val resPort = res.partnerPort
@@ -92,17 +105,18 @@ class ConnectProcessRepository @Inject constructor(
                         Log.d(tag, "Device details: $connectedDetails")
                         updateAndEmitConnectedDeviceDetails(connectedDetails)
                         try {
-                            val replyBytes = "${Constants.QR_CONNECT_REPLY}/*$myFreeSpace*/".toByteArray()
+                            val freeSpace = FileIOOperations.getMyFreeSpace(context)
+                            val replyBytes = "${Constants.QR_CONNECT_REPLY}/*$freeSpace*/".toByteArray()
                             val replyPacket = DatagramPacket(
                                 replyBytes, replyBytes.size, resAddress, resPort
                             )
                             dSocket.send(replyPacket)
                             dSocket.close()
                             delay(500)
-                            statusFlow.send(ConnectStatus.DeviceConnected)
+                            _connectStatusFlow.emit(ConnectStatus.DeviceConnected)
                         }catch (e:Exception) {
                             dSocket.close()
-                            statusFlow.send(null)
+                            _connectStatusFlow.emit(ConnectStatus.OnWifi)
                         }
                     }
                 } else {
@@ -110,9 +124,9 @@ class ConnectProcessRepository @Inject constructor(
                     delay(500)
                 }
             }
+            serverOnPort = -1
             serverRunning = false
         }
-        return statusFlow.receiveAsFlow()
     }
 
     suspend fun noteUDPServerAndSendHandshake(
@@ -125,7 +139,7 @@ class ConnectProcessRepository @Inject constructor(
             val dSocket = DatagramSocket()
             val reply = dSocket.sendData(connectRequest, theirUdpServerAddress!!, port)
             Log.d(tag, "ServerReply >>> $reply")
-            keepUdpServer = false
+            serverOnPort = -1
             if(!reply.success) {
                 return@withContext false
             } else {
@@ -144,14 +158,14 @@ class ConnectProcessRepository @Inject constructor(
 
     fun stopAllUdpProcess() {
         Log.d(tag, "Stopping UDP server")
-        keepUdpServer = false
+        serverOnPort = -1
     }
 
     fun getPairingDeviceDetails() = pairingDeviceDetails
 
     companion object {
 
-        private var pairingDeviceDetails : ConnectedDeviceDetails? = null
+        private var pairingDeviceDetails: ConnectedDeviceDetails? = null
 
         private val _connectionUpdateChannel = MutableSharedFlow<ConnectedDeviceDetails?>()
         val connectionUpdateReceiver = _connectionUpdateChannel.asSharedFlow()
@@ -166,6 +180,10 @@ class ConnectProcessRepository @Inject constructor(
             CoroutineScope(Dispatchers.IO).launch {
                 _connectionUpdateChannel.emit(pairingDeviceDetails)
             }
+        }
+
+        fun markAsDisconnected() {
+            updateAndEmitConnectedDeviceDetails(null)
         }
     }
 }

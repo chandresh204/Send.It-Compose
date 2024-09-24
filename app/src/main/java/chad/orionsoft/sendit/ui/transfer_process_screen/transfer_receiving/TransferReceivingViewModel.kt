@@ -25,6 +25,7 @@ class TransferReceivingViewModel : ViewModel() {
         receiveProgressData()
         receiveStatusChange()
         receiveThumbnailUpdate()
+        receiveEverythingCleared()
     }
 
     fun deleteFile(id: Long, context: Context) {
@@ -118,6 +119,18 @@ class TransferReceivingViewModel : ViewModel() {
             it.copy(
                 receiveList = newList.distinct()
             )
+        }
+    }
+
+    private fun receiveEverythingCleared() {
+        viewModelScope.launch {
+            TransferProcessDomain.clearEverythingFlow.collect {
+                _transferReceivingState.update {
+                    it.copy(
+                        receiveList = emptyList()
+                    )
+                }
+            }
         }
     }
 

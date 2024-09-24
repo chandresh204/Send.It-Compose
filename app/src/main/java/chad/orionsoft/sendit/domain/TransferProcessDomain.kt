@@ -63,6 +63,10 @@ object TransferProcessDomain {
     private val _receivingItemThumbnailFlow = Channel<Pair<Long, Uri>>()
     val receivingItemThumbnailFlow = _receivingItemThumbnailFlow.receiveAsFlow()
 
+    // clear everything
+    private val _clearEverythingFlow = MutableSharedFlow<Boolean>()
+    val clearEverythingFlow = _clearEverythingFlow.asSharedFlow()
+
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private var totalSent = 0L
     private var totalReceived = 0L
@@ -234,6 +238,18 @@ object TransferProcessDomain {
                 updateItemTransferStatus(id, ProgressStatus.Deleted, false)
                 return true
             } else return false
+        }
+    }
+
+    fun clearSession() {
+        transferSendingList.clear()
+        transferReceivingList.clear()
+        val emitScope = CoroutineScope(Dispatchers.IO)
+        emitScope.launch {
+            _clearEverythingFlow.emit(true)
+        }
+        emitScope.launch {
+            _sendingItemCountFlow.emit(Pair(0,0))
         }
     }
 }
