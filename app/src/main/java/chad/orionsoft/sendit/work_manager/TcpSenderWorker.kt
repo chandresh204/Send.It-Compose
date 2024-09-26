@@ -11,7 +11,6 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.domain.TransferProcessDomain
-import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.model.TransferringMediaItem
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
@@ -19,10 +18,8 @@ import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.receiveData
 import chad.orionsoft.sendit.utils.sendData
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.OutputStream
 import java.net.Socket
