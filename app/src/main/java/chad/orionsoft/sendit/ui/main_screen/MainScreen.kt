@@ -14,20 +14,31 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,7 +47,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.model.MediaData
-import chad.orionsoft.sendit.ui.components.AppBarWithMessage
+import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith2Buttons
+import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.sender_audio.SenderAudio
 import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
@@ -44,11 +56,16 @@ import chad.orionsoft.sendit.ui.sender_video.SenderVideo
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.NavigationConstants
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(gotoScreen: (screenRoute: String) -> Unit) {
     val vModel = hiltViewModel<MainScreenViewModel>()
     val uiState by vModel.mainScreenState.collectAsState()
+    var disconnectionRequest by remember {
+        mutableStateOf(false)
+    }
 
     val context = LocalContext.current
     LaunchedEffect(uiState.connectedDeviceDetails) {
@@ -57,8 +74,42 @@ fun MainScreen(gotoScreen: (screenRoute: String) -> Unit) {
         }
     }
 
+    if(disconnectionRequest) {
+        BottomSheetWith2Buttons(
+            title = if (uiState.connectedDeviceDetails != null) "Do you want to disconnect?" else "Exit the App?",
+            positiveButton = {
+                TextWithIcon(Icons.Default.Done, text = "Yes")
+            },
+            negativeButton = {
+                TextWithIcon(Icons.Default.Clear, text = "No")
+            },
+            positiveButtonClick = {
+                disconnectionRequest = false
+                if(uiState.connectedDeviceDetails != null) {
+                    vModel.onEvent(MainScreenEvent.DisconnectNow)
+                } else {
+                    exitProcess(0)
+                }
+            },
+            negativeButtonClick = {
+                disconnectionRequest = false
+            }) {
+            disconnectionRequest = false
+        }
+    }
+
     Scaffold(topBar = {
-        AppBarWithMessage(title = "Send.It")
+        TopAppBar(title = {
+            Text(stringResource(R.string.app_name))
+        },
+            actions = {
+                IconButton(onClick = {
+                    disconnectionRequest = true
+                }) {
+                    Icon(Icons.Default.Clear, contentDescription = "Disconnect")
+                }
+            }
+        )
     }) { paddings ->
         Box(modifier = Modifier.padding(paddings)) {
             ScreenContent(modifier = Modifier.fillMaxSize()) { mData, isSelected ->

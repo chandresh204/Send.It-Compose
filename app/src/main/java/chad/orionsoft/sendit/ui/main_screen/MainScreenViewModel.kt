@@ -51,6 +51,8 @@ class MainScreenViewModel @Inject constructor(
                 }
                 if(it != null) {
                     startTCPServer(it.serverPort, it.name)
+                } else {
+                    stopAllTCPWork()
                 }
             }
         }
@@ -87,6 +89,10 @@ class MainScreenViewModel @Inject constructor(
                         startTCPSender(mainScreenState.value.connectedDeviceDetails!!.serverPort)
                     }
                 }
+            }
+
+            MainScreenEvent.DisconnectNow -> {
+                ConnectProcessRepository.markAsDisconnected()
             }
         }
 
@@ -145,6 +151,12 @@ class MainScreenViewModel @Inject constructor(
                 .addTag(Constants.SENDER_WM_TAG).build()
             wM.enqueueUniqueWork(Constants.SENDER_WM_TAG, ExistingWorkPolicy.REPLACE, workRequest)
         }
+    }
+
+    private fun stopAllTCPWork() {
+        val wM = WorkManager.getInstance(context)
+        wM.cancelAllWorkByTag(Constants.SENDER_WM_TAG)
+        wM.cancelAllWorkByTag(Constants.SERVER_WM_TAG)
     }
 
     @Synchronized
