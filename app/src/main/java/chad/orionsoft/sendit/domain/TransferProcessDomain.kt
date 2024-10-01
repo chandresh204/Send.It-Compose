@@ -32,6 +32,9 @@ object TransferProcessDomain {
     private val _sendingItemProgressFlow = Channel<SendingItemProgressData>()
     val sendingItemProgressFlow = _sendingItemProgressFlow.receiveAsFlow()
 
+    private val _sendingItemProgressPercFlow = Channel<Float>()
+    val sendingItemProgressPercFlow = _sendingItemProgressPercFlow.receiveAsFlow()
+
     private val _sendingItemStatusFlow = Channel<Pair<Long, ProgressStatus>>()
     val sendingItemStatusFlow = _sendingItemStatusFlow.receiveAsFlow()
 
@@ -44,6 +47,13 @@ object TransferProcessDomain {
      */
     val sendingItemCountFlow = _sendingItemCountFlow.asSharedFlow()
 
+    private val _sendingItemTitleFlow = MutableSharedFlow<String>()
+
+    /**
+     * Sends the flow of the title, currently in sending state
+     */
+    val sendingItemTitleFlow = _sendingItemTitleFlow.asSharedFlow()
+
     private val _transferSpeedFlow = MutableSharedFlow<Pair<Long, Long>>()
 
 
@@ -53,15 +63,28 @@ object TransferProcessDomain {
      */
     val transferSpeedFlow = _transferSpeedFlow.asSharedFlow()
 
+    private val _receivingItemCountFlow = MutableSharedFlow<Int>()
+    val receivingItemCountFlow  = _receivingItemCountFlow.asSharedFlow()
+
     // receiving flow
     private val _receivingItemProgressFlow = Channel<ReceivingItemProgressData>()
     val receivingItemProgressData = _receivingItemProgressFlow.receiveAsFlow()
+
+    private val _receivingItemProgressPercFlow = Channel<Float>()
+    val receivingItemProgressPercFlow = _receivingItemProgressPercFlow.receiveAsFlow()
 
     private val _receivingItemStatusFlow = Channel<Pair<Long, ProgressStatus>>()
     val receivingItemStatusFlow = _receivingItemStatusFlow.receiveAsFlow()
 
     private val _receivingItemThumbnailFlow = Channel<Pair<Long, Uri>>()
     val receivingItemThumbnailFlow = _receivingItemThumbnailFlow.receiveAsFlow()
+
+    private val _receivingItemTitleFlow = MutableSharedFlow<String>()
+    /**
+     * Sends the flow of the title, currently in sending state
+     */
+    val receivingItemTitleFlow = _receivingItemTitleFlow.asSharedFlow()
+
 
     // clear everything
     private val _clearEverythingFlow = MutableSharedFlow<Boolean>()
@@ -70,7 +93,10 @@ object TransferProcessDomain {
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private var totalSent = 0L
     private var totalReceived = 0L
+    private var currentSendingItemIdAndSize = Pair(-1L, 0L) // Pair(id, totalSize)
+    private var currentReceivingItemIdAndSize = Pair(-1L, 0L) // Pair(id,totalSize)
     var totalSentCount = 0
+    var totalReceivedCount = 0
 
     /**
      * Shows the current status of the sending process, true means sending is currently in progress
@@ -140,6 +166,18 @@ object TransferProcessDomain {
         ioScope.launch {
             _sendingItemProgressFlow.send(SendingItemProgressData(id, sent))
         }
+        val proc = if(currentSendingItemIdAndSize.first != id) {
+            val iToUpdate = transferSendingList.find { it.id == id }
+            iToUpdate?.let {  item ->
+                currentSendingItemIdAndSize = Pair(item.id, item.size)
+                sent.toFloat()/item.size
+            }
+        } else {
+            sent.toFloat()/ currentSendingItemIdAndSize.second
+        }
+        ioScope.launch {
+            _sendingItemProgressPercFlow.send(proc ?: 1f)
+        }
     }
 
     fun addToTotalSentInSession(sent: Int) {
@@ -158,6 +196,18 @@ object TransferProcessDomain {
         ioScope.launch {
             _receivingItemProgressFlow.send(ReceivingItemProgressData(id, received))
         }
+        val proc = if(currentReceivingItemIdAndSize.first != id) {
+            val iToUpdate = transferReceivingList.find { it.id == id }
+            iToUpdate?.let {  item ->
+                currentReceivingItemIdAndSize = Pair(item.id, item.size)
+                received.toFloat()/item.size
+            }
+        } else {
+            received.toFloat()/ currentReceivingItemIdAndSize.second
+        }
+        ioScope.launch {
+            _receivingItemProgressPercFlow.send(proc ?: 1f)
+        }
     }
 
     fun updateItemTransferStatus(id: Long, status: ProgressStatus, isSent: Boolean) { // isSent false means received
@@ -174,6 +224,10 @@ object TransferProcessDomain {
             if(isSent) {
                 _sendingItemStatusFlow.send(Pair(id, status))
             } else {
+                if(status == ProgressStatus.Success) {
+                    totalReceivedCount++
+                    launch { _receivingItemCountFlow.emit(totalReceivedCount) }
+                }
                 _receivingItemStatusFlow.send(Pair(id, status))
             }
         }
@@ -197,6 +251,18 @@ object TransferProcessDomain {
     fun updateSendingItemCount(completed: Int) {
         ioScope.launch {
             _sendingItemCountFlow.emit(Pair(completed, transferSendingList.size + sentHistoryList.size))
+        }
+    }
+
+    fun emitTitleOfCurrentSendingItem(title: String) {
+        ioScope.launch {
+            _sendingItemTitleFlow.emit(title)
+        }
+    }
+
+    fun emitTitleOfCurrentReceivingItem(title: String) {
+        ioScope.launch {
+            _receivingItemTitleFlow.emit(title)
         }
     }
 

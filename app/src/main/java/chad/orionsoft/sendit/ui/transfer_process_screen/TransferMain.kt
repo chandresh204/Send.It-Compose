@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,11 +44,16 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun TransferMain(onBack: () -> Unit) {
+fun TransferMain(landToReceivingTab:Boolean, onBack: () -> Unit) {
     val vModel = hiltViewModel<TransferMainViewModel>()
     val uiState by vModel.tMainState.collectAsState()
     val pagerState = rememberPagerState {
         2
+    }
+    LaunchedEffect(landToReceivingTab) {
+        if(landToReceivingTab) {
+            pagerState.scrollToPage(1)
+        }
     }
     val coroutineScope = rememberCoroutineScope()
     Scaffold(topBar = {
@@ -81,8 +87,9 @@ fun TransferMain(onBack: () -> Unit) {
                     TransferReceivingScreen()
                 }
             }
-            Row(modifier = Modifier.fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary)
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
                 .padding(8.dp),
                 horizontalArrangement = Arrangement.Center) {
                 val total = buildAnnotatedString {
@@ -141,5 +148,5 @@ private fun TransferTabs(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    TransferMain{}
+    TransferMain(false){}
 }

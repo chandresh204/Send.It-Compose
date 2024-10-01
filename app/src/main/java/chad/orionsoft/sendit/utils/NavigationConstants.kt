@@ -13,4 +13,5 @@ object NavigationConstants {
 
     // arguments
     const val FULL_SCREEN_IMG_URI = "fullScreenImageUri"
+    const val NAV_ARG_TRANSFER_RECEIVING = "toReceivingScreen"
 }

@@ -105,6 +105,7 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
                         progress = (TransferProcessDomain.totalSentCount+1)*100/totalCount
                     )
                     TransferProcessDomain.updateSendingItemCount(TransferProcessDomain.totalSentCount+1)
+                    TransferProcessDomain.emitTitleOfCurrentSendingItem(file.title)
                     val reply2 = tcpSocket.sendData(fileInfo)
                     if(reply2.success && reply2.resMsg?.contains(Constants.TCP_CONTINUE) == true) {
                         // start sending file

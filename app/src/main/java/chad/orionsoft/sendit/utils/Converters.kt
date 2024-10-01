@@ -38,6 +38,30 @@ object Converters {
         return str
     }
 
+    fun formatRateWithUnit(transferred: Long) : Pair<String, String> {
+        val rateStr : String
+        val rateUnit : String
+        when {
+            transferred < 1024 -> {
+                rateStr = "$transferred"
+                rateUnit = "B/s"
+            }
+            transferred in 1024 .. 1048575 -> {
+                rateStr = "${transferred/1024}"
+                rateUnit = "KB/s"
+            }
+            else -> {
+                val inMB1 = (transferred.toFloat() / 1048576)
+                val inMB2 = inMB1 * 100
+                val inMB3 = inMB2.roundToLong()
+                val inMB = (inMB3.toFloat() / 100)
+                rateStr = "$inMB"
+                rateUnit = "MB/s"
+            }
+        }
+        return Pair(rateStr, rateUnit)
+    }
+
     fun formatDuration(duration: Int): String {
         val cal = Calendar.getInstance()
         cal.timeInMillis = duration.toLong() - cal.timeZone.rawOffset

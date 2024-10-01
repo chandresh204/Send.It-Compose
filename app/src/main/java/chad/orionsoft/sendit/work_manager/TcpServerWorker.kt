@@ -200,6 +200,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                     val read1 = inStream.read(buff)
                     fileOut?.write(buff, 0, read1)
                     totalReceived += read1
+                    TransferProcessDomain.emitTitleOfCurrentReceivingItem(filename)
                     TransferProcessDomain.addToTotalReceivedInSession(read1)
                     if (loops % Constants.UPDATE_TRANSFER_STATUS_AFTER_LOOPS == 0) {
                         TransferProcessDomain.updateItemReceivedProgress(fileId, totalReceived)

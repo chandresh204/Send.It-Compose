@@ -64,8 +64,14 @@ class MainScreenViewModel @Inject constructor(
                     connectedDeviceDetails = qrConnectDomain.getPairingDeviceDetails()
                 )
             }
-
         }
+        receiveTransferSpeedFlow()
+        receiveCurrentSendingCountFlow()
+        receiveCurrentReceivingCountFlow()
+        receiveCurrentSendingItemTitle()
+        receiveCurrentSendingProgress()
+        receiveCurrentReceivingProgress()
+        receiveCurrentReceivingItemTitle()
     }
 
     fun onEvent(event: MainScreenEvent) {
@@ -185,6 +191,162 @@ class MainScreenViewModel @Inject constructor(
             it.copy(
                 selectionModel = SelectionUiModel()
             )
+        }
+    }
+
+    private fun receiveTransferSpeedFlow() {
+        viewModelScope.launch {
+            TransferProcessDomain.transferSpeedFlow.collect {
+                // sending card logic
+                if(it.first <= 0) {
+                    _mainScreenState.update { state ->
+                        state.copy(
+                            sendingFlowInfo = mainScreenState.value.sendingFlowInfo.copy(
+                                isVisible = false
+                            )
+                        )
+                    }
+                } else {
+                    val currentStatus = mainScreenState.value.sendingFlowInfo
+                    val rateAndUnit = Converters.formatRateWithUnit(it.first)
+                    val newStatus = currentStatus.copy(
+                        isVisible = true,
+                        transferRate = rateAndUnit.first,
+                        transferRateUnit = rateAndUnit.second,
+                    )
+                    _mainScreenState.update { state ->
+                        state.copy(
+                            sendingFlowInfo = newStatus
+                        )
+                    }
+                }
+                // receiving card logic
+                val receivingStatus = mainScreenState.value.receivingFlowInfo
+                val reteAndUnit = Converters.formatRateWithUnit(it.second)
+                val newStatus = if (it.second > 0) {
+                    receivingStatus.copy(
+                        isVisible = true,
+                        transferRate = reteAndUnit.first,
+                        transferRateUnit = reteAndUnit.second
+                    )
+                } else {
+                    receivingStatus.copy(
+                        transferRate = reteAndUnit.first,
+                        transferRateUnit = reteAndUnit.second
+                    )
+                }
+                _mainScreenState.update { state ->
+                    state.copy(
+                        receivingFlowInfo = newStatus
+                    )
+                }
+            }
+        }
+    }
+
+    private fun receiveCurrentSendingCountFlow() {
+        viewModelScope.launch {
+            TransferProcessDomain.sendingItemCountFlow.collectLatest {
+                val oldStatus = mainScreenState.value.sendingFlowInfo
+                val currentDetailsArray = oldStatus.transferItemDetail
+                currentDetailsArray[0] = "(${it.first}/${it.second})"
+                val newStatus = oldStatus.copy(
+                    transferItemDetail = currentDetailsArray
+                )
+                _mainScreenState.update { status ->
+                    status.copy(
+                        sendingFlowInfo = newStatus
+                    )
+                }
+            }
+        }
+    }
+
+    private fun receiveCurrentReceivingCountFlow() {
+        viewModelScope.launch {
+            TransferProcessDomain.receivingItemCountFlow.collectLatest {
+                val oldStatus = mainScreenState.value.receivingFlowInfo
+                val currentDetailsArray = oldStatus.transferItemDetail
+                currentDetailsArray[0] = "(${it+1})"
+                val newStatus = oldStatus.copy(
+                    transferItemDetail = currentDetailsArray,
+                    transferRate = "0",
+                    currentItemProgress = 1f,
+                )
+                _mainScreenState.update { status ->
+                    status.copy(
+                        receivingFlowInfo = newStatus
+                    )
+                }
+            }
+        }
+    }
+
+    private fun receiveCurrentSendingItemTitle() {
+        viewModelScope.launch {
+            TransferProcessDomain.sendingItemTitleFlow.collectLatest {
+                val oldStatus = mainScreenState.value.sendingFlowInfo
+                val currentDetailsArray = oldStatus.transferItemDetail
+                currentDetailsArray[1] = it
+                val newStatus = oldStatus.copy(
+                    transferItemDetail = currentDetailsArray
+                )
+                _mainScreenState.update { status ->
+                    status.copy(
+                        sendingFlowInfo = newStatus
+                    )
+                }
+            }
+        }
+    }
+
+    private fun receiveCurrentReceivingItemTitle() {
+        viewModelScope.launch {
+            TransferProcessDomain.receivingItemTitleFlow.collectLatest {
+                val oldStatus = mainScreenState.value.receivingFlowInfo
+                val currentDetailsArray = oldStatus.transferItemDetail
+                currentDetailsArray[1] = it
+                val newStatus = oldStatus.copy(
+                    transferItemDetail = currentDetailsArray
+                )
+                _mainScreenState.update { status ->
+                    status.copy(
+                        receivingFlowInfo = newStatus
+                    )
+                }
+            }
+        }
+    }
+
+    private fun receiveCurrentSendingProgress() {
+        viewModelScope.launch {
+            TransferProcessDomain.sendingItemProgressPercFlow.collectLatest {
+                val oldStatus = mainScreenState.value.sendingFlowInfo
+                val newStatus = oldStatus.copy(
+                    currentItemProgress = it
+                )
+                _mainScreenState.update { status ->
+                    status.copy(
+                        sendingFlowInfo = newStatus
+                    )
+                }
+            }
+        }
+    }
+
+    private fun receiveCurrentReceivingProgress() {
+        viewModelScope.launch {
+            TransferProcessDomain.receivingItemProgressPercFlow.collectLatest {
+                val oldStatus = mainScreenState.value.receivingFlowInfo
+                val newStatus = oldStatus.copy(
+                    currentItemProgress = it
+                )
+                _mainScreenState.update { state ->
+                    state.copy(
+                        receivingFlowInfo = newStatus
+                    )
+                }
+            }
         }
     }
 

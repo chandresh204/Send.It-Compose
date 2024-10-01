@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.StrokeCap
 @Composable
 fun AnimatedLinearProgressBar(modifier: Modifier,
                               newProgress: () -> Float) {
-    LinearProgressIndicator(progress = newProgress.invoke(),
+    LinearProgressIndicator(progress = newProgress,
         strokeCap = StrokeCap.Round,
         trackColor = MaterialTheme.colorScheme.surface,
         modifier = modifier)

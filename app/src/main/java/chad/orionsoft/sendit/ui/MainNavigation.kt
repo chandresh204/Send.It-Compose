@@ -51,9 +51,17 @@ fun MainNavigation() {
             FullScreenImage(decodedPath)
         }
         composable(
-            route = NavigationConstants.NAV_TRANSFER_PROGRESS_SCREEN,
+            route = NavigationConstants.NAV_TRANSFER_PROGRESS_SCREEN +
+                    "/{${NavigationConstants.NAV_ARG_TRANSFER_RECEIVING}}",
+            arguments = listOf(
+                navArgument(NavigationConstants.NAV_ARG_TRANSFER_RECEIVING) {
+                    type = NavType.BoolType
+                }
+            )
         ) {
-            TransferMain {
+            val toReceivingScreen = it.arguments
+                ?.getBoolean(NavigationConstants.NAV_ARG_TRANSFER_RECEIVING) ?: false
+            TransferMain(landToReceivingTab = toReceivingScreen) {
                 navController.popBackStack()
             }
         }
