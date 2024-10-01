@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -19,7 +20,7 @@ import androidx.compose.ui.unit.dp
 fun TextWithIcon(imageVector: ImageVector,
                  text: String,
                  textStyle: TextStyle = TextStyle.Default,
-                 modifier: Modifier = Modifier) {
+                 @SuppressLint("ModifierParameter") modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically) {

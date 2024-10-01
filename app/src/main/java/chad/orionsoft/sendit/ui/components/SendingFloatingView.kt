@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,12 +19,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,56 +32,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chad.orionsoft.sendit.R
-import chad.orionsoft.sendit.model.ConnectedDeviceDetails
-
-@Composable
-fun SendingFloatingView(
-    modifier: Modifier = Modifier,
-    title: String,
-    subTitle: String,
-    progressUpdate: () -> Float
-) {
-    Card(modifier = modifier.width(100.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 7.dp
-        )) {
-        Box {
-            Row(modifier = Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = title,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.titleSmall)
-                    Text(text = subTitle,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodySmall)
-                }
-                Icon(Icons.Default.KeyboardArrowUp,
-                    modifier = Modifier.size(20.dp),
-                    contentDescription = "Sending")
-            }
-            if(progressUpdate.invoke() > 0f) {
-                LinearProgressIndicator(
-                    progress = progressUpdate,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .height(2.dp)
-                        .padding(horizontal = 4.dp)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun SendFloatingButton(

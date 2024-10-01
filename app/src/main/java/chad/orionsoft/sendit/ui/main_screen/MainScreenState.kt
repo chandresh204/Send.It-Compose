@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.ui.main_screen
 
-import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 
 data class MainScreenState(
