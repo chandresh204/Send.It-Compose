@@ -3,13 +3,16 @@ package chad.orionsoft.sendit.domain
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
 import chad.orionsoft.sendit.model.FileType
-import chad.orionsoft.sendit.utils.Constants
+import chad.orionsoft.sendit.model.MediaData
+import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -99,5 +102,46 @@ class ContentResolverDomain @Inject constructor(
                 contentResolver.update(newFileUri, newValue, null ,null)
             }
         }
+    }
+
+    fun processFileSelectionIntent(intent: Intent,
+                                   resolver: ContentResolver = context.contentResolver) : List<MediaData> {
+        val mediaList = mutableListOf<MediaData>()
+        intent.clipData?.let {
+            for(i in 0 until it.itemCount) {
+                val clipItem = it.getItemAt(i)
+                val uri = clipItem.uri
+                resolver.query(uri, null, null, null,null)
+                    .use {  cur ->
+                        cur?.let {  cur1 ->
+                            createMediaDataFromResolverCursor(cur1, uri)?.let { mediaData ->
+                                mediaList.add(mediaData)
+                            }
+                        }
+                    }
+
+            }
+        }
+        val dataUri = intent.data ?: Uri.parse("")
+        resolver.query(dataUri, null, null, null, null).use {
+            it?.let { cur ->
+                createMediaDataFromResolverCursor(cur, dataUri)?.let { mediaData -> mediaList.add(mediaData) }
+            }
+        }
+        return mediaList
+    }
+
+    private fun createMediaDataFromResolverCursor(cur1: Cursor, uri: Uri) : MediaData? {
+        if(cur1.moveToFirst()) {
+            val titleIndex = cur1.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
+            val sizeIndex = cur1.getColumnIndex(MediaStore.Files.FileColumns.SIZE)
+            val id = System.currentTimeMillis()
+            val title = cur1.getString(titleIndex)
+            val size = cur1.getLong(sizeIndex)
+            return MediaData(id, uri, title, null, -1, uri, size,
+                    -1, Converters.getFileTypeFromFileName(title)
+            )
+        }
+        return null
     }
 }

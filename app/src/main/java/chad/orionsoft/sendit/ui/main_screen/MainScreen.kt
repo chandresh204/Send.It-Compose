@@ -226,7 +226,9 @@ private fun ScreenContent(modifier: Modifier = Modifier, onMediaSelected : (Medi
                 }
 
                 3 -> {
-                    SenderFileSelect()
+                    SenderFileSelect { mediaData, selected ->
+                        onMediaSelected(mediaData, selected)
+                    }
                 }
             }
         }

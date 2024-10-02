@@ -1,10 +1,7 @@
 package chad.orionsoft.sendit.ui.sender_file_select
 
-data class FileSelectState(
-    val selectFiles: List<FileSelectUiData> = emptyList()
-)
+import chad.orionsoft.sendit.model.MediaData
 
-data class FileSelectUiData(
-    val id: Long,
-    val title: String
+data class FileSelectState(
+    val selectFiles: List<MediaData> = emptyList()
 )
