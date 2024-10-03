@@ -57,7 +57,7 @@ class NotificationDomain @Inject constructor(
             Notification.Builder(context)
         }
         notificationBuilder
-            .setSmallIcon(R.drawable.send_icon1_small)
+            .setSmallIcon(R.mipmap.ic_launcher_round)
             .setContentTitle(title)
             .setContentText(content)
             .setOngoing(isSticky)

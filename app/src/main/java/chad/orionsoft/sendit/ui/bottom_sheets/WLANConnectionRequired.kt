@@ -14,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.utils.Constants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,14 +56,16 @@ fun WLANConnectionRequiredBottomSheet(
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
             Text(text = stringResource(id = R.string.wlan_connect_to_wifi))
             OutlinedButton(onClick = connectToWifiClick) {
-                Text(text = stringResource(id = R.string.button_connect_to_wifi))
+                TextWithIcon(painterResource(id = R.drawable.wifi_24),
+                    text = stringResource(id = R.string.button_connect_to_wifi), tint = MaterialTheme.colorScheme.primary)
             }
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
             Text(text = "--" + stringResource(id = R.string.or) + "--")
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
             Text(text = stringResource(id = R.string.wlan_create_network))
             OutlinedButton(onClick = createNetworkClick) {
-                Text(text = stringResource(id = R.string.button_create_network))
+                TextWithIcon(painterResource(id = R.drawable.hotspot_24),
+                    text = stringResource(id = R.string.button_create_network), tint = MaterialTheme.colorScheme.primary)
             }
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
             TextButton(onClick = closeNow) {

@@ -120,16 +120,16 @@ object Converters {
     fun getPlaceHolderIconsAsPerMediaType(mediaType : FileType) : Int {
         return when(mediaType) {
            FileType.FileTypeImage -> {
-               R.drawable.image_icon_small
+               R.drawable.image_24px
            }
             FileType.FileTypeAudio -> {
-                R.drawable.music_icon_small
+                R.drawable.music_note_24px
             }
             FileType.FileTypeVideo -> {
-                R.drawable.video_icon_small
+                R.drawable.play_circle_24px
             }
             FileType.FileTypeOther -> {
-                R.drawable.file_unknown_icon_small
+                R.drawable.file_present_24px
             }
         }
     }
@@ -137,10 +137,10 @@ object Converters {
     fun getPlaceHolderIconsAsPerFileName(filename: String) : Int {
         val extension = filename.substring(filename.lastIndexOf(".")).lowercase()
         return when {
-            Constants.audioExtensions.contains(extension) -> R.drawable.music_icon_small
-            Constants.imageExtensions.contains(extension) -> R.drawable.image_icon_small
-            Constants.videoExtensions.contains(extension) -> R.drawable.video_icon_small
-            else -> R.drawable.file_unknown_icon_small
+            Constants.audioExtensions.contains(extension) -> R.drawable.music_note_24px
+            Constants.imageExtensions.contains(extension) -> R.drawable.image_24px
+            Constants.videoExtensions.contains(extension) -> R.drawable.play_circle_24px
+            else -> R.drawable.file_present_24px
         }
     }
 

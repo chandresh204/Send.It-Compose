@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -89,14 +90,20 @@ fun NotConnectedFloatingButton(
                 )
         ) {
             Text(text = "Not\nConnected",
-                modifier = Modifier.padding(start = 27.dp, top = 4.dp, bottom = 4.dp, end = 8.dp),
+                modifier = Modifier.padding(start = 33.dp, top = 4.dp, bottom = 4.dp, end = 8.dp),
                 style = MaterialTheme.typography.bodySmall)
         }
         Image(
-            painterResource(id = R.drawable.receive_icon_small),
+            painterResource(id = R.drawable.devices_off_24px),
             modifier = Modifier
-                .size(55.dp)
-                .align(Alignment.CenterStart),
+                .size(60.dp)
+                .align(Alignment.CenterStart)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(12.dp),
+            colorFilter = ColorFilter.tint(
+                color = MaterialTheme.colorScheme.onPrimary
+            ),
             contentDescription = null
         )
     }
@@ -108,12 +115,12 @@ fun ConnectedFloatingButton(modifier: Modifier = Modifier,
                             color: Color,
                             onClick: () -> Unit) {
     Text(text = startLetter.toString(),
-        fontSize = 22.sp,
+        fontSize = 30.sp,
         fontWeight = FontWeight.Bold,
         modifier = modifier
             .clip(CircleShape)
             .background(color)
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .padding(horizontal = 22.dp, vertical = 12.dp)
             .clickable(onClick = onClick)
     )
 }
@@ -228,7 +235,7 @@ private fun IconInProgressBar(
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
 @Composable
 private fun Preview() {
     Box(modifier = Modifier.fillMaxSize()) {

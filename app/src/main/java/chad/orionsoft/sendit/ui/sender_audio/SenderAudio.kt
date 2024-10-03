@@ -46,7 +46,7 @@ fun SenderAudio(onSelectionChanged: (MediaData, Boolean) -> Unit) {
                 modifier = Modifier.animateItemPlacement(),
                 isSelected = aud.selected,
                 thumbUri = aud.audioData.thumbnail,
-                placeHolder = R.drawable.music_icon_small,
+                placeHolder = R.drawable.music_note_24px,
                 title = aud.audioData.title,
                 subtitle = "${Converters.formatDuration(aud.audioData.duration)} " +
                         Converters.formatDataString(aud.audioData.size),

@@ -122,7 +122,7 @@ fun SteadyItemCard(
 @Composable
 private fun Preview() {
     SendItTheme {
-        SteadyItemCard(thumbnailPlaceholder = R.drawable.music_icon,
+        SteadyItemCard(thumbnailPlaceholder = R.drawable.music_note_24px,
             modifier = Modifier.padding(8.dp),
             title = "Cool Weather", size = "11 MB",
             thumbnail = Uri.parse(""),

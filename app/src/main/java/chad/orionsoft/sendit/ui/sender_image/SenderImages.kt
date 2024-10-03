@@ -35,7 +35,7 @@ fun SenderImagesScreen(onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
                 title = "",
                 subtitle = "",
                 actionIconVector = null,
-                actionIconDrawableRes = R.drawable.eye_icon_small,
+                actionIconDrawableRes = R.drawable.visibility_24px,
                 onActionClick = {
                     StartActivity.openFile(context, img.imageData.title, img.imageData.uri)
                 }) {

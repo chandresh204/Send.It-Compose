@@ -49,7 +49,7 @@ fun SenderVideo(onSelectionChanged: (MediaData, Boolean) -> Unit) {
                 modifier = Modifier.animateItemPlacement(),
                 isSelected = vid.selected,
                 thumbUri = vid.videoData.uri,
-                placeHolder = R.drawable.video_icon_small,
+                placeHolder = R.drawable.play_circle_24px,
                 title = vid.videoData.title,
                 subtitle = "${Converters.formatDuration(vid.videoData.duration)}\n" +
                         Converters.formatDataString(vid.videoData.size),

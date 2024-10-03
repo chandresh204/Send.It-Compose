@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +29,21 @@ fun TextWithIcon(imageVector: ImageVector,
         Icon(imageVector, contentDescription = null)
         Spacer(modifier = Modifier.padding(horizontal = 2.dp))
         Text(text = text, style = textStyle)
+    }
+}
+
+@Composable
+fun TextWithIcon(painter: Painter,
+                 text: String,
+                 textStyle: TextStyle = TextStyle.Default,
+                 tint: Color,
+                 @SuppressLint("ModifierParameter") modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically) {
+        Icon(painter, contentDescription = null, tint = tint)
+        Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+        Text(text = text, style = textStyle, color = tint)
     }
 }
 

@@ -178,18 +178,18 @@ private fun Preview() {
                 Modifier,
                 isSelected = false,
                 thumbUri = Uri.parse(""),
-                placeHolder = R.drawable.music_icon_small,
+                placeHolder = R.drawable.music_note_24px,
                 title = "Music 1",
                 subtitle = "Size 12 MB, 00:00",
                 actionIconVector = null,
-                actionIconDrawableRes = R.drawable.eye_icon_small,
+                actionIconDrawableRes = R.drawable.visibility_24px,
                 onActionClick = {}
             ) {}
             MediaItemViewBar(
                 Modifier,
                 isSelected = true,
                 thumbUri = Uri.parse(""),
-                placeHolder = R.drawable.music_icon_small,
+                placeHolder = R.drawable.music_note_24px,
                 title = "Music 2",
                 subtitle = "Size 21 MB, 00:14",
                 actionIconVector = Icons.Default.Check,
@@ -201,7 +201,7 @@ private fun Preview() {
                     Modifier,
                     isSelected = true,
                     thumbUri = Uri.parse(""),
-                    placeHolder = R.drawable.music_icon_small,
+                    placeHolder = R.drawable.music_note_24px,
                     title = "Music 2",
                     subtitle = "00:14",
                     actionIconVector = Icons.Default.Check,
@@ -212,11 +212,11 @@ private fun Preview() {
                     Modifier,
                     isSelected = false,
                     thumbUri = Uri.parse(""),
-                    placeHolder = R.drawable.music_icon_small,
+                    placeHolder = R.drawable.music_note_24px,
                     title = "",
                     subtitle = "05:30",
                     actionIconVector = null,
-                    actionIconDrawableRes = R.drawable.eye_icon_small,
+                    actionIconDrawableRes = R.drawable.visibility_24px,
                     onActionClick = {}
                 ) {}
             }

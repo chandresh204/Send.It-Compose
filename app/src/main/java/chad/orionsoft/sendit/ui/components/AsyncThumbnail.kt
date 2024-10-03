@@ -79,7 +79,7 @@ private fun Preview() {
         AsyncThumbnail(modifier = Modifier
             .size(40.dp)
             .clip(CircleShape),
-            placeholder = R.drawable.music_icon_small,
+            placeholder = R.drawable.music_note_24px,
         Uri.parse("")
         )
     }
