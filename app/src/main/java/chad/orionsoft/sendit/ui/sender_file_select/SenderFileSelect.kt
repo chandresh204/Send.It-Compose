@@ -17,8 +17,12 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,15 +37,32 @@ import chad.orionsoft.sendit.utils.Converters
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SenderFileSelect(onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
+fun SenderFileSelect(
+    fromSharedIntent: Intent?,
+    onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
 
     val vModel = hiltViewModel<FileSelectViewModel>()
     val uiState by vModel.fState.collectAsState()
     val context = LocalContext.current
 
+    var consumedSharedIntent : Intent? by rememberSaveable {
+        mutableStateOf(null)
+    }
+
     val fileChooser = Intent(Intent.ACTION_GET_CONTENT).apply {
         type = "*/*"
         putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+    }
+
+    LaunchedEffect(fromSharedIntent) {
+        fromSharedIntent?.let {
+            if(fromSharedIntent != consumedSharedIntent) {
+                vModel.onEvent(FileSelectEvent.OnFileData(it) { mData ->
+                    onItemSelectedChanged(mData, true)
+                })
+                consumedSharedIntent = fromSharedIntent
+            }
+        }
     }
 
     val fileSelectLauncher = rememberLauncherForActivityResult(
@@ -79,7 +100,9 @@ fun SenderFileSelect(onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
                 }
             }
             item {
-                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp ),
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center) {
                     Button(onClick = {
                         fileSelectLauncher.launch(Intent.createChooser(fileChooser, "Select Files"))
@@ -96,6 +119,6 @@ fun SenderFileSelect(onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
 @Composable
 private fun SenderFileSelectPrev() {
     SendItTheme {
-        SenderFileSelect { _,_  -> }
+        SenderFileSelect(null) { _,_  -> }
     }
 }

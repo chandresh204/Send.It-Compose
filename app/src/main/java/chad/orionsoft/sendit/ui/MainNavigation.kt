@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,7 +17,7 @@ import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
 
 @Composable
-fun MainNavigation() {
+fun MainNavigation(sharedIntent : Intent?) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = NavigationConstants.NAV_WELCOME_SCREEN) {
         composable(NavigationConstants.NAV_WELCOME_SCREEN) {
@@ -26,7 +27,7 @@ fun MainNavigation() {
             }
         }
         composable(NavigationConstants.NAV_HOME_SCREEN) {
-            MainScreen { route ->
+            MainScreen(sharedIntent) { route ->
                 navController.navigate(route)
             }
         }

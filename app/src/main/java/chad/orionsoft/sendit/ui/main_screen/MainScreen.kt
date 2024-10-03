@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.main_screen
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -60,7 +61,7 @@ import kotlin.system.exitProcess
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(gotoScreen: (screenRoute: String) -> Unit) {
+fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit) {
     val vModel = hiltViewModel<MainScreenViewModel>()
     val uiState by vModel.mainScreenState.collectAsState()
     var disconnectionRequest by remember {
@@ -112,7 +113,7 @@ fun MainScreen(gotoScreen: (screenRoute: String) -> Unit) {
         )
     }) { paddings ->
         Box(modifier = Modifier.padding(paddings)) {
-            ScreenContent(modifier = Modifier.fillMaxSize()) { mData, isSelected ->
+            ScreenContent(modifier = Modifier.fillMaxSize(), sharedIntent) { mData, isSelected ->
                 vModel.onEvent(MainScreenEvent.OnItemSelected(mData, isSelected))
             }
             Column(modifier = Modifier
@@ -191,7 +192,9 @@ fun MainScreen(gotoScreen: (screenRoute: String) -> Unit) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ScreenContent(modifier: Modifier = Modifier, onMediaSelected : (MediaData, Boolean) -> Unit) {
+private fun ScreenContent(modifier: Modifier = Modifier,
+                          sharedIntent: Intent?,
+                          onMediaSelected : (MediaData, Boolean) -> Unit) {
     val pagerState = rememberPagerState {
         4
     }
@@ -226,11 +229,16 @@ private fun ScreenContent(modifier: Modifier = Modifier, onMediaSelected : (Medi
                 }
 
                 3 -> {
-                    SenderFileSelect { mediaData, selected ->
+                    SenderFileSelect(sharedIntent) { mediaData, selected ->
                         onMediaSelected(mediaData, selected)
                     }
                 }
             }
+        }
+    }
+    LaunchedEffect(sharedIntent) {
+        sharedIntent?.let {
+            pagerState.animateScrollToPage(3) // scroll directly to file select page if arrived from shared intent
         }
     }
 }
