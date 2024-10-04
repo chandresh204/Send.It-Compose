@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import chad.orionsoft.sendit.ui.about_screen.AboutScreen
 import chad.orionsoft.sendit.ui.edit_screen.EditScreen
 import chad.orionsoft.sendit.ui.main_screen.MainScreen
 import chad.orionsoft.sendit.ui.qr_connect.QrConnectScreen
@@ -70,6 +71,13 @@ fun MainNavigation(sharedIntent : Intent?) {
             route = NavigationConstants.NAV_QR_SHOW_SCREEN
         ) {
             QrConnectScreen {
+                navController.popBackStack()
+            }
+        }
+        composable(
+            route = NavigationConstants.NAV_ABOUT_SCREEN
+        ) {
+            AboutScreen {
                 navController.popBackStack()
             }
         }
