@@ -2,14 +2,12 @@ package chad.orionsoft.sendit.ui.sender_image
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import chad.orionsoft.sendit.domain.ContentResolverDomain
 import chad.orionsoft.sendit.domain.ThumbnailDomain
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

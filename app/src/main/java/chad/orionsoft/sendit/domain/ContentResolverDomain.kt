@@ -5,8 +5,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -14,10 +12,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
-import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
 import javax.inject.Inject
 
 class ContentResolverDomain @Inject constructor(

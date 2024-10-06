@@ -5,14 +5,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
-import chad.orionsoft.sendit.domain.ContentResolverDomain
 import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
