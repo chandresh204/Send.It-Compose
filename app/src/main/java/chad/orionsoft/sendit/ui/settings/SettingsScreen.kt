@@ -40,9 +40,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import chad.orionsoft.sendit.ui.theme.ColorBlue
-import chad.orionsoft.sendit.ui.theme.ColorGreen
-import chad.orionsoft.sendit.ui.theme.ColorRed
 import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Constants
 

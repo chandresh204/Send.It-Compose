@@ -44,24 +44,6 @@ class PreferenceRepository @Inject constructor(
     fun getKnownReceivers() : MutableSet<String>? =
         sharedPreferences.getStringSet(SharedPreferencesConstants.PREFS_KNOWN_RECEIVER, emptySet())
 
-    fun addToKnownReceiver(id: String)  {
-        addLog("Adding to known receiver: $id")
-        val knownReceivers = getKnownReceivers()?.toMutableSet() ?: mutableSetOf()
-        knownReceivers.add(id)
-        sharedPreferences.edit().putStringSet(
-            SharedPreferencesConstants.PREFS_KNOWN_RECEIVER, knownReceivers
-        ).apply()
-    }
-
-    fun getMyUniqueId() : String {
-        val myId = sharedPreferences.getString(SharedPreferencesConstants.PREFS_MY_UNIQUE_ID, null)
-        return if(myId == null) {
-            val newId = RuntimeConstants.generateRandomCode(12)
-            sharedPreferences.edit().putString(SharedPreferencesConstants.PREFS_MY_UNIQUE_ID, newId).apply()
-            newId
-        } else myId
-    }
-
     fun getMyColorCode() : Color {
         return Color.Unspecified.copy(
             red = 0.8f, green = 0.2f,
