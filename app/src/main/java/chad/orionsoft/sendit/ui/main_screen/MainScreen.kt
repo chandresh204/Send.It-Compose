@@ -56,6 +56,7 @@ import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
 import chad.orionsoft.sendit.ui.sender_video.SenderVideo
 import chad.orionsoft.sendit.ui.theme.SendItTheme
+import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.NavigationConstants
 import kotlinx.coroutines.launch
@@ -107,7 +108,7 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
                 sharedIntent,
                 onDisconnectClick = { disconnectionRequest = true },
                 onMenuClick = {
-                    // TODO implement menu click
+                    gotoScreen(NavigationConstants.NAV_SETTINGS)
                 },
                 onAppIconClick = {
                     gotoScreen(NavigationConstants.NAV_ABOUT_SCREEN)

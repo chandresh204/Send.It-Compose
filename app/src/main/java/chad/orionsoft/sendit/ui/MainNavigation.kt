@@ -8,17 +8,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import chad.orionsoft.sendit.ui.about_screen.AboutScreen
-import chad.orionsoft.sendit.ui.edit_screen.EditScreen
 import chad.orionsoft.sendit.ui.main_screen.MainScreen
 import chad.orionsoft.sendit.ui.qr_connect.QrConnectScreen
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
+import chad.orionsoft.sendit.ui.settings.SettingsScreen
 import chad.orionsoft.sendit.ui.transfer_process_screen.TransferMain
 import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
+import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
 
 @Composable
-fun MainNavigation(sharedIntent : Intent?) {
+fun MainNavigation(sharedIntent : Intent?, themeChangeCallback: (ColorConstants) -> Unit) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = NavigationConstants.NAV_WELCOME_SCREEN) {
         composable(NavigationConstants.NAV_WELCOME_SCREEN) {
@@ -32,8 +33,8 @@ fun MainNavigation(sharedIntent : Intent?) {
                 navController.navigate(route)
             }
         }
-        composable(NavigationConstants.NAV_EDIT) {
-            EditScreen {
+        composable(NavigationConstants.NAV_SETTINGS) {
+            SettingsScreen(themeChangeCallBack = themeChangeCallback) {
                 navController.popBackStack()
             }
         }

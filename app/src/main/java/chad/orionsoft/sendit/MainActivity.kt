@@ -5,12 +5,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.MainNavigation
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject lateinit var preferenceRepository: PreferenceRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,8 +28,13 @@ class MainActivity : ComponentActivity() {
             intent
         } else null
         setContent {
-            SendItTheme {
-                MainNavigation(sharedIntent)
+            var selectedAppColor by remember {
+                mutableStateOf(preferenceRepository.getAppColorFromPreference())
+            }
+            SendItTheme(selectedAppColor) {
+                MainNavigation(sharedIntent) {
+                    selectedAppColor = it
+                }
             }
         }
     }

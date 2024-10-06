@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import androidx.compose.ui.graphics.Color
+import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import chad.orionsoft.sendit.utils.SharedPreferencesConstants
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,6 +28,18 @@ class PreferenceRepository @Inject constructor(
 
     fun getUserNameFromPreferences() : String? =
         sharedPreferences.getString(SharedPreferencesConstants.PREFS_USER_NAME, null)
+
+    fun setAppColorInPreferences(appColor: ColorConstants) {
+        sharedPreferences.edit().putInt(
+            SharedPreferencesConstants.PREFS_APP_COLOR, appColor.id
+        ).apply()
+    }
+
+    fun getAppColorFromPreference() : ColorConstants {
+        val colorId = sharedPreferences.getInt(SharedPreferencesConstants.PREFS_APP_COLOR, ColorConstants.Device.id)
+        val fromPrefs = ColorConstants.entries.find { it.id == colorId }
+        return fromPrefs ?: ColorConstants.Device
+    }
 
     fun getKnownReceivers() : MutableSet<String>? =
         sharedPreferences.getStringSet(SharedPreferencesConstants.PREFS_KNOWN_RECEIVER, emptySet())

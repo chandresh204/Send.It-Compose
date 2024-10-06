@@ -4,7 +4,7 @@ object NavigationConstants {
 
     const val NAV_WELCOME_SCREEN = "welcomeScreen"
     const val NAV_HOME_SCREEN = "homeScreen"
-    const val NAV_EDIT = "editScreen"
+    const val NAV_SETTINGS = "settingsScreen"
     const val NAV_SENDER_IMAGES = "senderImages"
     const val NAV_FULL_SCREEN_IMAGE = "fullScreenImage"
     const val NAV_TRANSFER_PROGRESS_SCREEN = "transferProgressScreen"
