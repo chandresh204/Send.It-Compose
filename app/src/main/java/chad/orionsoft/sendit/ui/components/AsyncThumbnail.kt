@@ -42,7 +42,7 @@ fun AsyncThumbnail(modifier: Modifier = Modifier,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 loadedBitmap = context.contentResolver.loadThumbnail(
                     imageUri, Size(thumbnailSize,thumbnailSize), null)
-            }
+            } 
         } catch (e: Exception) {
             Log.e("AsyncThumbnail", "$e")
         }

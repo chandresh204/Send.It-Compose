@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.sender_audio
 
+import android.graphics.Bitmap
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.model.SortOrder
 
@@ -15,4 +16,5 @@ data class SenderAudioState(
 data class AudioUIData(
     val audioData: MediaData,
     val selected: Boolean,
+    val thumbnail: Bitmap?
 )

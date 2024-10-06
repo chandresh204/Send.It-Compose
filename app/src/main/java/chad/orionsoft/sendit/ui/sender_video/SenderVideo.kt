@@ -1,6 +1,8 @@
 package chad.orionsoft.sendit.ui.sender_video
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -23,6 +25,7 @@ import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.bottom_sheets.OptionSelectBottomSheet
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
 import chad.orionsoft.sendit.ui.model.SortOrder
+import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -38,6 +41,7 @@ fun SenderVideo(onSelectionChanged: (MediaData, Boolean) -> Unit) {
     val context = LocalContext.current
 
     LazyVerticalGrid(
+        modifier = Modifier.fillMaxSize().padding(horizontal = Constants.PAGE_PADDING.dp),
         columns = GridCells.Adaptive(100.dp)) {
         val displayList = if(uiState.isSearching) {
             uiState.searchedList
@@ -48,7 +52,7 @@ fun SenderVideo(onSelectionChanged: (MediaData, Boolean) -> Unit) {
             MediaItemViewGrid(
                 modifier = Modifier.animateItemPlacement(),
                 isSelected = vid.selected,
-                thumbUri = vid.videoData.uri,
+                thumbnail = vid.thumbnailBitmap,
                 placeHolder = R.drawable.play_circle_24px,
                 title = vid.videoData.title,
                 subtitle = "${Converters.formatDuration(vid.videoData.duration)}\n" +

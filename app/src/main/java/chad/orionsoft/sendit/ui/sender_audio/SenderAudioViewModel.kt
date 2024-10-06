@@ -3,10 +3,15 @@ package chad.orionsoft.sendit.ui.sender_audio
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import chad.orionsoft.sendit.domain.ThumbnailDomain
+import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
 import chad.orionsoft.sendit.ui.model.SortOrder
+import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SenderAudioViewModel @Inject constructor(
     mediaRepository: MediaRepository,
+    private val thumbnailDomain: ThumbnailDomain
 ) : ViewModel() {
 
     private val _avState = MutableStateFlow(SenderAudioState())
@@ -25,7 +31,7 @@ class SenderAudioViewModel @Inject constructor(
 
     init {
         val fullList = mediaRepository.generateAudioList().map { data ->
-            AudioUIData(data, false)
+            AudioUIData(data, false, null)
         }
         _avState.update {
             it.copy(
@@ -57,6 +63,7 @@ class SenderAudioViewModel @Inject constructor(
                 audioList = aList
             )
         }
+        generateThumbnails(aList)
         if(avState.value.isSearching) {
             val searchList = when(sortOrder) {
                 SortOrder.ByName -> {
@@ -210,6 +217,38 @@ class SenderAudioViewModel @Inject constructor(
                     audData.audioData.title.lowercase().contains(query) // query already in lower case
                 }
             )
+        }
+    }
+
+    private fun generateThumbnails(audioList : List<AudioUIData>) {
+        val thumbScope = CoroutineScope(Dispatchers.IO)
+        for (i in 0 .. 50) {
+            val audio = try {
+                audioList[i]
+            } catch (e: Exception) {
+                break
+            }
+            if(audio.thumbnail != null) continue
+            thumbScope.launch {
+                val bMap = thumbnailDomain.generateThumbnail(
+                    Converters.extractLastElementOfUri(audio.audioData.uri),
+                    audio.audioData.pathData ?: "", FileType.FileTypeAudio)
+
+                val updateList = avState.value.audioList.toMutableList()
+                val iToUpdate = updateList.find { audio.audioData.id == it.audioData.id }
+                iToUpdate?.let {
+                    val index = updateList.indexOf(it)
+                    val newAudioData = it.copy(
+                        thumbnail = bMap
+                    )
+                    updateList[index] = newAudioData
+                    _avState.update { state ->
+                        state.copy(
+                            audioList = updateList,
+                        )
+                    }
+                }
+            }
         }
     }
 }

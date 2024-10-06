@@ -11,5 +11,6 @@ data class MediaData(
     val thumbnail: Uri,
     val size: Long,
     val lastModified: Long,
-    val mediaType: FileType
+    val mediaType: FileType,
+    val pathData : String? = null, // only for sdk < Q, used as AlbumArtPath only in audio
 )

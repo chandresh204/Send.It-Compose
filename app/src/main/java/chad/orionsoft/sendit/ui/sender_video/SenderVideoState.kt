@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.sender_video
 
+import android.graphics.Bitmap
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.model.SortOrder
 
@@ -16,4 +17,5 @@ data class SenderVideoState(
 data class VideoUiData(
     val videoData: MediaData,
     val selected: Boolean,
+    val thumbnailBitmap: Bitmap?
 )

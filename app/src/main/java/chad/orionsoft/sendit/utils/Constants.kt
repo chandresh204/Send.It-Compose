@@ -41,13 +41,7 @@ object Constants {
     // Device pair status check
     const val UDP_IS_ALIVE = APP_CODE
 
-    // const val TCP_FILE_INFO = TCP_FILE_CONTINUE((filename))type/*size*/
-
-//    // file types
-//    const val FILE_TYPE_IMAGE = "Image"
-//    const val FILE_TYPE_AUDIO = "audio"
-//    const val FILE_TYPE_VIDEO = "video"
-//    const val FILE_TYPE_OTHER = "other"
+    const val THUMBNAIL_DIR = "thumbnails"
 
     // work manager params
     const val SERVER_WM_TAG = "tcpServer"

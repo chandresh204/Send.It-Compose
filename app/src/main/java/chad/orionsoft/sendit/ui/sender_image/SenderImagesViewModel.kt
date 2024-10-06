@@ -2,9 +2,14 @@ package chad.orionsoft.sendit.ui.sender_image
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import chad.orionsoft.sendit.domain.ContentResolverDomain
+import chad.orionsoft.sendit.domain.ThumbnailDomain
+import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
+import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -14,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SenderImagesViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
+    private val thumbnailDomain: ThumbnailDomain
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(SenderImagesState())
@@ -22,15 +28,40 @@ class SenderImagesViewModel @Inject constructor(
     private val tag = "SenderImageViewModel"
 
     init {
+        val allImages = getAllImages().toMutableList()
         _uiState.update {
             it.copy(
-                images = getAllImages().toMutableList()
+                images = allImages
             )
+        }
+        viewModelScope.launch {
+            startThumbGeneration(allImages)
         }
         viewModelScope.launch {
             MainScreenViewModel.clearAllSelectionReceiver.collect {
                 if(it) {
                     clearAllSelection()
+                }
+            }
+        }
+    }
+
+    private fun startThumbGeneration(images: List<ImageUiData>) {
+        for (i in 0 .. 50) {
+            val bMap = thumbnailDomain.generateThumbnail(Converters.extractLastElementOfUri(images[i].imageData.uri),
+                images[i].imageData.pathData ?: "", FileType.FileTypeImage)
+            val updateList = uiState.value.images
+            val iToUpdate = updateList.find { images[i].imageData.id == it.imageData.id }
+            iToUpdate?.let {
+                val index = updateList.indexOf(it)
+                val newImageData = it.copy(
+                    thumbnailBitmap = bMap
+                )
+                updateList[index] = newImageData
+                _uiState.update { state ->
+                    state.copy(
+                        images = updateList,
+                    )
                 }
             }
         }

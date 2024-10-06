@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.components
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -29,9 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +48,7 @@ import chad.orionsoft.sendit.utils.Constants
 fun MediaItemViewBar(
     modifier: Modifier,
     isSelected : Boolean,
-    thumbUri: Uri,
+    thumbnail: Bitmap?,
     @DrawableRes placeHolder: Int,
     title: String,
     subtitle: String,
@@ -71,10 +75,21 @@ fun MediaItemViewBar(
                     else MaterialTheme.colorScheme.background
                 )
                 .padding(horizontal = 8.dp, vertical = 4.dp)) {
-            AsyncThumbnail(placeholder = placeHolder, imageUri = thumbUri,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape))
+            if(thumbnail != null) {
+                Image(thumbnail.asImageBitmap(),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape),
+                    contentDescription = "thumbnail")
+            } else {
+                Image(
+                    painterResource(placeHolder),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape),
+                    contentDescription = "thumbnail")
+            }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
@@ -169,6 +184,89 @@ fun MediaItemViewGrid(
 
 }
 
+@Composable
+fun MediaItemViewGrid(
+    modifier: Modifier = Modifier,
+    isSelected : Boolean,
+    thumbnail: Bitmap?,
+    @DrawableRes placeHolder: Int,
+    title: String,
+    subtitle: String,
+    actionIconVector: ImageVector?,
+    @DrawableRes actionIconDrawableRes: Int?,
+    onActionClick: () -> Unit,
+    onViewClick:() -> Unit
+) {
+    Column(modifier = modifier.padding(4.dp)) {
+        Card(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 5.dp
+            )
+        ) {
+            Box(modifier = Modifier) {
+                if(thumbnail != null) {
+                    Image(thumbnail.asImageBitmap(),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .alpha(if (isSelected) 0.5f else 1f)
+                            .height(120.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(onClick = onViewClick),
+                        contentDescription = "thumbnail")
+                } else {
+                    Image(
+                        painterResource(placeHolder),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .alpha(if (isSelected) 0.5f else 1f)
+                            .height(120.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(onClick = onViewClick),
+                        contentDescription = "thumbnail")
+                }
+                IconButton(onClick = onActionClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(
+                            32.dp
+                        )) {
+                    if(actionIconVector != null) {
+                        Image(
+                            actionIconVector,
+                            contentDescription = "action")
+                    } else if (actionIconDrawableRes != null) {
+                        Image(
+                            painterResource(id = actionIconDrawableRes),
+                            contentDescription = "action")
+                    }
+                }
+                if(title.isNotEmpty()) {
+                    Text(text = subtitle,
+                        modifier = Modifier
+                            .align(
+                                Alignment.TopStart
+                            )
+                            .padding(5.dp),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            shadow = Shadow(
+                                color = MaterialTheme.colorScheme.background,
+                                offset = Offset(2f,2f),
+                            )
+                        ))
+                }
+                if(isSelected) {
+                    Checkbox(checked = true,
+                        modifier = Modifier.align(Alignment.BottomStart),
+                        onCheckedChange = {})
+                }
+            }
+        }
+        Text(text = title, maxLines = 1, style = MaterialTheme.typography.bodySmall)
+    }
+
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
@@ -177,7 +275,7 @@ private fun Preview() {
             MediaItemViewBar(
                 Modifier,
                 isSelected = false,
-                thumbUri = Uri.parse(""),
+                thumbnail = null,
                 placeHolder = R.drawable.music_note_24px,
                 title = "Music 1",
                 subtitle = "Size 12 MB, 00:00",
@@ -188,7 +286,7 @@ private fun Preview() {
             MediaItemViewBar(
                 Modifier,
                 isSelected = true,
-                thumbUri = Uri.parse(""),
+                thumbnail = null,
                 placeHolder = R.drawable.music_note_24px,
                 title = "Music 2",
                 subtitle = "Size 21 MB, 00:14",

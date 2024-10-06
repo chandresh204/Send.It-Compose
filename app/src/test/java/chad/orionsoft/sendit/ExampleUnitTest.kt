@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit
 
+import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.utils.Converters
 import org.junit.Test
@@ -15,6 +16,15 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
        val fileName = "thisIsMYFile.file.jpg"
         println("mimeType >>>> ${Converters.getMimeTypeFromFileName(fileName)}")
+    }
+
+    @Test
+    fun empty_uri_thumbnail_file_name() {
+        val emptyUri = ""
+        val fileName = emptyUri.run {
+            substring(this.lastIndexOf("/")+1)
+        }
+        print("result >>> $fileName\n")
     }
 
     fun convertStringToColor(colorStr: String) : Color {

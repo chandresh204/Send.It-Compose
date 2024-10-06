@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.utils
 
+import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.FileType
@@ -169,6 +170,11 @@ object Converters {
         val port = addressWithPort.split(":")[1].toInt()
         return Pair(address, port)
     }
+
+    fun extractLastElementOfUri(uri: Uri) : String =
+        uri.toString().run {
+            substring(this.lastIndexOf("/")+1)
+        }
 
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
 
