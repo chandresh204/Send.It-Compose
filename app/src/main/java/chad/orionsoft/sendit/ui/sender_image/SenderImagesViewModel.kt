@@ -1,11 +1,14 @@
 package chad.orionsoft.sendit.ui.sender_image
 
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import chad.orionsoft.sendit.domain.ThumbPaginator
 import chad.orionsoft.sendit.domain.ThumbnailDomain
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
+import chad.orionsoft.sendit.ui.model.MediaUiData
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +28,8 @@ class SenderImagesViewModel @Inject constructor(
 
     private val tag = "SenderImageViewModel"
 
+    private var paginator : ThumbPaginator
+
     init {
         val allImages = getAllImages().toMutableList()
         _uiState.update {
@@ -33,29 +38,43 @@ class SenderImagesViewModel @Inject constructor(
             )
         }
         viewModelScope.launch {
-            startThumbGeneration(allImages)
-        }
-        viewModelScope.launch {
             MainScreenViewModel.clearAllSelectionReceiver.collect {
                 if(it) {
                     clearAllSelection()
                 }
             }
         }
+        paginator = ThumbPaginator(thumbnailDomain, allImages)
+        /*viewModelScope.launch {
+            paginator.loadNextBundle(0) { newList ->
+                _uiState.update {
+                    it.copy(images = newList)
+                }
+            }
+        }*/
     }
 
-    private fun startThumbGeneration(images: List<ImageUiData>) {
-        for (i in 0 .. 50) {
-            val bMap = thumbnailDomain.generateThumbnail(Converters.extractLastElementOfUri(images[i].imageData.uri),
-                images[i].imageData.pathData ?: "", FileType.FileTypeImage)
-            val updateList = uiState.value.images
-            val iToUpdate = updateList.find { images[i].imageData.id == it.imageData.id }
+    private fun startThumbGeneration(images: List<MediaUiData>) {
+        for (i in 0 .. 20) {
+            val image = try { images[i] } catch (e:Exception) {
+                break
+            }
+            val bMap = if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                thumbnailDomain.generateThumbnail(
+                    Converters.extractLastElementOfUri(image.mediaData.uri),
+                    image.mediaData.pathData ?: "", FileType.FileTypeImage
+                )
+            } else {
+                thumbnailDomain.generateThumbnail(image.mediaData.uri)
+            }
+            val updateList = uiState.value.images.toMutableList()
+            val iToUpdate = updateList.find { image.mediaData.id == it.mediaData.id }
             iToUpdate?.let {
                 val index = updateList.indexOf(it)
-                val newImageData = it.copy(
+                val newmediaData = it.copy(
                     thumbnailBitmap = bMap
                 )
-                updateList[index] = newImageData
+                updateList[index] = newmediaData
                 _uiState.update { state ->
                     state.copy(
                         images = updateList,
@@ -73,54 +92,46 @@ class SenderImagesViewModel @Inject constructor(
                 changeSelectionStateOfImage(event.id)
             }
 
-            /*SenderImagesEvent.OnClearAllSelection -> {
-                clearAllSelection()
+            is SenderImagesEvent.OnLastVisibleItemIndexChanged -> {
+                println("last visible : ${event.index}")
+                viewModelScope.launch {
+                    paginator.loadNextBundle(event.index) { newList ->
+                        _uiState.update {
+                            it.copy(images = newList)
+                        }
+                    }
+                }
             }
-            SenderImagesEvent.OnSelectAll -> {
-                selectAll()
-            }*/
         }
     }
 
     private fun changeSelectionStateOfImage(id: Long) {
         val oldList = uiState.value.images
-        val index = oldList.indexOf(oldList.find { it.imageData.id == id })
+        val index = oldList.indexOf(oldList.find { it.mediaData.id == id })
         if(index >= 0) {
-            oldList[index].isSelected = !oldList[index].isSelected
-            val addOrRemove = oldList[index].isSelected
+            oldList[index].selected = !oldList[index].selected
+            val addOrRemove = oldList[index].selected
             _uiState.update {
                 it.copy(
                     images = oldList,
                     selectedCount = if(addOrRemove) {
                         it.selectedCount + 1
                     } else it.selectedCount - 1,
-                /*    selectedSize = if(addOrRemove) {
-                        onItemSelectionChanged(oldList[index].imageData, true)
-                        it.selectedSize + oldList[index].imageData.size
-                    } else {
-                        onItemSelectionChanged(oldList[index].imageData, false)
-                        it.selectedSize - oldList[index].imageData.size
-                    },*/
                 )
             }
-            /*_uiState.update {
-                it.copy(
-                    selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
-                )
-            }*/
         }
     }
 
-    private fun getAllImages() : List<ImageUiData> {
+    private fun getAllImages() : List<MediaUiData> {
         return mediaRepository.getImages().map {
-            ImageUiData(it, false, null)
+            MediaUiData(it, false, null)
         }
     }
 
     private fun clearAllSelection() {
         val imageList = _uiState.value.images
         imageList.forEach {
-            it.isSelected = false
+            it.selected = false
         }
         _uiState.update {
             it.copy(
@@ -128,51 +139,5 @@ class SenderImagesViewModel @Inject constructor(
             )
         }
     }
-
-   /* private fun clearAllSelection() {
-        val oldList = uiState.value.images.toMutableList()
-        for(i in oldList.indices) {
-            oldList[i] = oldList[i].copy(
-                isSelected = false
-            )
-        }
-        _uiState.update {
-            it.copy(
-                images = oldList,
-                selectedCount = 0,
-                selectedSize = 0L
-            )
-        }
-        updateTotalSelectedSize()
-    }
-
-    private fun selectAll() {
-        val oldList = uiState.value.images.toMutableList()
-        var selectedCount = 0
-        var totalSize = 0L
-        for (i in oldList.indices) {
-            oldList[i] = oldList[i].copy(
-                isSelected = true
-            )
-            selectedCount++
-            totalSize += oldList[i].imageData.size
-        }
-        _uiState.update {
-            it.copy(
-                images = oldList,
-                selectedCount = selectedCount,
-                selectedSize = totalSize
-            )
-        }
-        updateTotalSelectedSize()
-    }
-
-    private fun updateTotalSelectedSize() {
-        _uiState.update {
-            it.copy(
-                selectedSizeToDisplay = Converters.formatDataString(it.selectedSize)
-            )
-        }
-    } */
 
 }

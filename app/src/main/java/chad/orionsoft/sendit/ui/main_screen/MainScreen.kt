@@ -43,20 +43,18 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.TransferProcessDomain
+import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith2Buttons
+import chad.orionsoft.sendit.ui.common_media_screen.CommonMediaTabContent
 import chad.orionsoft.sendit.ui.components.ConnectedFloatingButton
 import chad.orionsoft.sendit.ui.components.NotConnectedFloatingButton
 import chad.orionsoft.sendit.ui.components.ReceivingFloatingCard
 import chad.orionsoft.sendit.ui.components.SendFloatingButton
 import chad.orionsoft.sendit.ui.components.SendingFloatingCard
 import chad.orionsoft.sendit.ui.components.TextWithIcon
-import chad.orionsoft.sendit.ui.sender_audio.SenderAudio
 import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
-import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
-import chad.orionsoft.sendit.ui.sender_video.SenderVideo
 import chad.orionsoft.sendit.ui.theme.SendItTheme
-import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.NavigationConstants
 import kotlinx.coroutines.launch
@@ -218,21 +216,18 @@ private fun ScreenContent(modifier: Modifier = Modifier,
             ) {
             when (it) {
                 0 -> {
-                    SenderImagesScreen { mediaData, selected ->
-                        onMediaSelected(mediaData, selected)
-                    }
+                    CommonMediaTabContent(
+                        mediaType = FileType.FileTypeImage, onItemSelectedChanged = onMediaSelected)
                 }
 
                 1 -> {
-                    SenderAudio { mediaData, selected ->
-                        onMediaSelected(mediaData, selected)
-                    }
+                    CommonMediaTabContent(
+                        mediaType = FileType.FileTypeAudio,  onItemSelectedChanged = onMediaSelected)
                 }
 
                 2 -> {
-                    SenderVideo { mediaData, selected ->
-                        onMediaSelected(mediaData, selected)
-                    }
+                    CommonMediaTabContent(
+                        mediaType = FileType.FileTypeVideo,  onItemSelectedChanged = onMediaSelected)
                 }
 
                 3 -> {

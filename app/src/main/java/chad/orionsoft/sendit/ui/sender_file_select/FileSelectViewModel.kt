@@ -1,10 +1,15 @@
 package chad.orionsoft.sendit.ui.sender_file_select
 
+import android.os.Build
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chad.orionsoft.sendit.domain.ContentResolverDomain
+import chad.orionsoft.sendit.domain.ThumbnailDomain
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
+import chad.orionsoft.sendit.ui.model.MediaUiData
+import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,22 +19,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FileSelectViewModel @Inject constructor(
-    private val contentResolverDomain: ContentResolverDomain
+    private val contentResolverDomain: ContentResolverDomain,
+    private val thumbnailDomain: ThumbnailDomain
 ) : ViewModel() {
-
-    private val _fState = MutableStateFlow(FileSelectState())
-    val fState = _fState.asStateFlow()
 
     private val tag = "FileSelectViewModel"
 
+    val selectedMedia = mutableStateListOf<MediaUiData>()
     init {
         viewModelScope.launch {
             MainScreenViewModel.clearAllSelectionReceiver.collect {
-                _fState.update {
-                    it.copy(
-                        selectFiles = emptyList()
-                    )
-                }
+                selectedMedia.clear()
             }
         }
     }
@@ -38,32 +38,35 @@ class FileSelectViewModel @Inject constructor(
         when(event) {
             is FileSelectEvent.OnFileData -> {
                 val newSelectionList = contentResolverDomain.processFileSelectionIntent(event.intent)
-                val newUiList = fState.value.selectFiles.toMutableList()
                 newSelectionList.forEach { mData ->
-                    if(newUiList.find { it.uri ==  mData.uri} == null) {
+                    if(selectedMedia.find { it.mediaData.uri ==  mData.uri} == null) {
                         event.addIfDataFound(mData) // callback to add item in main screen sending list
-                        newUiList.add(mData)
+                        val newMUIData = MediaUiData(mData, true, null)
+                        selectedMedia.add(newMUIData)
+                        // launch the thumbnail generate process async for this file
+                        viewModelScope.launch {
+                            val thumbBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                thumbnailDomain.generateThumbnail(mData.uri)
+                            } else {
+                                thumbnailDomain.generateThumbnail(Converters.extractLastElementOfUri(mData.uri),
+                                    mData.pathData ?: "", mData.mediaType)
+                            }
+                            thumbBitmap?.let {
+                                val indexOf = selectedMedia.indexOf(newMUIData)
+                                if(indexOf >= 0) {
+                                    selectedMedia[indexOf] = selectedMedia[indexOf].copy(
+                                        thumbnailBitmap = it
+                                    )
+                                }
+                            }
+                        }
+
                     }
-                }
-                Log.d(tag, "New Selection: ${newSelectionList.joinToString()}")
-                _fState.update {
-                    it.copy(
-                        selectFiles = newUiList
-                    )
                 }
             }
 
             is FileSelectEvent.OnFileRemove -> {
-                val iToRemove = fState.value.selectFiles.find { it.id == event.id }
-                iToRemove?.let { toRemove ->
-                    val newList = fState.value.selectFiles.toMutableList()
-                    newList.remove(toRemove)
-                    _fState.update {
-                        it.copy(
-                            selectFiles = newList
-                        )
-                    }
-                }
+                selectedMedia.removeAt(event.index)
             }
         }
     }

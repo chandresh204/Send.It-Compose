@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -45,7 +47,7 @@ import chad.orionsoft.sendit.utils.Constants
 
 @Composable
 fun MediaItemViewBar(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     isSelected : Boolean,
     thumbnail: Bitmap?,
     @DrawableRes placeHolder: Int,
@@ -226,17 +228,22 @@ fun MediaItemViewGrid(
                 }
                 IconButton(onClick = onActionClick,
                     modifier = Modifier
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.background.copy(
+                            alpha = 0.4f
+                        ))
                         .align(Alignment.TopEnd)
-                        .size(
-                            32.dp
-                        )) {
+                        .size(32.dp)
+                ) {
                     if(actionIconVector != null) {
                         Image(
                             actionIconVector,
+                            modifier = Modifier.size(22.dp),
                             contentDescription = "action")
                     } else if (actionIconDrawableRes != null) {
                         Image(
                             painterResource(id = actionIconDrawableRes),
+                            modifier = Modifier.size(22.dp),
                             contentDescription = "action")
                     }
                 }
@@ -244,19 +251,20 @@ fun MediaItemViewGrid(
                     Text(text = subtitle,
                         modifier = Modifier
                             .align(
-                                Alignment.TopStart
+                                Alignment.BottomStart
                             )
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background                              .copy(
+                                alpha = 0.4f
+                            ))
                             .padding(5.dp),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            shadow = Shadow(
-                                color = MaterialTheme.colorScheme.background,
-                                offset = Offset(2f,2f),
-                            )
-                        ))
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
                 if(isSelected) {
                     Checkbox(checked = true,
-                        modifier = Modifier.align(Alignment.BottomStart),
+                        modifier = Modifier.align(Alignment.TopStart),
                         onCheckedChange = {})
                 }
             }
@@ -300,22 +308,22 @@ private fun Preview() {
                     thumbUri = Uri.parse(""),
                     placeHolder = R.drawable.music_note_24px,
                     title = "Music 2",
-                    subtitle = "00:14",
+                    subtitle = "10:14\n35MB",
                     actionIconVector = Icons.Default.Check,
                     actionIconDrawableRes = null,
                     onActionClick = {}
                 ) {}
-                MediaItemViewGrid(
-                    Modifier,
-                    isSelected = false,
-                    thumbUri = Uri.parse(""),
-                    placeHolder = R.drawable.music_note_24px,
-                    title = "",
-                    subtitle = "05:30",
-                    actionIconVector = null,
-                    actionIconDrawableRes = R.drawable.visibility_24px,
-                    onActionClick = {}
-                ) {}
+            }
+            MediaItemViewGrid(
+                isSelected = true,
+                thumbnail = null,
+                placeHolder = R.drawable.play_circle_24px,
+                title = "Video",
+                subtitle = "13LA",
+                actionIconVector = Icons.Default.PlayArrow,
+                actionIconDrawableRes = null,
+                onActionClick = { /*TODO*/ }) {
+
             }
         }
 

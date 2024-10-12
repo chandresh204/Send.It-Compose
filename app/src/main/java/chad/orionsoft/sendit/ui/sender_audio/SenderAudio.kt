@@ -41,23 +41,23 @@ fun SenderAudio(onSelectionChanged: (MediaData, Boolean) -> Unit) {
             uiState.searchedList
         } else uiState.audioList
         items(displayList, key = { audData ->
-            audData.audioData.id
+            audData.mediaData.id
         }) { aud ->
             MediaItemViewBar(
                 modifier = Modifier.animateItemPlacement(),
                 isSelected = aud.selected,
-                thumbnail = aud.thumbnail,
+                thumbnail = aud.thumbnailBitmap,
                 placeHolder = R.drawable.music_note_24px,
-                title = aud.audioData.title,
-                subtitle = "${Converters.formatDuration(aud.audioData.duration)} " +
-                        Converters.formatDataString(aud.audioData.size),
+                title = aud.mediaData.title,
+                subtitle = "${Converters.formatDuration(aud.mediaData.duration)} " +
+                        Converters.formatDataString(aud.mediaData.size),
                 actionIconVector = Icons.Default.PlayArrow,
                 actionIconDrawableRes = null,
                 onActionClick = {
-                    StartActivity.openFile(context, aud.audioData.title, aud.audioData.uri)
+                    StartActivity.openFile(context, aud.mediaData.title, aud.mediaData.uri)
                 }) {
-                    onSelectionChanged(aud.audioData, !aud.selected)
-                    vModel.onEvent(SenderAudioEvent.OnSelectClick(aud.audioData.id)
+                    onSelectionChanged(aud.mediaData, !aud.selected)
+                    vModel.onEvent(SenderAudioEvent.OnSelectClick(aud.mediaData.id)
                 )
             }
         }

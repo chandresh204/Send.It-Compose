@@ -141,6 +141,14 @@ object Converters {
             Constants.audioExtensions.contains(extension) -> R.drawable.music_note_24px
             Constants.imageExtensions.contains(extension) -> R.drawable.image_24px
             Constants.videoExtensions.contains(extension) -> R.drawable.play_circle_24px
+            extension.contains("pdf") -> R.drawable.picture_as_pdf_24px
+            extension.contains("apk") -> R.drawable.android_24px
+            extension.contains("exe") -> R.drawable.windows_exe
+            extension.contains("msi ") -> R.drawable.windows_exe
+            extension.contains("zip") -> R.drawable.folder_zip_24px
+            extension.contains("7z") -> R.drawable.folder_zip_24px
+            extension.contains("rar") -> R.drawable.folder_zip_24px
+            extension.contains("tar") -> R.drawable.folder_zip_24px
             else -> R.drawable.file_present_24px
         }
     }

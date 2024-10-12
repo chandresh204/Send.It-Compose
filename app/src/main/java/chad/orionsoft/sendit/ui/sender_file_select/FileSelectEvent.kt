@@ -5,5 +5,5 @@ import chad.orionsoft.sendit.model.MediaData
 
 sealed class FileSelectEvent {
     data class OnFileData(val intent: Intent, val addIfDataFound: (MediaData) -> Unit) : FileSelectEvent()
-    data class OnFileRemove(val id: Long) : FileSelectEvent()
+    data class OnFileRemove(val index: Int) : FileSelectEvent()
 }

@@ -104,6 +104,7 @@ class MediaRepository @Inject constructor(
         }
         aCursor?.close()
         alCursor?.close()
+        audioList.sortBy { it.title.lowercase() }
         return audioList
     }
 
@@ -132,6 +133,7 @@ class MediaRepository @Inject constructor(
                 } while (vCursor.moveToNext())
             }
         }
+        videosList.sortByDescending { videoObject -> videoObject.lastModified }
         return videosList
     }
 }

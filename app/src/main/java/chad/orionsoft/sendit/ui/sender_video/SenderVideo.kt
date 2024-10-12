@@ -1,15 +1,16 @@
 package chad.orionsoft.sendit.ui.sender_video
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +29,6 @@ import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SenderVideo(onSelectionChanged: (MediaData, Boolean) -> Unit) {
 
@@ -39,31 +39,38 @@ fun SenderVideo(onSelectionChanged: (MediaData, Boolean) -> Unit) {
         mutableStateOf(false)
     }
     val context = LocalContext.current
+    val gridState = rememberLazyGridState()
+    val lastVisible by remember {
+        derivedStateOf { gridState.firstVisibleItemIndex + 20 }
+    }
+    vModel.onEvent(SenderVideoEvent.OnLastVisibleItemChanged(lastVisible))
 
     LazyVerticalGrid(
-        modifier = Modifier.fillMaxSize().padding(horizontal = Constants.PAGE_PADDING.dp),
+        state =gridState,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Constants.PAGE_PADDING.dp),
         columns = GridCells.Adaptive(100.dp)) {
         val displayList = if(uiState.isSearching) {
             uiState.searchedList
         } else uiState.videoList
         items(displayList, key = { vidData ->
-            vidData.videoData.id
+            vidData.mediaData.id
         }) { vid ->
             MediaItemViewGrid(
-                modifier = Modifier.animateItemPlacement(),
                 isSelected = vid.selected,
                 thumbnail = vid.thumbnailBitmap,
                 placeHolder = R.drawable.play_circle_24px,
-                title = vid.videoData.title,
-                subtitle = "${Converters.formatDuration(vid.videoData.duration)}\n" +
-                        Converters.formatDataString(vid.videoData.size),
+                title = vid.mediaData.title,
+                subtitle = "${Converters.formatDuration(vid.mediaData.duration)}\n" +
+                        Converters.formatDataString(vid.mediaData.size),
                 actionIconVector = Icons.Default.PlayArrow,
                 actionIconDrawableRes = null,
                 onActionClick = {
-                    StartActivity.openFile(context, vid.videoData.title, vid.videoData.uri)
+                    StartActivity.openFile(context, vid.mediaData.title, vid.mediaData.uri)
                 }) {
-                    onSelectionChanged(vid.videoData, !vid.selected)
-                    vModel.onEvent(SenderVideoEvent.OnSelectClick(vid.videoData.id))
+                    onSelectionChanged(vid.mediaData, !vid.selected)
+                    vModel.onEvent(SenderVideoEvent.OnSelectClick(vid.mediaData.id))
             }
         }
     }

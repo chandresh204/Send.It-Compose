@@ -12,4 +12,6 @@ sealed class SenderVideoEvent {
     data object OnClearAllSelection : SenderVideoEvent()
 
     data class OnSortingChanged(val sortOrder: SortOrder) : SenderVideoEvent()
+
+    data class OnLastVisibleItemChanged(val lastIndex : Int) : SenderVideoEvent()
 }

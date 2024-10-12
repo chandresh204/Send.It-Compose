@@ -6,7 +6,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,15 +23,17 @@ fun SenderImagesScreen(onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
     val vModel = hiltViewModel<SenderImagesViewModel>()
     val uiState by vModel.uiState.collectAsState()
     val gridState = rememberLazyGridState()
+    val lastVisibleItem by remember { derivedStateOf { gridState.firstVisibleItemIndex + 20} }  // assuming
+    vModel.onEvent(SenderImagesEvent.OnLastVisibleItemIndexChanged(lastVisibleItem))
     val context = LocalContext.current
     LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Adaptive(100.dp)) {
         items(uiState.images, key = {
-            "${it.imageData.id}-${it.thumbnailBitmap}"
+            "${it.mediaData.id}-${it.thumbnailBitmap}"
         }) { img ->
             MediaItemViewGrid(
-                isSelected = img.isSelected,
+                isSelected = img.selected,
                 thumbnail = img.thumbnailBitmap,
                 placeHolder = R.drawable.image_24px,
                 title = "",
@@ -37,10 +41,10 @@ fun SenderImagesScreen(onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
                 actionIconVector = null,
                 actionIconDrawableRes = R.drawable.visibility_24px,
                 onActionClick = {
-                    StartActivity.openFile(context, img.imageData.title, img.imageData.uri)
+                    StartActivity.openFile(context, img.mediaData.title, img.mediaData.uri)
                 }) {
-                onItemSelectedChanged(img.imageData, !img.isSelected)
-                vModel.onEvent(SenderImagesEvent.OnSelectClick(img.imageData.id))
+                onItemSelectedChanged(img.mediaData, !img.selected)
+                vModel.onEvent(SenderImagesEvent.OnSelectClick(img.mediaData.id))
             }
         }
     }

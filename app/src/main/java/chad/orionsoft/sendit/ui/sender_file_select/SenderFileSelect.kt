@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -18,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,7 +42,7 @@ fun SenderFileSelect(
     onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
 
     val vModel = hiltViewModel<FileSelectViewModel>()
-    val uiState by vModel.fState.collectAsState()
+    val selectedList = vModel.selectedMedia
     val context = LocalContext.current
 
     var consumedSharedIntent : Intent? by rememberSaveable {
@@ -82,23 +80,24 @@ fun SenderFileSelect(
 
     Scaffold {
         LazyColumn(modifier = Modifier.padding(it)) {
-            items(uiState.selectFiles, key = { mData ->
-                mData.id
-            }) {  mediaData ->
+            items(selectedList.size, key = { keyInt ->
+                selectedList[keyInt].mediaData.id
+            }) {  index ->
+                val media = selectedList[index]
                 MediaItemViewBar(
                     modifier = Modifier.animateItemPlacement(),
                     isSelected = false,
-                    thumbnail = null, // TODO create thumbnail
-                    placeHolder = Converters.getPlaceHolderIconsAsPerMediaType(mediaData.mediaType),
-                    title = mediaData.title,
-                    subtitle = Converters.formatDataString(mediaData.size),
+                    thumbnail = media.thumbnailBitmap, // TODO create thumbnail
+                    placeHolder = Converters.getPlaceHolderIconsAsPerFileName(media.mediaData.title),
+                    title = media.mediaData.title,
+                    subtitle = Converters.formatDataString(media.mediaData.size),
                     actionIconVector = Icons.Default.Close,
                     actionIconDrawableRes = null,
                     onActionClick = {
-                        vModel.onEvent(FileSelectEvent.OnFileRemove(mediaData.id))
-                        onItemSelectedChanged(mediaData, false)
+                        vModel.onEvent(FileSelectEvent.OnFileRemove(index))
+                        onItemSelectedChanged(media.mediaData, false)
                     }) {
-                    StartActivity.openFile(context, mediaData.title, mediaData.uri)
+                    StartActivity.openFile(context, media.mediaData.title, media.mediaData.uri)
                 }
             }
             item {

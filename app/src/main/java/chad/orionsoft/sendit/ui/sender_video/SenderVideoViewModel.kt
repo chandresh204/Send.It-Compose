@@ -1,12 +1,15 @@
 package chad.orionsoft.sendit.ui.sender_video
 
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import chad.orionsoft.sendit.domain.ThumbPaginator
 import chad.orionsoft.sendit.domain.ThumbnailDomain
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
+import chad.orionsoft.sendit.ui.model.MediaUiData
 import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,9 +32,11 @@ class SenderVideoViewModel @Inject constructor(
 
     private val tag = "SenderVideoViewModel"
 
+    private var paginator : ThumbPaginator? = null
+
     init {
         val fullList = mediaRepository.generateVideoList().map { data ->
-            VideoUiData(data, false, null)
+            MediaUiData(data, false, null)
         }
         _avState.update {
             it.copy(
@@ -51,11 +56,11 @@ class SenderVideoViewModel @Inject constructor(
     private fun sortTheList(sortOrder: SortOrder) {
         val aList = when(sortOrder) {
             SortOrder.ByName -> {
-                avState.value.videoList.sortedBy { it.videoData.title }
+                avState.value.videoList.sortedBy { it.mediaData.title }
 
             }
             SortOrder.ByDate -> {
-                avState.value.videoList.sortedByDescending { it.videoData.lastModified }
+                avState.value.videoList.sortedByDescending { it.mediaData.lastModified }
             }
         }
         _avState.update {
@@ -64,14 +69,15 @@ class SenderVideoViewModel @Inject constructor(
             )
         }
         startThumbGeneration(aList)
+        paginator = ThumbPaginator(thumbnailDomain, aList)
         if(avState.value.isSearching) {
             val searchList = when(sortOrder) {
                 SortOrder.ByName -> {
-                    avState.value.searchedList.sortedBy { it.videoData.title }
+                    avState.value.searchedList.sortedBy { it.mediaData.title }
 
                 }
                 SortOrder.ByDate -> {
-                    avState.value.searchedList.sortedByDescending { it.videoData.lastModified }
+                    avState.value.searchedList.sortedByDescending { it.mediaData.lastModified }
                 }
             }
             _avState.update {
@@ -120,16 +126,28 @@ class SenderVideoViewModel @Inject constructor(
                     createListBySearch(event.query.lowercase())
                 }
             }
+
+            is SenderVideoEvent.OnLastVisibleItemChanged -> {
+                viewModelScope.launch {
+                    paginator?.loadNextBundle(event.lastIndex) { newList ->
+                        _avState.update { state ->
+                            state.copy(
+                                videoList = newList,
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
     private fun changeSelectionStateOfVideo(id: Long) {
         val oldList = avState.value.videoList.toMutableList()
-        val index = oldList.indexOf(oldList.find { it.videoData.id == id })
-        val searchList = mutableListOf<VideoUiData>()
+        val index = oldList.indexOf(oldList.find { it.mediaData.id == id })
+        val searchList = mutableListOf<MediaUiData>()
         if(avState.value.isSearching) {
             searchList.addAll(avState.value.searchedList)
-            val sIndex = searchList.indexOf(searchList.find { it.videoData.id == id })
+            val sIndex = searchList.indexOf(searchList.find { it.mediaData.id == id })
             if(sIndex >= 0) {
                 searchList[sIndex] = searchList[sIndex].copy(
                     selected = !searchList[sIndex].selected,
@@ -153,9 +171,9 @@ class SenderVideoViewModel @Inject constructor(
                         it.selectedCount + 1
                     } else it.selectedCount - 1,
                     /*selectedSize = if(addOrRemove) {
-                        it.selectedSize + oldList[index].videoData.size
+                        it.selectedSize + oldList[index].mediaData.size
                     } else {
-                        it.selectedSize - oldList[index].videoData.size
+                        it.selectedSize - oldList[index].mediaData.size
                     },*/
                 )
             }
@@ -189,7 +207,7 @@ class SenderVideoViewModel @Inject constructor(
                 selected = true
             )
             selectedCount++
-            totalSize += oldList[i].videoData.size
+            totalSize += oldList[i].mediaData.size
         }
         _avState.update {
             it.copy(
@@ -209,43 +227,47 @@ class SenderVideoViewModel @Inject constructor(
 //        }
 //    }
 
-    private fun startThumbGeneration(videos: List<VideoUiData>) {
-        val thumbScope = CoroutineScope(Dispatchers.IO)
-        for (i in 0 .. 50) {
-            val video = try {
-                videos[i]
-            } catch (e: Exception) {
-                 break
-            }
-            if(video.thumbnailBitmap != null) continue
-            thumbScope.launch {
-                val bMap = thumbnailDomain.generateThumbnail(
-                    Converters.extractLastElementOfUri(video.videoData.uri),
-                    video.videoData.pathData ?: "", FileType.FileTypeVideo)
+    private fun startThumbGeneration(videos: List<MediaUiData>) {
+        /*val thumbScope = CoroutineScope(Dispatchers.IO)
+        thumbScope.launch {
+            for (i in 0 .. 50) {
+                val video = try {
+                    videos[i]
+                } catch (e: Exception) {
+                     break
+                }
+                if(video.thumbnailBitmap != null) continue
+                val bMap = if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                    thumbnailDomain.generateThumbnail(
+                        Converters.extractLastElementOfUri(video.mediaData.uri),
+                        video.mediaData.pathData ?: "", FileType.FileTypeVideo)
+                } else {
+                    thumbnailDomain.generateThumbnail(video.mediaData.uri)
+                }
 
                 val updateList = avState.value.videoList.toMutableList()
-                val iToUpdate = updateList.find { video.videoData.id == it.videoData.id }
+                val iToUpdate = updateList.find { video.mediaData.id == it.mediaData.id }
                 iToUpdate?.let {
                     val index = updateList.indexOf(it)
-                    val newVideoData = it.copy(
+                    val newmediaData = it.copy(
                         thumbnailBitmap = bMap
                     )
-                    updateList[index] = newVideoData
+                    updateList[index] = newmediaData
                     _avState.update { state ->
                         state.copy(
                             videoList = updateList,
                         )
                     }
                 }
-            }
-        }
+                }
+        }*/
     }
 
     private fun createListBySearch(query: String) {
         _avState.update {
             it.copy(
                 searchedList = avState.value.videoList.filter { audData ->
-                    audData.videoData.title.lowercase().contains(query) // query already in lower case
+                    audData.mediaData.title.lowercase().contains(query) // query already in lower case
                 }
             )
         }

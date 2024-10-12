@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.sender_audio
 
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import chad.orionsoft.sendit.domain.ThumbnailDomain
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
+import chad.orionsoft.sendit.ui.model.MediaUiData
 import chad.orionsoft.sendit.ui.model.SortOrder
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +33,7 @@ class SenderAudioViewModel @Inject constructor(
 
     init {
         val fullList = mediaRepository.generateAudioList().map { data ->
-            AudioUIData(data, false, null)
+            MediaUiData(data, false, null)
         }
         _avState.update {
             it.copy(
@@ -51,11 +53,11 @@ class SenderAudioViewModel @Inject constructor(
     private fun sortTheList(sortOrder: SortOrder) {
         val aList = when(sortOrder) {
             SortOrder.ByName -> {
-                avState.value.audioList.sortedBy { it.audioData.title }
+                avState.value.audioList.sortedBy { it.mediaData.title }
 
             }
             SortOrder.ByDate -> {
-                avState.value.audioList.sortedByDescending { it.audioData.lastModified }
+                avState.value.audioList.sortedByDescending { it.mediaData.lastModified }
             }
         }
         _avState.update {
@@ -67,11 +69,11 @@ class SenderAudioViewModel @Inject constructor(
         if(avState.value.isSearching) {
             val searchList = when(sortOrder) {
                 SortOrder.ByName -> {
-                    avState.value.searchedList.sortedBy { it.audioData.title }
+                    avState.value.searchedList.sortedBy { it.mediaData.title }
 
                 }
                 SortOrder.ByDate -> {
-                    avState.value.searchedList.sortedByDescending { it.audioData.lastModified }
+                    avState.value.searchedList.sortedByDescending { it.mediaData.lastModified }
                 }
             }
             _avState.update {
@@ -126,11 +128,11 @@ class SenderAudioViewModel @Inject constructor(
 
     private fun changeSelectionStateOfAudio(id: Long) {
         val oldList = avState.value.audioList.toMutableList()
-        val index = oldList.indexOf(oldList.find { it.audioData.id == id })
-        val searchList = mutableListOf<AudioUIData>()
+        val index = oldList.indexOf(oldList.find { it.mediaData.id == id })
+        val searchList = mutableListOf<MediaUiData>()
         if(avState.value.isSearching) {
             searchList.addAll(avState.value.searchedList)
-            val sIndex = searchList.indexOf(searchList.find { it.audioData.id == id })
+            val sIndex = searchList.indexOf(searchList.find { it.mediaData.id == id })
             if(sIndex >= 0) {
                 searchList[sIndex] = searchList[sIndex].copy(
                     selected = !searchList[sIndex].selected,
@@ -156,9 +158,9 @@ class SenderAudioViewModel @Inject constructor(
                         it.selectedCount - 1
                     },
 //                    selectedSize = if(addOrRemove) {
-//                        it.selectedSize + oldList[index].audioData.size
+//                        it.selectedSize + oldList[index].mediaData.size
 //                    } else {
-//                        it.selectedSize - oldList[index].audioData.size
+//                        it.selectedSize - oldList[index].mediaData.size
 //                    },
                 )
             }
@@ -191,7 +193,7 @@ class SenderAudioViewModel @Inject constructor(
                 selected = true
             )
             selectedCount++
-            totalSize += oldList[i].audioData.size
+            totalSize += oldList[i].mediaData.size
         }
         _avState.update {
             it.copy(
@@ -214,13 +216,13 @@ class SenderAudioViewModel @Inject constructor(
         _avState.update {
             it.copy(
                 searchedList = avState.value.audioList.filter { audData ->
-                    audData.audioData.title.lowercase().contains(query) // query already in lower case
+                    audData.mediaData.title.lowercase().contains(query) // query already in lower case
                 }
             )
         }
     }
 
-    private fun generateThumbnails(audioList : List<AudioUIData>) {
+    private fun generateThumbnails(audioList : List<MediaUiData>) {
         val thumbScope = CoroutineScope(Dispatchers.IO)
         for (i in 0 .. 50) {
             val audio = try {
@@ -228,20 +230,24 @@ class SenderAudioViewModel @Inject constructor(
             } catch (e: Exception) {
                 break
             }
-            if(audio.thumbnail != null) continue
+            if(audio.thumbnailBitmap != null) continue
             thumbScope.launch {
-                val bMap = thumbnailDomain.generateThumbnail(
-                    Converters.extractLastElementOfUri(audio.audioData.uri),
-                    audio.audioData.pathData ?: "", FileType.FileTypeAudio)
+                val bMap = if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                    thumbnailDomain.generateThumbnail(
+                        Converters.extractLastElementOfUri(audio.mediaData.uri),
+                        audio.mediaData.pathData ?: "", FileType.FileTypeAudio)
+                } else {
+                    thumbnailDomain.generateThumbnail(audio.mediaData.uri)
+                }
 
                 val updateList = avState.value.audioList.toMutableList()
-                val iToUpdate = updateList.find { audio.audioData.id == it.audioData.id }
+                val iToUpdate = updateList.find { audio.mediaData.id == it.mediaData.id }
                 iToUpdate?.let {
                     val index = updateList.indexOf(it)
-                    val newAudioData = it.copy(
-                        thumbnail = bMap
+                    val newmediaData = it.copy(
+                        thumbnailBitmap = bMap
                     )
-                    updateList[index] = newAudioData
+                    updateList[index] = newmediaData
                     _avState.update { state ->
                         state.copy(
                             audioList = updateList,
