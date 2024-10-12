@@ -32,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -322,7 +321,7 @@ private fun Preview() {
                 subtitle = "13LA",
                 actionIconVector = Icons.Default.PlayArrow,
                 actionIconDrawableRes = null,
-                onActionClick = { /*TODO*/ }) {
+                onActionClick = {  }) {
 
             }
         }

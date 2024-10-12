@@ -87,7 +87,7 @@ fun SenderFileSelect(
                 MediaItemViewBar(
                     modifier = Modifier.animateItemPlacement(),
                     isSelected = false,
-                    thumbnail = media.thumbnailBitmap, // TODO create thumbnail
+                    thumbnail = media.thumbnailBitmap,
                     placeHolder = Converters.getPlaceHolderIconsAsPerFileName(media.mediaData.title),
                     title = media.mediaData.title,
                     subtitle = Converters.formatDataString(media.mediaData.size),

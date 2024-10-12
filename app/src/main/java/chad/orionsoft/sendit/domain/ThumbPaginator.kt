@@ -2,7 +2,6 @@ package chad.orionsoft.sendit.domain
 
 import android.os.Build
 import android.util.Log
-import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.ui.model.MediaUiData
 import chad.orionsoft.sendit.utils.Converters
 import kotlinx.coroutines.delay
