@@ -13,17 +13,19 @@ import chad.orionsoft.sendit.ui.qr_connect.QrConnectScreen
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
 import chad.orionsoft.sendit.ui.settings.SettingsScreen
 import chad.orionsoft.sendit.ui.transfer_process_screen.TransferMain
-import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
+import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen2
 import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
 
 @Composable
-fun MainNavigation(sharedIntent : Intent?, themeChangeCallback: (ColorConstants) -> Unit) {
+fun MainNavigation(sharedIntent : Intent?,
+                   initScreen: String,
+                   themeChangeCallback: (ColorConstants) -> Unit) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = NavigationConstants.NAV_WELCOME_SCREEN) {
+    NavHost(navController = navController, startDestination = initScreen) {
         composable(NavigationConstants.NAV_WELCOME_SCREEN) {
-            WelcomeScreen {
+            WelcomeScreen2 {
                 navController.popBackStack(NavigationConstants.NAV_WELCOME_SCREEN, true)
                 navController.navigate(NavigationConstants.NAV_HOME_SCREEN)
             }

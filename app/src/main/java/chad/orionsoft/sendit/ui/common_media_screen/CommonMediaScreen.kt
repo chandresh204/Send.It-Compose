@@ -1,5 +1,10 @@
 package chad.orionsoft.sendit.ui.common_media_screen
 
+import android.content.Intent
+import android.provider.Settings
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -10,6 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -20,6 +28,7 @@ import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.ui.components.MediaItemViewBar
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
+import chad.orionsoft.sendit.ui.components.NoPermissionView
 import chad.orionsoft.sendit.utils.Converters
 
 @Composable
@@ -32,9 +41,32 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
         },
         key = mediaType.title
     )
+    val context = LocalContext.current
+    var isPermissionPermanentlyDenied by remember {
+        mutableStateOf(false)
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if(!it) {
+            isPermissionPermanentlyDenied = true
+            Toast.makeText(context, "Please go to app settings to provide permission", Toast.LENGTH_LONG).show()
+        } else {
+            vModel.loadMediaFromContentResolver(callingAfterGettingPermission = true)
+        }
+    }
     val mediaList = vModel.mediaList
     val screenState by vModel.screenState.collectAsState()
-    val context = LocalContext.current
+    val noPermission by vModel.isMissingPermission.collectAsState()
+    if(noPermission) {
+        NoPermissionView(isDeniedPermanently = isPermissionPermanentlyDenied) {
+            if(isPermissionPermanentlyDenied) {
+                val settingsIntent = Intent(Settings.ACTION_APPLICATION_SETTINGS)
+                context.startActivity(settingsIntent)
+            } else {
+                permissionLauncher.launch(vModel.getRequiredPermissionString())
+            }
+        }
+        return
+    }
     when(screenState.viewMode) {
         ViewMode.ByNameInList -> {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -64,7 +96,7 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                 item {
                     LaunchedEffect(true) {
                         println("$mediaType >> loading more In List...")
-                        vModel.loadMoreItems()
+                        vModel.loadMoreItemsToDisplay()
                     }
                 }
             }
@@ -94,7 +126,7 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                 item {
                     LaunchedEffect(true) {
                         println("$mediaType >> loading more In Grid...")
-                        vModel.loadMoreItems()
+                        vModel.loadMoreItemsToDisplay()
                     }
                 }
             }

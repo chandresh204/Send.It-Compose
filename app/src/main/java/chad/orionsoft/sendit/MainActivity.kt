@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.MainNavigation
 import chad.orionsoft.sendit.ui.theme.SendItTheme
+import chad.orionsoft.sendit.utils.NavigationConstants
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -31,11 +32,12 @@ class MainActivity : ComponentActivity() {
             var selectedAppColor by remember {
                 mutableStateOf(preferenceRepository.getAppColorFromPreference())
             }
+            val userName = preferenceRepository.getUserNameFromPreferences()
             SendItTheme(selectedAppColor) {
-                MainNavigation(sharedIntent) {
+                MainNavigation(sharedIntent,
+                    if(userName.isNullOrEmpty()) NavigationConstants.NAV_WELCOME_SCREEN else NavigationConstants.NAV_HOME_SCREEN) {
                     selectedAppColor = it
                 }
-//                CommonMediaScreenWithViewModel()
             }
         }
     }

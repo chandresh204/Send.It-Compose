@@ -1,7 +1,13 @@
 package chad.orionsoft.sendit.ui.welcome_screen
 
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModel
+import chad.orionsoft.sendit.domain.PermissionDomain
 import chad.orionsoft.sendit.repository.PreferenceRepository
+import chad.orionsoft.sendit.utils.ColorConstants
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,32 +16,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
-    private val preferenceRepository: PreferenceRepository
+    private val preferenceRepository: PreferenceRepository,
+    private val permissionDomain: PermissionDomain
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(WelcomeState())
+    private val _uiState = MutableStateFlow(WelcomeState(
+        appColor = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ColorConstants.Device
+        } else ColorConstants.Purple,
+        appColorList = RuntimeConstants.createAppColorList()
+    ))
     val uiState = _uiState.asStateFlow()
 
     val tag = "WelcomeViewModel"
     init {
-        if(!preferenceRepository.getUserNameFromPreferences().isNullOrEmpty()) {
-            _uiState.update {
-                it.copy(
-                    moveToNextScreen = true
-                )
-            }
+        _uiState.update {
+            it.copy(
+                userName = preferenceRepository.getUserNameFromPreferences() ?: ""
+            )
         }
     }
 
     fun onEvent(welcomeEvents: WelcomeEvents) {
         when(welcomeEvents) {
-            is WelcomeEvents.OnNextClick -> {
-                preferenceRepository.setUserNameInPreferences(uiState.value.userName ?: "")
-                _uiState.update {
-                    it.copy(
-                        moveToNextScreen = true
-                    )
-                }
+            is WelcomeEvents.OnSaveUsername -> {
+                preferenceRepository.setUserNameInPreferences(uiState.value.userName)
             }
 
             is WelcomeEvents.OnUserNameChanged -> {
@@ -45,7 +50,21 @@ class WelcomeViewModel @Inject constructor(
                     )
                 }
             }
+
+            is WelcomeEvents.OnNewColorSelected -> {
+                _uiState.update {
+                    it.copy(
+                        appColor = welcomeEvents.color
+                    )
+                }
+            }
+
+            WelcomeEvents.OnSaveAppColor -> {
+                preferenceRepository.setAppColorInPreferences(uiState.value.appColor)
+            }
         }
     }
+
+    fun getAllRequiredMediaPermissionArray() : Array<String> = permissionDomain.getAllMediaPermissionsString()
 
 }

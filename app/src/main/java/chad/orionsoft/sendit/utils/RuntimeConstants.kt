@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.repository.PreferenceRepository
+import kotlinx.coroutines.flow.update
 import kotlin.random.Random
 
 object RuntimeConstants {
@@ -29,8 +30,27 @@ object RuntimeConstants {
         return sb.toString()
     }
 
+    /**
+     * gets name from [PreferenceRepository] , then adds device Manufacturer and model
+     */
     fun createMyUserName(preferenceRepository: PreferenceRepository) : String {
         val userName = preferenceRepository.getUserNameFromPreferences()
         return "$userName - ${Build.MANUFACTURER}:${ Build.MODEL}"
+    }
+
+    /**
+     * adds device Manufacturer and model into supplied string
+     */
+    fun createMyUserName(name: String) : String = "$name - ${Build.MANUFACTURER}:${ Build.MODEL}"
+
+    fun createAppColorList() : List<ColorConstants> {
+        val appColors = mutableListOf<ColorConstants>()
+        ColorConstants.entries.forEach {
+            if(it == ColorConstants.Device && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                return@forEach
+            }
+            appColors.add(it)
+        }
+        return appColors
     }
 }

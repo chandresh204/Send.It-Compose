@@ -1,8 +1,10 @@
 package chad.orionsoft.sendit.ui.common_media_screen
 
+import android.content.Context
 import android.os.Build
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import chad.orionsoft.sendit.domain.PermissionDomain
 import chad.orionsoft.sendit.domain.ThumbnailDomain
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
@@ -13,18 +15,22 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = CommonMediaScreenViewModel.CommonMediaViewModelFactory::class)
 class CommonMediaScreenViewModel @AssistedInject constructor(
     private val thumbnailDomain: ThumbnailDomain,
-    mediaRepository: MediaRepository,
-    @Assisted private val fileType: FileType
+    private val mediaRepository: MediaRepository,
+    private val permissionDomain: PermissionDomain,
+    @Assisted private val fileType: FileType,
+    @ApplicationContext private val context: Context
 ): ViewModel() {
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
@@ -32,6 +38,7 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
 
     val mediaList = mutableStateListOf<MediaUiData>()
     private var allMediaList: List<MediaData>? = null
+    val isMissingPermission = MutableStateFlow(false)
 
     private val _screenState = MutableStateFlow(
         when(fileType)  {
@@ -49,19 +56,48 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
     private var endReached = false
 
     init {
+        loadMediaFromContentResolver(false)
+    }
+
+    fun loadMediaFromContentResolver(callingAfterGettingPermission: Boolean) {
         ioScope.launch {
             isStillLoadingFromDevice = true
+            var isMissingPermission1 = false
             allMediaList = when(fileType) {
-                FileType.FileTypeImage -> mediaRepository.getImages()
-                FileType.FileTypeAudio -> mediaRepository.generateAudioList()
-                FileType.FileTypeVideo -> mediaRepository.generateVideoList()
+                FileType.FileTypeImage -> if(permissionDomain.isImagesPermission()) {
+                    isMissingPermission1 = false
+                    mediaRepository.getImages()
+                } else {
+                    isMissingPermission1 = true
+                    emptyList()
+                }
+                FileType.FileTypeAudio -> if(permissionDomain.isAudioPermission()) {
+                    isMissingPermission1 = false
+                    mediaRepository.generateAudioList()
+                } else {
+                    isMissingPermission1 = true
+                    emptyList()
+                }
+                FileType.FileTypeVideo -> if(permissionDomain.isVideoPermission()) {
+                    isMissingPermission1 = false
+                    mediaRepository.generateVideoList()
+                } else {
+                    isMissingPermission1 = true
+                    emptyList()
+                }
                 else -> mediaRepository.getImages()
             }
+            isMissingPermission.update {
+                isMissingPermission1
+            }
             isStillLoadingFromDevice = false
+            if(callingAfterGettingPermission) {
+                loadMoreItemsToDisplay()
+            }
         }
     }
 
-    fun loadMoreItems() {
+    fun loadMoreItemsToDisplay() {
         if (endReached) return
         val startIndex = currentPage * pageSize
         val endIndex = (currentPage+1) * pageSize
@@ -109,6 +145,8 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
             selected = !mediaList[index].selected
         )
     }
+
+    fun getRequiredPermissionString(): String = permissionDomain.getRequiredPermissionStringAsPerMediaType(fileType)
 
     @AssistedFactory
     interface CommonMediaViewModelFactory {
