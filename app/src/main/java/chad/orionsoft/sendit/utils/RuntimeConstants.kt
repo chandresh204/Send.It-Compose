@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.repository.PreferenceRepository
-import kotlinx.coroutines.flow.update
 import kotlin.random.Random
 
 object RuntimeConstants {

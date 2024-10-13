@@ -1,8 +1,6 @@
 package chad.orionsoft.sendit.ui.welcome_screen
 
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModel
 import chad.orionsoft.sendit.domain.PermissionDomain
 import chad.orionsoft.sendit.repository.PreferenceRepository
