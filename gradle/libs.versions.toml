@@ -1,15 +1,15 @@
 [versions]
-agp = "8.4.2"
-kotlin = "1.9.0"
-hilt="2.49"
+agp = "8.5.0"
+kotlin = "2.0.20"
+hilt="2.52"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.4"
-activityCompose = "1.9.1"
-composeBom = "2024.08.00"
-composeNavigation = "2.7.7"
+lifecycleRuntimeKtx = "2.8.6"
+activityCompose = "1.9.3"
+composeBom = "2024.10.00"
+composeNavigation = "2.8.3"
 hiltNavigationCompose = "1.2.0"
 coil = "2.6.0"
 workRuntimeKtx = "2.9.1"
@@ -43,5 +43,6 @@ zxing-android-embedded = { group = "com.journeyapps", name = "zxing-android-embe
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dagger-hilt = {id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 

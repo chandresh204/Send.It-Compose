@@ -25,10 +25,7 @@ fun MainNavigation(sharedIntent : Intent?,
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = initScreen) {
         composable(NavigationConstants.NAV_WELCOME_SCREEN) {
-            WelcomeScreen2(themeChangeCallBack = themeChangeCallback) {
-                navController.popBackStack(NavigationConstants.NAV_WELCOME_SCREEN, true)
-                navController.navigate(NavigationConstants.NAV_HOME_SCREEN)
-            }
+            WelcomeScreen2(themeChangeCallBack = themeChangeCallback)
         }
         composable(NavigationConstants.NAV_HOME_SCREEN) {
             MainScreen(sharedIntent) { route ->
