@@ -82,8 +82,7 @@ fun WelcomeScreen(navToHome: () -> Unit = {}) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WelcomeScreen2(vModel : WelcomeViewModel = hiltViewModel(),
-                   themeChangeCallBack : (ColorConstants) -> Unit,
-                   navToHome: () -> Unit,) {
+                   themeChangeCallBack : (ColorConstants) -> Unit) {
     val uiState by vModel.uiState.collectAsState()
     val pagerState = rememberPagerState {
         3
@@ -143,5 +142,5 @@ fun WelcomeScreen2(vModel : WelcomeViewModel = hiltViewModel(),
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    WelcomeScreen2(themeChangeCallBack = {})  {}
+    WelcomeScreen2(themeChangeCallBack = {})
 }

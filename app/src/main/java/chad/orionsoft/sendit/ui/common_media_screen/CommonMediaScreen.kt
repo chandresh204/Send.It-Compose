@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ContentInfoCompat.Flags
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.StartActivity
