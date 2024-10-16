@@ -1,7 +1,5 @@
 package chad.orionsoft.sendit.ui.welcome_screen
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -19,7 +17,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,6 +31,7 @@ import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.ui.welcome_screen.welcome_pages.WelcomePage1
 import chad.orionsoft.sendit.ui.welcome_screen.welcome_pages.WelcomePage2
 import chad.orionsoft.sendit.ui.welcome_screen.welcome_pages.WelcomePage3
+import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Constants
 
 /*@Composable
@@ -84,6 +82,7 @@ fun WelcomeScreen(navToHome: () -> Unit = {}) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WelcomeScreen2(vModel : WelcomeViewModel = hiltViewModel(),
+                   themeChangeCallBack : (ColorConstants) -> Unit,
                    navToHome: () -> Unit,) {
     val uiState by vModel.uiState.collectAsState()
     val pagerState = rememberPagerState {
@@ -92,15 +91,8 @@ fun WelcomeScreen2(vModel : WelcomeViewModel = hiltViewModel(),
     var currentPage by remember {
         mutableIntStateOf(0)
     }
-    var permissionRequestedDone by remember {
-        mutableStateOf(false)
-    }
     LaunchedEffect(currentPage) {
         pagerState.animateScrollToPage(currentPage)
-    }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()) {
-        permissionRequestedDone = true
     }
     SendItTheme(selectedAppColor = uiState.appColor) {
         Scaffold {
@@ -136,17 +128,8 @@ fun WelcomeScreen2(vModel : WelcomeViewModel = hiltViewModel(),
                         ) { newColor ->
                             vModel.onEvent(WelcomeEvents.OnNewColorSelected(newColor))
                         }
-                        2 -> WelcomePage3(nextButtonString = if(permissionRequestedDone) "Let's Go" else "Allow Access") {
-                            if(permissionRequestedDone) {
-                                navToHome()
-                            } else {
-                                val permissionRequired = vModel.getAllRequiredMediaPermissionArray()
-                                if(permissionRequired.isEmpty()) {
-                                    navToHome()
-                                } else {
-                                    permissionLauncher.launch(permissionRequired)
-                                }
-                            }
+                        2 -> WelcomePage3(nextButtonString = "Let's Go") {
+                            themeChangeCallBack(uiState.appColor)
                         }
                     }
                 }
@@ -160,5 +143,5 @@ fun WelcomeScreen2(vModel : WelcomeViewModel = hiltViewModel(),
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    WelcomeScreen2 {}
+    WelcomeScreen2(themeChangeCallBack = {})  {}
 }

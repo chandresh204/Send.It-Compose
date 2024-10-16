@@ -18,6 +18,7 @@ class MediaRepository @Inject constructor(
     private val videosList = mutableListOf<MediaData>()
 
     fun getImages() : List<MediaData> {
+        imagesList.clear()
         val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         context.contentResolver
             .query(imageUri, null, null, null, null).use { iCursor ->
@@ -50,6 +51,7 @@ class MediaRepository @Inject constructor(
     }
 
     fun generateAudioList() : List<MediaData> {
+        audioList.clear()
         val audioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
 
@@ -109,6 +111,7 @@ class MediaRepository @Inject constructor(
     }
 
     fun generateVideoList() : List<MediaData> {
+        videosList.clear()
         val vURI = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         context.contentResolver.query(vURI,null,null,null,null).use { vCursor ->
             if (vCursor!=null && vCursor.moveToFirst()) {

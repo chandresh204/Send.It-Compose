@@ -5,7 +5,6 @@ import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.utils.ColorConstants
-import chad.orionsoft.sendit.utils.RuntimeConstants
 import chad.orionsoft.sendit.utils.SharedPreferencesConstants
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -39,6 +38,17 @@ class PreferenceRepository @Inject constructor(
         val colorId = sharedPreferences.getInt(SharedPreferencesConstants.PREFS_APP_COLOR, ColorConstants.Device.id)
         val fromPrefs = ColorConstants.entries.find { it.id == colorId }
         return fromPrefs ?: ColorConstants.Device
+    }
+
+    fun getHowManyTimesFullAccessRequested() : Int =
+        sharedPreferences.getInt(SharedPreferencesConstants.PREFS_FULL_ACCESS_REQUESTED, 0)
+
+    fun addCountToFullAccessRequested()  {
+        val oldCounts = getHowManyTimesFullAccessRequested()
+        sharedPreferences.edit().putInt(
+            SharedPreferencesConstants.PREFS_FULL_ACCESS_REQUESTED,
+            oldCounts + 1
+        ).apply()
     }
 
     fun getKnownReceivers() : MutableSet<String>? =

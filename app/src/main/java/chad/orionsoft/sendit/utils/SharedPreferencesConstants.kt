@@ -7,4 +7,5 @@ object SharedPreferencesConstants {
     const val PREFS_KNOWN_RECEIVER = "knownReceivers"
     const val PREFS_MY_UNIQUE_ID = "myUniqueId"
     const val PREFS_APP_COLOR = "appColor"
+    const val PREFS_FULL_ACCESS_REQUESTED = "fullAccessRequested"
 }
