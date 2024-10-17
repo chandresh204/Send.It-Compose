@@ -95,6 +95,15 @@ object Converters {
         return Triple(data1, data2, data3)
     }
 
+    fun convertColorToString(color: Color) : String {
+        val redInt = color.red * 255
+        val greenInt = color.green *255
+        val blueInt = color.blue * 255
+        return redInt.toInt().toString(16).padStart(2, '0') +
+                greenInt.toInt().toString(16).padStart(2, '0') +
+                blueInt.toInt().toString(16).padStart(2, '0')
+    }
+
     fun convertStringToColor(colorStr: String) : Color {
         val red = colorStr.substring(0, 2)
         val green = colorStr.substring(2,4)

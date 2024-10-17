@@ -251,6 +251,82 @@ private val blueDarkScheme = darkColorScheme(
     surfaceContainerHighest = ColorBlue.surfaceContainerHighestDark,
 )
 
+private val pinkLightScheme = lightColorScheme(
+    primary = ColorPink. primaryLight,
+    onPrimary = ColorPink. onPrimaryLight,
+    primaryContainer = ColorPink. primaryContainerLight,
+    onPrimaryContainer = ColorPink. onPrimaryContainerLight,
+    secondary = ColorPink. secondaryLight,
+    onSecondary = ColorPink. onSecondaryLight,
+    secondaryContainer = ColorPink. secondaryContainerLight,
+    onSecondaryContainer = ColorPink. onSecondaryContainerLight,
+    tertiary = ColorPink. tertiaryLight,
+    onTertiary = ColorPink. onTertiaryLight,
+    tertiaryContainer = ColorPink. tertiaryContainerLight,
+    onTertiaryContainer = ColorPink. onTertiaryContainerLight,
+    error = ColorPink. errorLight,
+    onError = ColorPink. onErrorLight,
+    errorContainer = ColorPink. errorContainerLight,
+    onErrorContainer = ColorPink. onErrorContainerLight,
+    background = ColorPink. backgroundLight,
+    onBackground = ColorPink. onBackgroundLight,
+    surface = ColorPink. surfaceLight,
+    onSurface = ColorPink. onSurfaceLight,
+    surfaceVariant = ColorPink. surfaceVariantLight,
+    onSurfaceVariant = ColorPink. onSurfaceVariantLight,
+    outline = ColorPink. outlineLight,
+    outlineVariant = ColorPink. outlineVariantLight,
+    scrim = ColorPink. scrimLight,
+    inverseSurface = ColorPink. inverseSurfaceLight,
+    inverseOnSurface = ColorPink. inverseOnSurfaceLight,
+    inversePrimary = ColorPink. inversePrimaryLight,
+    surfaceDim = ColorPink. surfaceDimLight,
+    surfaceBright = ColorPink. surfaceBrightLight,
+    surfaceContainerLowest = ColorPink. surfaceContainerLowestLight,
+    surfaceContainerLow = ColorPink. surfaceContainerLowLight,
+    surfaceContainer = ColorPink. surfaceContainerLight,
+    surfaceContainerHigh = ColorPink. surfaceContainerHighLight,
+    surfaceContainerHighest = ColorPink. surfaceContainerHighestLight,
+)
+
+private val pinkDarkScheme = darkColorScheme (
+primary = ColorPink.primaryDark,
+onPrimary = ColorPink.onPrimaryDark,
+primaryContainer = ColorPink.primaryContainerDark,
+onPrimaryContainer = ColorPink.onPrimaryContainerDark,
+secondary = ColorPink.secondaryDark,
+onSecondary = ColorPink.onSecondaryDark,
+secondaryContainer = ColorPink.secondaryContainerDark,
+onSecondaryContainer = ColorPink.onSecondaryContainerDark,
+tertiary = ColorPink.tertiaryDark,
+onTertiary = ColorPink.onTertiaryDark,
+tertiaryContainer = ColorPink.tertiaryContainerDark,
+onTertiaryContainer = ColorPink.onTertiaryContainerDark,
+error = ColorPink.errorDark,
+onError = ColorPink.onErrorDark,
+errorContainer = ColorPink.errorContainerDark,
+onErrorContainer = ColorPink.onErrorContainerDark,
+background = ColorPink.backgroundDark,
+onBackground = ColorPink.onBackgroundDark,
+surface = ColorPink.surfaceDark,
+onSurface = ColorPink.onSurfaceDark,
+surfaceVariant = ColorPink.surfaceVariantDark,
+onSurfaceVariant = ColorPink.onSurfaceVariantDark,
+outline = ColorPink.outlineDark,
+outlineVariant = ColorPink.outlineVariantDark,
+scrim = ColorPink.scrimDark,
+inverseSurface = ColorPink.inverseSurfaceDark,
+inverseOnSurface = ColorPink.inverseOnSurfaceDark,
+inversePrimary = ColorPink.inversePrimaryDark,
+surfaceDim = ColorPink.surfaceDimDark,
+surfaceBright = ColorPink.surfaceBrightDark,
+surfaceContainerLowest = ColorPink.surfaceContainerLowestDark,
+surfaceContainerLow = ColorPink.surfaceContainerLowDark,
+surfaceContainer = ColorPink.surfaceContainerDark,
+surfaceContainerHigh = ColorPink.surfaceContainerHighDark,
+surfaceContainerHighest = ColorPink.surfaceContainerHighestDark,
+)
+
     @Composable
 fun SendItTheme(
         selectedAppColor: ColorConstants = ColorConstants.Device,
@@ -278,6 +354,9 @@ fun SendItTheme(
         }
         ColorConstants.Purple -> {
             if (darkTheme) DarkColorScheme else LightColorScheme
+        }
+        ColorConstants.Pink -> {
+            if (darkTheme) pinkDarkScheme else pinkLightScheme
         }
     }
 

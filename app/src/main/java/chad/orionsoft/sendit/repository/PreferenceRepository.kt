@@ -53,11 +53,4 @@ class PreferenceRepository @Inject constructor(
 
     fun getKnownReceivers() : MutableSet<String>? =
         sharedPreferences.getStringSet(SharedPreferencesConstants.PREFS_KNOWN_RECEIVER, emptySet())
-
-    fun getMyColorCode() : Color {
-        return Color.Unspecified.copy(
-            red = 0.8f, green = 0.2f,
-            blue = 0.4f
-        )
-    }
 }

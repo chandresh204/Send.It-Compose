@@ -57,6 +57,7 @@ import chad.orionsoft.sendit.ui.sender_file_select.SenderFileSelect
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.NavigationConstants
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
@@ -127,7 +128,7 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
                         }
                     } else {
                         uiState.connectedDeviceDetails?.let {
-                            ConnectedFloatingButton(startLetter = it.name.first(), color = it.color) {
+                            ConnectedFloatingButton(startLetter = it.name.first(), color = RuntimeConstants.theirColor) {
                                 // TODO Show Connection statistics
                             }
                         }

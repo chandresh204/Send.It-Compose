@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.utils
 
 import android.os.Build
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.repository.PreferenceRepository
@@ -15,7 +16,8 @@ object RuntimeConstants {
 
 //    var connectedDeviceDetails : ConnectedDeviceDetails? = null
 
-    var myColor : String = "0033EE"
+    var myColor : Color = Color.Unspecified
+    var theirColor : Color = Color.DarkGray
 
     fun generateRandomCode(digit: Int) : String {
         val sb = StringBuilder()

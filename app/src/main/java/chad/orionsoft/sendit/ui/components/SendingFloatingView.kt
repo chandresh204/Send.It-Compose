@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.utils.RuntimeConstants
 
 @Composable
 fun SendFloatingButton(
@@ -164,6 +165,7 @@ fun SendingFloatingCard(modifier: Modifier,
             AnimatedLinearProgressBar(modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp),
+                color = MaterialTheme.colorScheme.primary,
                 progressUpdate)
         }
     }
@@ -214,6 +216,7 @@ fun ReceivingFloatingCard(modifier: Modifier,
                 AnimatedLinearProgressBar(modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp),
+                    color = RuntimeConstants.theirColor,
                     progressUpdate)
             }
         }

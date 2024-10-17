@@ -14,8 +14,7 @@ import kotlin.random.Random
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-       val fileName = "thisIsMYFile.file.jpg"
-        println("mimeType >>>> ${Converters.getMimeTypeFromFileName(fileName)}")
+
     }
 
     @Test
@@ -25,19 +24,6 @@ class ExampleUnitTest {
             substring(this.lastIndexOf("/")+1)
         }
         print("result >>> $fileName\n")
-    }
-
-    fun convertStringToColor(colorStr: String) : Color {
-        val red = colorStr.substring(0, 2)
-        val green = colorStr.substring(2,4)
-        val blue = colorStr.substring(4,6)
-        println(red.toInt(radix = 16)/255f)
-        return Color.Unspecified.copy(
-            alpha = 1f,
-            red = red.toInt(radix = 16)/255f,
-            green = green.toInt(radix = 16)/255f,
-            blue = green.toInt(radix = 16)/255f
-        )
     }
 
     private fun generateRandomString() : String {

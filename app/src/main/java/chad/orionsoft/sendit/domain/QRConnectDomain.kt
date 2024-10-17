@@ -41,7 +41,7 @@ class QRConnectDomain @Inject constructor(
         val wifiAddress = networkObserver.getWifiAddress()?.split("/")?.get(0)
         var qrCode = ""
         if(!wifiAddress.isNullOrEmpty()) {
-            val myColor = preferenceRepository.getMyColorCode()
+            val myColor = Converters.convertColorToString(RuntimeConstants.myColor)
             val operationalPort = generateRandomPortAndStartServer()
             val tripleData = Converters.createTripleData(Constants.APP_CODE,
                 RuntimeConstants.createMyUserName(preferenceRepository),
@@ -75,9 +75,10 @@ class QRConnectDomain @Inject constructor(
         val ipAndPort = Converters.separateAddressAndPort(ipAddressWithPort)
         val color = qrTriple.third
         println("Scanned >>>> Color : $color")
+        RuntimeConstants.theirColor = Converters.convertStringToColor(color)
         // My Details
         val myNameAndType = RuntimeConstants.createMyUserName(preferenceRepository)
-        val myColor = RuntimeConstants.myColor
+        val myColor = Converters.convertColorToString(RuntimeConstants.myColor)
         val myFreeSpace = FileIOOperations.getMyFreeSpace(context)
         val success = connectProcessRepository.noteUDPServerAndSendHandshake(
             nameAndType, Constants.DEVICE_TYPE_PHONE, Color.Red, ipAndPort.first, ipAndPort.second,

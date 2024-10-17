@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,6 +14,7 @@ import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.MainNavigation
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.NavigationConstants
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,6 +36,7 @@ class MainActivity : ComponentActivity() {
             }
             val userName = preferenceRepository.getUserNameFromPreferences()
             SendItTheme(selectedAppColor) {
+                RuntimeConstants.myColor = selectedAppColor.color ?: MaterialTheme.colorScheme.primary
                 MainNavigation(sharedIntent,
                     if(userName.isNullOrEmpty()) NavigationConstants.NAV_WELCOME_SCREEN else NavigationConstants.NAV_HOME_SCREEN) {
                     selectedAppColor = it

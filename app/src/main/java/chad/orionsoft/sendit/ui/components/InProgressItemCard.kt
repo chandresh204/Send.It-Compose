@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ fun InProgressItemCard(
     title:String,
     subTitle: String,
     thumbnail: Uri?,
+    color: Color,
     progressInFloat: Float
 ) {
     Card(modifier) {
@@ -56,7 +58,8 @@ fun InProgressItemCard(
                 Text(text = subTitle,
                     style = MaterialTheme.typography.bodyLarge)
                 AnimatedLinearProgressBar(modifier = Modifier
-                    .fillMaxWidth()) {
+                    .fillMaxWidth(),
+                    color = color) {
                     progressInFloat
                 }
             }
@@ -74,6 +77,7 @@ private fun Preview() {
             title = "debian 15",
             subTitle = "12M/123M",
             progressInFloat = 0.5f,
+            color = Color.Cyan,
             thumbnail = Uri.parse(""))
     }
 }

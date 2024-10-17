@@ -30,6 +30,7 @@ import chad.orionsoft.sendit.ui.components.InProgressItemCard
 import chad.orionsoft.sendit.ui.components.SteadyItemCard
 import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.utils.Constants
+import chad.orionsoft.sendit.utils.RuntimeConstants
 
 @Composable
 fun TransferReceivingScreen(vModel : TransferReceivingViewModel = hiltViewModel()) {
@@ -75,6 +76,7 @@ fun TransferReceivingScreen(vModel : TransferReceivingViewModel = hiltViewModel(
                             title = it.transferringMediaItem.title,
                             subTitle = it.progressText,
                             thumbnail = it.transferringMediaItem.thumbnailUri,
+                            color = RuntimeConstants.theirColor,
                             progressInFloat = it.progress
                         )
                     } else {
