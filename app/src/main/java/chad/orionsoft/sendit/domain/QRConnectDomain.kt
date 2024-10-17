@@ -1,7 +1,6 @@
 package chad.orionsoft.sendit.domain
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
@@ -15,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 

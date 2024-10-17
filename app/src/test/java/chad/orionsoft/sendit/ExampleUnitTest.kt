@@ -1,8 +1,5 @@
 package chad.orionsoft.sendit
 
-import android.net.Uri
-import androidx.compose.ui.graphics.Color
-import chad.orionsoft.sendit.utils.Converters
 import org.junit.Test
 import kotlin.random.Random
 
