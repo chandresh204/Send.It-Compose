@@ -9,6 +9,7 @@ import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import chad.orionsoft.sendit.utils.getResponse
 import chad.orionsoft.sendit.utils.sendData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -92,7 +93,7 @@ class ConnectProcessRepository @Inject constructor(
                         val resPort = res.partnerPort
                         val tripleData = Converters.extractTripleData(res.response)
                         val deviceName = tripleData.first
-                        val deviceColor = tripleData.second
+                        RuntimeConstants.theirColor = Converters.convertStringToColor(tripleData.second)
                         val deviceFree = tripleData.third
                         val connectedDetails = ConnectedDeviceDetails(
                             deviceName,
