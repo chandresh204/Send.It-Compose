@@ -1,11 +1,18 @@
 package chad.orionsoft.sendit.domain
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.ui.common_media_screen.PermissionType
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PermissionDomain @Inject constructor(
@@ -128,13 +135,27 @@ class PermissionDomain @Inject constructor(
     }
 
     fun getAllMediaPermissionsString() : Array<String> {
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        return if(Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU) {
             arrayOf(
-                android.Manifest.permission.READ_MEDIA_IMAGES,
                 android.Manifest.permission.READ_MEDIA_AUDIO,
+                android.Manifest.permission.READ_MEDIA_IMAGES,
                 android.Manifest.permission.READ_MEDIA_VIDEO)
+        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            arrayOf(
+                android.Manifest.permission.READ_MEDIA_AUDIO,
+                android.Manifest.permission.READ_MEDIA_IMAGES,
+                android.Manifest.permission.READ_MEDIA_VIDEO,
+                android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
         } else {
             arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
+    }
+
+    fun openAppSettings() {
+        val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.parse("package:${context.packageName}")
+            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(settingsIntent)
     }
 }

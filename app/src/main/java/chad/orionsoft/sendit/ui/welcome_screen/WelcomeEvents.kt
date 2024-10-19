@@ -7,4 +7,5 @@ sealed class WelcomeEvents {
     data class OnUserNameChanged(val new: String) :WelcomeEvents()
     data class OnNewColorSelected(val color: ColorConstants) : WelcomeEvents()
     data object OnSaveAppColor : WelcomeEvents()
+    data class OnPermissionObtained(val permissions: Map<String,Boolean>) : WelcomeEvents()
 }

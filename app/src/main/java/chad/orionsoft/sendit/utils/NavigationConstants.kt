@@ -10,6 +10,7 @@ object NavigationConstants {
     const val NAV_TRANSFER_PROGRESS_SCREEN = "transferProgressScreen"
     const val NAV_QR_SHOW_SCREEN = "qrCodeShowScreen"
     const val NAV_ABOUT_SCREEN = "aboutScreen"
+    const val NAV_14_PERMISSION_SCREEN = "14permissionScreen"
 
     // arguments
     const val FULL_SCREEN_IMG_URI = "fullScreenImageUri"

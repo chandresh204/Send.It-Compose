@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
@@ -38,6 +41,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
@@ -114,6 +118,33 @@ fun MediaItemViewBar(
 }
 
 @Composable
+fun MediaItemAddBar(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Card(modifier = modifier
+        .fillMaxWidth()
+        .padding(
+            horizontal = Constants.PAGE_PADDING.dp,
+            vertical = 6.dp
+        )
+        .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )) {
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 15.dp)) {
+            Icon(Icons.Default.Add, "Access More")
+            Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+            Text(text = "Access More", style = MaterialTheme.typography.titleMedium)
+        }
+    }
+}
+
+@Composable
 fun MediaItemViewGrid(
     modifier: Modifier = Modifier,
     isSelected : Boolean,
@@ -185,7 +216,32 @@ fun MediaItemViewGrid(
 }
 
 @Composable
-fun MediaItemViewGrid(
+fun MediaItemAddGrid(onClick: () -> Unit) {
+    Card(modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )) {
+        Box {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(128.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(onClick = onClick) {
+                    Icon(Icons.Default.Add, "Access more")
+                }
+                Text(text = "Access More", textAlign = TextAlign.Center)
+            }
+        }
+    }
+}
+
+@Composable
+fun  MediaItemViewGrid(
     modifier: Modifier = Modifier,
     isSelected : Boolean,
     thumbnail: Bitmap?,
@@ -228,9 +284,11 @@ fun MediaItemViewGrid(
                 IconButton(onClick = onActionClick,
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.background.copy(
-                            alpha = 0.4f
-                        ))
+                        .background(
+                            MaterialTheme.colorScheme.background.copy(
+                                alpha = 0.4f
+                            )
+                        )
                         .align(Alignment.TopEnd)
                         .size(32.dp)
                 ) {
@@ -253,9 +311,11 @@ fun MediaItemViewGrid(
                                 Alignment.BottomStart
                             )
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.background                              .copy(
-                                alpha = 0.4f
-                            ))
+                            .background(
+                                MaterialTheme.colorScheme.background.copy(
+                                    alpha = 0.4f
+                                )
+                            )
                             .padding(5.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onBackground
@@ -300,6 +360,7 @@ private fun Preview() {
                 actionIconDrawableRes = null,
                 onActionClick = {}
             ) {}
+            MediaItemAddBar {}
             Row {
                 MediaItemViewGrid(
                     Modifier,
@@ -322,8 +383,8 @@ private fun Preview() {
                 actionIconVector = Icons.Default.PlayArrow,
                 actionIconDrawableRes = null,
                 onActionClick = {  }) {
-
             }
+            MediaItemAddGrid {}
         }
 
     }

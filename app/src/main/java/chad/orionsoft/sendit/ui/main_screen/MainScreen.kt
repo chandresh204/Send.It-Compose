@@ -2,7 +2,6 @@ package chad.orionsoft.sendit.ui.main_screen
 
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -111,6 +110,9 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
                 },
                 onAppIconClick = {
                     gotoScreen(NavigationConstants.NAV_ABOUT_SCREEN)
+                },
+                onNavTo14Permission = {
+                    gotoScreen(NavigationConstants.NAV_14_PERMISSION_SCREEN)
                 }
             ) { mData, isSelected ->
                 vModel.onEvent(MainScreenEvent.OnItemSelected(mData, isSelected))
@@ -189,13 +191,13 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ScreenContent(modifier: Modifier = Modifier,
                           sharedIntent: Intent?,
                           onDisconnectClick: () -> Unit,
                           onMenuClick: () -> Unit,
                           onAppIconClick: () -> Unit,
+                          onNavTo14Permission : () -> Unit,
                           onMediaSelected : (MediaData, Boolean) -> Unit) {
     val pagerState = rememberPagerState {
         4
@@ -218,17 +220,17 @@ private fun ScreenContent(modifier: Modifier = Modifier,
             when (it) {
                 0 -> {
                     CommonMediaTabContent(
-                        mediaType = FileType.FileTypeImage, onItemSelectedChanged = onMediaSelected)
+                        mediaType = FileType.FileTypeImage, navTo14Permission = onNavTo14Permission, onItemSelectedChanged = onMediaSelected)
                 }
 
                 1 -> {
                     CommonMediaTabContent(
-                        mediaType = FileType.FileTypeAudio,  onItemSelectedChanged = onMediaSelected)
+                        mediaType = FileType.FileTypeAudio, navTo14Permission = onNavTo14Permission, onItemSelectedChanged = onMediaSelected)
                 }
 
                 2 -> {
                     CommonMediaTabContent(
-                        mediaType = FileType.FileTypeVideo,  onItemSelectedChanged = onMediaSelected)
+                        mediaType = FileType.FileTypeVideo, navTo14Permission = onNavTo14Permission, onItemSelectedChanged = onMediaSelected)
                 }
 
                 3 -> {

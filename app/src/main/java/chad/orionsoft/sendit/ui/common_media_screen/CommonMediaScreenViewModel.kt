@@ -12,6 +12,7 @@ import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
 import chad.orionsoft.sendit.ui.model.MediaUiData
+import chad.orionsoft.sendit.ui.permission_screen.Android14PermissionChangeEvent
 import chad.orionsoft.sendit.utils.Converters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -61,6 +63,13 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
             MainScreenViewModel.clearAllSelectionReceiver.collect {
                 if(it) {
                     clearAllSelection()
+                }
+            }
+        }
+        viewModelScope.launch {
+            Android14PermissionChangeEvent.permissionFlow.collectLatest {
+                if(it != PermissionType.NoPermission) {
+                    loadMediaFromContentResolver(true)
                 }
             }
         }
@@ -176,9 +185,9 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
 
     fun getRequiredPermissionString(): Array<String> = permissionDomain.getRequiredPermissionStringAsPerMediaType(fileType)
 
-    fun getHowManyTimesFullAccessRequested() : Int = preferenceRepository.getHowManyTimesFullAccessRequested()
-
-    fun addCountToFullAccessRequested() = preferenceRepository.addCountToFullAccessRequested()
+    fun openAppSettingsToGetPermission() {
+        permissionDomain.openAppSettings()
+    }
 
     @AssistedFactory
     interface CommonMediaViewModelFactory {

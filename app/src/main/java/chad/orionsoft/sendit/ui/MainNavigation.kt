@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui
 
 import android.content.Intent
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,11 +10,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import chad.orionsoft.sendit.ui.about_screen.AboutScreen
 import chad.orionsoft.sendit.ui.main_screen.MainScreen
+import chad.orionsoft.sendit.ui.permission_screen.Android14MediaPermissionScreen
 import chad.orionsoft.sendit.ui.qr_connect.QrConnectScreen
 import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
 import chad.orionsoft.sendit.ui.settings.SettingsScreen
 import chad.orionsoft.sendit.ui.transfer_process_screen.TransferMain
-import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen2
+import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
 import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
@@ -25,7 +27,14 @@ fun MainNavigation(sharedIntent : Intent?,
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = initScreen) {
         composable(NavigationConstants.NAV_WELCOME_SCREEN) {
-            WelcomeScreen2(themeChangeCallBack = themeChangeCallback)
+            WelcomeScreen(
+                navTo14Permission = {
+                navController.navigate(NavigationConstants.NAV_14_PERMISSION_SCREEN)
+            }) { colorConstant ->
+                navController.popBackStack(NavigationConstants.NAV_WELCOME_SCREEN, true)
+                navController.navigate(NavigationConstants.NAV_HOME_SCREEN)
+                themeChangeCallback(colorConstant)
+            }
         }
         composable(NavigationConstants.NAV_HOME_SCREEN) {
             MainScreen(sharedIntent) { route ->
@@ -79,6 +88,19 @@ fun MainNavigation(sharedIntent : Intent?,
         ) {
             AboutScreen {
                 navController.popBackStack()
+            }
+        }
+
+        composable(
+            route = NavigationConstants.NAV_14_PERMISSION_SCREEN
+        ) {
+            // TODO provide color constant in arguments
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                Android14MediaPermissionScreen {
+                    navController.popBackStack()
+                }
+            } else {
+                // Not required
             }
         }
     }

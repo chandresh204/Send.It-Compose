@@ -8,16 +8,12 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,7 +29,7 @@ import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
-import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith1Button
+import chad.orionsoft.sendit.ui.components.MediaItemAddGrid
 import chad.orionsoft.sendit.ui.components.MediaItemViewBar
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
 import chad.orionsoft.sendit.ui.components.NoPermissionView
@@ -42,6 +38,7 @@ import chad.orionsoft.sendit.utils.Converters
 @Composable
 fun CommonMediaTabContent(modifier: Modifier = Modifier,
                           mediaType: FileType,
+                          navTo14Permission: () -> Unit,
                           onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
     val vModel : CommonMediaScreenViewModel = hiltViewModel(
         creationCallback = { factory : CommonMediaScreenViewModel.CommonMediaViewModelFactory ->
@@ -50,14 +47,6 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
         key = mediaType.title
     )
     val context = LocalContext.current
-    val goToAppSettings = {
-        // TODO fix this code
-        val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.parse("package:${context.packageName}")
-            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(settingsIntent)
-    }
     var isPermissionPermanentlyDenied by remember {
         mutableStateOf(false)
     }
@@ -66,48 +55,17 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
         if(it.all { res -> !res.value }) {
             isPermissionPermanentlyDenied = true
         }
-        vModel.addCountToFullAccessRequested()
         vModel.loadMediaFromContentResolver(true)
-    }
-    var android14permissionDialog by remember {
-        mutableStateOf(false)
-    }
-    if(android14permissionDialog) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            BottomSheetWith1Button(title = "Allow Access to media",
-                subtitle = "Allow access to media", negativeButton = { Text(text = "Allow All") }) {
-                val fullAccessPermission = when (mediaType) {
-                    FileType.FileTypeImage -> {
-                        arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES,
-                            android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-                    }
-
-                    FileType.FileTypeAudio -> {
-                        arrayOf(android.Manifest.permission.READ_MEDIA_AUDIO)
-                    }
-
-                    FileType.FileTypeVideo -> {
-                        arrayOf(android.Manifest.permission.READ_MEDIA_VIDEO)
-                    }
-
-                    else -> {
-                        arrayOf(android.Manifest.permission.READ_MEDIA_VIDEO)
-                    }
-                }
-                android14permissionDialog = false
-                permissionLauncher.launch(fullAccessPermission)
-            }
-        }
     }
     val mediaList = vModel.mediaList
     val screenState by vModel.screenState.collectAsState()
     if(screenState.permissionType == PermissionType.NoPermission) {
         NoPermissionView(isDeniedPermanently = isPermissionPermanentlyDenied) {
             if(isPermissionPermanentlyDenied) {
-                goToAppSettings()
+                vModel.openAppSettingsToGetPermission()
             } else {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && mediaType != FileType.FileTypeAudio) {
-                    android14permissionDialog = true
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    navTo14Permission()
                 } else {
                     permissionLauncher.launch(vModel.getRequiredPermissionString())
                 }
@@ -118,7 +76,9 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
     Column {
     when(screenState.viewMode) {
         ViewMode.ByNameInList -> {
-            LazyColumn(modifier = modifier.weight(1f).fillMaxSize()) {
+            LazyColumn(modifier = modifier
+                .weight(1f)
+                .fillMaxSize()) {
                 items(mediaList.size) { index ->
                     val media = mediaList[index]
                     MediaItemViewBar(
@@ -142,6 +102,11 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                         vModel.changeItemSelection(index)
                     }
                 }
+                if(screenState.permissionType == PermissionType.PartialAccess) {
+                    item {
+                        MediaItemAddGrid(onClick = navTo14Permission)
+                    }
+                }
                 item {
                     LaunchedEffect(true) {
                         println("$mediaType >> loading more In List...")
@@ -153,7 +118,9 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
         ViewMode.ByLastModifiedInGrid -> {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(100.dp),
-                modifier = modifier.weight(1f).fillMaxSize()
+                modifier = modifier
+                    .weight(1f)
+                    .fillMaxSize()
             ) {
                 items(mediaList.size) { index ->
                     val media = mediaList[index]
@@ -179,6 +146,11 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                         onItemSelectedChanged(media.mediaData, !media.selected)
                     }
                 }
+                if(screenState.permissionType == PermissionType.PartialAccess) {
+                    item {
+                        MediaItemAddGrid(onClick = navTo14Permission)
+                    }
+                }
                 item {
                     LaunchedEffect(true) {
                         println("$mediaType >> loading more In Grid...")
@@ -188,35 +160,6 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
             }
 
         }
-        }
-        if (screenState.permissionType == PermissionType.PartialAccess) {
-            AccessMoreRowOnPartialPermission(
-                modifier = Modifier.padding(bottom = 90.dp),
-                onMoreAccessClick = {
-                permissionLauncher.launch(vModel.getRequiredPermissionString())
-            }) {
-                if (vModel.getHowManyTimesFullAccessRequested() > 2) {
-                    goToAppSettings()
-                } else {
-                    android14permissionDialog = true
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AccessMoreRowOnPartialPermission(
-    modifier: Modifier = Modifier,
-    onMoreAccessClick : () -> Unit,
-    onFullAccessClick : () -> Unit
-    ) {
-    Row(modifier = modifier) {
-        TextButton(onClick = onMoreAccessClick, modifier = Modifier.weight(1f)) {
-            Text(text = "Access More")
-        }
-        TextButton(onClick = onFullAccessClick, modifier = Modifier.weight(1f)) {
-            Text(text = "Allow All")
         }
     }
 }

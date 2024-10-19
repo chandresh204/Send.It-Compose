@@ -2,14 +2,19 @@ package chad.orionsoft.sendit.ui.welcome_screen
 
 import android.os.Build
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import chad.orionsoft.sendit.domain.PermissionDomain
 import chad.orionsoft.sendit.repository.PreferenceRepository
+import chad.orionsoft.sendit.ui.common_media_screen.PermissionType
+import chad.orionsoft.sendit.ui.permission_screen.Android14PermissionChangeEvent
 import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,6 +38,18 @@ class WelcomeViewModel @Inject constructor(
                 userName = preferenceRepository.getUserNameFromPreferences() ?: ""
             )
         }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            viewModelScope.launch {
+                Android14PermissionChangeEvent.permissionFlow.collectLatest {
+                    _uiState.update {  state ->
+                        state.copy(
+                            permissionType = it
+                        )
+                    }
+                }
+            }
+        }
+
     }
 
     fun onEvent(welcomeEvents: WelcomeEvents) {
@@ -59,6 +76,21 @@ class WelcomeViewModel @Inject constructor(
 
             WelcomeEvents.OnSaveAppColor -> {
                 preferenceRepository.setAppColorInPreferences(uiState.value.appColor)
+            }
+
+            is WelcomeEvents.OnPermissionObtained -> {
+                val permissionStatus = if(welcomeEvents.permissions.all { it.value }) {
+                    PermissionType.FullAccess
+                } else if (welcomeEvents.permissions.any { it.value }) {
+                    PermissionType.PartialAccess
+                } else {
+                    PermissionType.NoPermission
+                }
+                _uiState.update {
+                    it.copy(
+                        permissionType = permissionStatus
+                    )
+                }
             }
         }
     }
