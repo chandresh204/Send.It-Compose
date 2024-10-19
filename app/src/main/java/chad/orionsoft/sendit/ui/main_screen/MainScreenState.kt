@@ -6,7 +6,8 @@ data class MainScreenState(
     val selectionModel : SelectionUiModel = SelectionUiModel(),
     val connectedDeviceDetails: ConnectedDeviceDetails? = null,
     val sendingFlowInfo : TransferFlowDetails = TransferFlowDetails(),
-    val receivingFlowInfo : TransferFlowDetails = TransferFlowDetails()
+    val receivingFlowInfo : TransferFlowDetails = TransferFlowDetails(),
+    val totalSentAndReceived: Pair<String, String> = Pair("0B", "0B")
 )
 
 data class SelectionUiModel(

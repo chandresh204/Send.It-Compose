@@ -235,9 +235,14 @@ class MainScreenViewModel @Inject constructor(
                         transferRateUnit = reteAndUnit.second
                     )
                 }
+                val totalSentAndReceived = Pair(
+                    Converters.formatDataString(TransferProcessDomain.getTotalSentInSession()),
+                    Converters.formatDataString(TransferProcessDomain.getTotalReceivedInSession())
+                )
                 _mainScreenState.update { state ->
                     state.copy(
-                        receivingFlowInfo = newStatus
+                        receivingFlowInfo = newStatus,
+                        totalSentAndReceived = totalSentAndReceived
                     )
                 }
             }

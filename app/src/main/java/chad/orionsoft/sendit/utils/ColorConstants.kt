@@ -15,3 +15,7 @@ enum class ColorConstants(val id:Int, val color: Color?) {
     Purple(104, Purple40),
     Pink(105, ColorPink.primaryLight)
 }
+
+fun Color.isLightColor() : Boolean {
+    return (this.red + this.green + this.blue) > 1.5f
+}

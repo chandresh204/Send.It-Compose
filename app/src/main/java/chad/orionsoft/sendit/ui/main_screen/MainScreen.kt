@@ -4,6 +4,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,9 +45,10 @@ import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
+import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetPairedDeviceDetails
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith2Buttons
 import chad.orionsoft.sendit.ui.common_media_screen.CommonMediaTabContent
-import chad.orionsoft.sendit.ui.components.ConnectedFloatingButton
+import chad.orionsoft.sendit.ui.components.CharInCircle
 import chad.orionsoft.sendit.ui.components.NotConnectedFloatingButton
 import chad.orionsoft.sendit.ui.components.ReceivingFloatingCard
 import chad.orionsoft.sendit.ui.components.SendFloatingButton
@@ -65,6 +67,9 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
     val vModel = hiltViewModel<MainScreenViewModel>()
     val uiState by vModel.mainScreenState.collectAsState()
     var disconnectionRequest by remember {
+        mutableStateOf(false)
+    }
+    var connectedDeviceStatisticsRequest by remember {
         mutableStateOf(false)
     }
 
@@ -99,6 +104,26 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
         }
     }
 
+    if(connectedDeviceStatisticsRequest) {
+        uiState.connectedDeviceDetails?.let { cDevice ->
+            BottomSheetPairedDeviceDetails(
+                cDevice = cDevice,
+                sent = uiState.totalSentAndReceived.first,
+                received = uiState.totalSentAndReceived.second,
+                onViewClicked = {
+                    connectedDeviceStatisticsRequest = false
+                    gotoScreen(NavigationConstants.NAV_TRANSFER_PROGRESS_SCREEN + "/false")
+                },
+                onDisconnectClicked = {
+                    disconnectionRequest = true
+                    connectedDeviceStatisticsRequest = false
+                }) {
+                connectedDeviceStatisticsRequest = false
+            }
+        }
+
+    }
+
     Scaffold { paddings ->
         Box(modifier = Modifier.padding(paddings)) {
             ScreenContent(
@@ -130,9 +155,11 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
                         }
                     } else {
                         uiState.connectedDeviceDetails?.let {
-                            ConnectedFloatingButton(startLetter = it.name.first(), color = RuntimeConstants.theirColor) {
-                                // TODO Show Connection statistics
-                            }
+                            CharInCircle(
+                                modifier = Modifier.clickable(onClick =  {
+                                    connectedDeviceStatisticsRequest = true
+                                }),
+                                char = it.name.first(), color = RuntimeConstants.theirColor, size = 50)
                         }
                     }
                     Spacer(modifier = Modifier.weight(1f))

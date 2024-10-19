@@ -110,22 +110,6 @@ fun NotConnectedFloatingButton(
 }
 
 @Composable
-fun ConnectedFloatingButton(modifier: Modifier = Modifier,
-                            startLetter: Char,
-                            color: Color,
-                            onClick: () -> Unit) {
-    Text(text = startLetter.toString(),
-        fontSize = 30.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
-            .clip(CircleShape)
-            .background(color)
-            .padding(horizontal = 22.dp, vertical = 12.dp)
-            .clickable(onClick = onClick)
-    )
-}
-
-@Composable
 fun SendingFloatingCard(modifier: Modifier,
                         sendingSpeed: String,
                         sendingSpeedUnit: String,
@@ -244,11 +228,6 @@ private fun Preview() {
         Column(modifier = Modifier.align(Alignment.BottomEnd),
             horizontalAlignment = Alignment.End) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                ConnectedFloatingButton(
-                    modifier = Modifier.padding(16.dp),
-                    startLetter ='E',
-                    color = Color.DarkGray
-                    ) {}
                 NotConnectedFloatingButton {
 
                 }
