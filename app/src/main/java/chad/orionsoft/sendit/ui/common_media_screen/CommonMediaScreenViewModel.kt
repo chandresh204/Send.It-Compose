@@ -32,7 +32,6 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
     private val thumbnailDomain: ThumbnailDomain,
     private val mediaRepository: MediaRepository,
     private val permissionDomain: PermissionDomain,
-    private val preferenceRepository: PreferenceRepository,
     @Assisted private val fileType: FileType,
 ): ViewModel() {
 
