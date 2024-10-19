@@ -27,12 +27,12 @@ class Android14PermissionViewModel @Inject constructor(
     init {
         val isAudioPermission = permissionDomain.isAudioPermission() != PermissionType.NoPermission
         val isVideoPermission = permissionDomain.isVideoPermission()
-            _pState.update {
-                it.copy(
-                    isAudioPermission = isAudioPermission,
-                    avPermissionType = isVideoPermission
-                )
-            }
+        _pState.update {
+            it.copy(
+                isAudioPermission = isAudioPermission,
+                avPermissionType = isVideoPermission
+            )
+        }
         if(isAudioPermission && isVideoPermission != PermissionType.NoPermission) {
             Android14PermissionChangeEvent.updateAndroid14PermissionState(PermissionType.PartialAccess)
             obtainMediaCountsIfPermission()

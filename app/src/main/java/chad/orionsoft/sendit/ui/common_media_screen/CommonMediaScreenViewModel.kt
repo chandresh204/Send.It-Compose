@@ -9,7 +9,6 @@ import chad.orionsoft.sendit.domain.ThumbnailDomain
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
 import chad.orionsoft.sendit.repository.MediaRepository
-import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
 import chad.orionsoft.sendit.ui.model.MediaUiData
 import chad.orionsoft.sendit.ui.permission_screen.Android14PermissionChangeEvent
