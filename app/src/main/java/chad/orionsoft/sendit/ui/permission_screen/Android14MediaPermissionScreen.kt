@@ -7,7 +7,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -38,8 +37,6 @@ import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith1Button
 import chad.orionsoft.sendit.ui.common_media_screen.PermissionType
 import chad.orionsoft.sendit.ui.components.TextWithIcon
-import chad.orionsoft.sendit.ui.theme.SendItTheme
-import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Constants
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
