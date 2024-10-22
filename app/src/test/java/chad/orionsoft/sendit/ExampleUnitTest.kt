@@ -11,7 +11,7 @@ import kotlin.random.Random
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-
+        println(generateRandomString())
     }
 
     @Test

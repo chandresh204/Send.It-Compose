@@ -20,6 +20,7 @@ import chad.orionsoft.sendit.work_manager.TcpSenderWorker
 import chad.orionsoft.sendit.work_manager.TcpServerWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -98,7 +99,9 @@ class MainScreenViewModel @Inject constructor(
             }
 
             MainScreenEvent.DisconnectNow -> {
-                ConnectProcessRepository.markAsDisconnected()
+                viewModelScope.launch {
+                    qrConnectDomain.sendDisconnectSignal()
+                }
             }
         }
 

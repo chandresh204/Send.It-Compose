@@ -1,7 +1,6 @@
 package chad.orionsoft.sendit.domain
 
 import android.content.Context
-import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.repository.PreferenceRepository
@@ -29,7 +28,6 @@ class QRConnectDomain @Inject constructor(
 
     private val _failedCauseFlow = MutableSharedFlow<Pair<String,String>>()
     val failedCauseFlow = _failedCauseFlow.asSharedFlow()
-
 
     fun openQRServerAndShowQR() : String {
        return generateQRString()
@@ -61,7 +59,6 @@ class QRConnectDomain @Inject constructor(
     }
 
     suspend fun processScannedQR(qrContent: String) {
-        val previousState = connectProcessRepository.getCurrentNetworkState()
         val qrTriple = Converters.extractTripleData(qrContent)
         val nameAndType = qrTriple.first
         connectProcessRepository.updateConnectStatus(ConnectStatus.ConnectingDevice.also {
@@ -79,12 +76,12 @@ class QRConnectDomain @Inject constructor(
         val myColor = Converters.convertColorToString(RuntimeConstants.myColor)
         val myFreeSpace = FileIOOperations.getMyFreeSpace(context)
         val success = connectProcessRepository.noteUDPServerAndSendHandshake(
-            nameAndType, Constants.DEVICE_TYPE_PHONE, Color.Red, ipAndPort.first, ipAndPort.second,
+            nameAndType, ipAndPort.first, ipAndPort.second,
             Converters.createTripleData(Constants.APP_CODE, myNameAndType, myColor, myFreeSpace))
         if(success) {
             connectProcessRepository.updateConnectStatus(ConnectStatus.DeviceConnected)
         } else {
-            connectProcessRepository.updateConnectStatus(previousState)
+            connectProcessRepository.markAsDisconnected()
             CoroutineScope(Dispatchers.IO).launch {
                 _failedCauseFlow.emit(
                     Pair("Failed to Connect : $nameAndType",
@@ -94,10 +91,15 @@ class QRConnectDomain @Inject constructor(
         }
     }
 
+    suspend fun sendDisconnectSignal() {
+        connectProcessRepository.sendDisconnectSignal()
+        connectProcessRepository.markAsDisconnected()
+    }
+
     fun stopAllUdpProcess() {
         connectProcessRepository.stopAllUdpProcess()
     }
 
     fun getPairingDeviceDetails() = connectProcessRepository.getPairingDeviceDetails()
-    fun getCurrentNetworkState(): ConnectStatus = connectProcessRepository.getCurrentNetworkState()
+    fun getCurrentConnectState(): ConnectStatus = connectProcessRepository.getCurrentConnectState()
 }

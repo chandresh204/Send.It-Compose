@@ -8,14 +8,16 @@ object Constants {
     const val SCAN_QR_TIME_OUT = 60 // seconds
 
     const val APP_CODE = "zôrC*jìéHÊ3mFF¾4ÕúëHXåÐ"
+    const val UDP_DISCONNECT = "ĜĘēãÃé¨ôfs[öąČaċåā2çDó³)ÅðJ"
+    const val UDP_IS_PRESENT = "ñĝÁ,º|ÌĄ&es|SÖÛ¶DÕ>Æ"
 
     // triple data pattern == ((data1))data2/*data3*/
 
     const val DEVICE_TYPE_PHONE = "siopa"
     const val DEVICE_TYPE_DESKTOP = "lyiop"
 
-    const val MIN_SUPPORT_VERSION = 300
-    const val CURRENT_APP_SUPPORT_VERSION = 300
+    const val MIN_SUPPORT_VERSION = 300 // TODO add in QR code transfer
+    const val CURRENT_APP_SUPPORT_VERSION = 300 // TODO add in QR code transfer
 
     const val TCP_MODE_STR = "3á&ĉ_ĝcĖÄA¹ÙÒ:ÿ¸ûoò.Ğ#ĤM" // + ((mode))count/*size*/
 
@@ -37,9 +39,6 @@ object Constants {
     const val QR_CONNECT_REPLY = "[Õæs·}dÙÁÂp£x¡g¯OÕ£°ç£H¦ö"  // + /*freeSpace*/
     // QR Scanner
     const val QR_CONNECT_SIG = APP_CODE // + triple(username, color, freeSpace) *step1
-
-    // Device pair status check
-    const val UDP_IS_ALIVE = APP_CODE
 
     const val THUMBNAIL_DIR = "thumbnails"
 

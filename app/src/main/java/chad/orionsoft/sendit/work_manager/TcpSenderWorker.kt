@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
@@ -18,16 +19,23 @@ import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.receiveData
 import chad.orionsoft.sendit.utils.sendData
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.OutputStream
 import java.net.Socket
 
-class TcpSenderWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+@HiltWorker
+class TcpSenderWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted private val params: WorkerParameters,
+    private val notificationDomain: NotificationDomain,
+    private val connectProcessRepository: ConnectProcessRepository
+) : CoroutineWorker(context, params) {
 
     private val notificationId = 99
-    private val notificationDomain = NotificationDomain(context)
     private val tag = "TCPSenderWorker"
     private var foregroundInfo: ForegroundInfo
 
@@ -54,7 +62,7 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
 
     private suspend fun startFileSend() : Result  {
         return withContext(Dispatchers.IO) {
-            val connectedDevice = ConnectProcessRepository.getPairingDeviceDetails()
+            val connectedDevice = connectProcessRepository.getPairingDeviceDetails()
             if (connectedDevice == null) {
                 showErrorNotification("Connected Device details not found")
                 return@withContext Result.success()
@@ -79,7 +87,7 @@ class TcpSenderWorker(val context: Context, params: WorkerParameters) : Coroutin
             val tcpSocket =try {
                 Socket(connectedDevice.address, connectedDevice.serverPort)
             } catch (e: Exception) {
-                ConnectProcessRepository.markAsDisconnected()
+                connectProcessRepository.markAsDisconnected()
                 TransferProcessDomain.clearSession()
                 Log.e(tag, "could not create socket, probably device disconnected")
                 return@withContext Result.success()

@@ -25,7 +25,7 @@ class QrConnectViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            updateAsPerConnectStatus(qrConnectDomain.getCurrentNetworkState())
+            updateAsPerConnectStatus(qrConnectDomain.getCurrentConnectState())
             ConnectProcessRepository.connectStatusFlow.collectLatest {
                 updateAsPerConnectStatus(it)
             }

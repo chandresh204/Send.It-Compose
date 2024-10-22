@@ -7,7 +7,6 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 
 fun DatagramSocket.getResponse(): UDPResponse {
-    Log.d("DatagramSocket", "receiving on ${this.port}....")
     return try {
         val buff = ByteArray(1024)
         val receivePacket = DatagramPacket(buff, buff.size)

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
@@ -18,6 +19,8 @@ import chad.orionsoft.sendit.model.ProgressStatus
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -26,11 +29,15 @@ import java.io.InputStream
 import java.net.ServerSocket
 import java.net.Socket
 
-class TcpServerWorker(val context: Context, params: WorkerParameters)
-    : CoroutineWorker(context, params) {
+@HiltWorker
+class TcpServerWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted private val params: WorkerParameters,
+    private val contentResolverDomain: ContentResolverDomain,
+    private val notificationDomain: NotificationDomain,
+    private val connectProcessRepository: ConnectProcessRepository
+) : CoroutineWorker(context, params) {
 
-    private val notificationDomain: NotificationDomain = NotificationDomain(context)
-    private val contentResolverDomain : ContentResolverDomain = ContentResolverDomain(context)
     private lateinit var serverSocket: ServerSocket
     private lateinit var recSocket : Socket
     private val tag = "TcpServerWorker"
@@ -51,7 +58,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
         Log.d(tag, ">>> Starting")
-        if(ConnectProcessRepository.getPairingDeviceDetails() == null) {
+        if(connectProcessRepository.getPairingDeviceDetails() == null) {
             Log.d(tag, ">>> Stopping due to not connected")
             showErrorNotification("TCPServer : Not connected to any device")
             return Result.failure()
@@ -113,7 +120,7 @@ class TcpServerWorker(val context: Context, params: WorkerParameters)
                 isTCPServerRunning = false
                 Log.e(tag, "Exception in start: $e")
                 showErrorNotification("Error: $e")
-                ConnectProcessRepository.updateAndEmitConnectedDeviceDetails(null)
+                connectProcessRepository.markAsDisconnected()
                 return@withContext Result.failure()
             }
         }
