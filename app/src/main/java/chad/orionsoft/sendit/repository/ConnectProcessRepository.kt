@@ -68,12 +68,8 @@ class ConnectProcessRepository @Inject constructor(
             Log.d(tag, "Udp server already running on $serverOnPort")
             return
         } else {
-            serverOnPort = -1
+            serverOnPort = port
             CoroutineScope(Dispatchers.IO).launch {
-                while (serverRunning) {
-                    Log.d(tag, "Waiting for server to stop on Port: $serverOnPort")
-                    delay(200)
-                }
                 startUDPServer(port)
             }
         }
@@ -81,7 +77,6 @@ class ConnectProcessRepository @Inject constructor(
 
     private suspend fun startUDPServer(port: Int) {
         withContext(Dispatchers.IO) {
-            serverOnPort = port
             val dSocket = DatagramSocket(port)
             dSocket.soTimeout = 30000
             while (serverOnPort == port) {
@@ -137,7 +132,7 @@ class ConnectProcessRepository @Inject constructor(
                 }
             }
             dSocket.close()
-            serverOnPort = -1
+            Log.d(tag, "Stopped udp server on $port")
             serverRunning = false
         }
     }
@@ -160,7 +155,6 @@ class ConnectProcessRepository @Inject constructor(
             val dSocket = DatagramSocket()
             val reply = dSocket.sendData(connectRequest, theirUdpServerAddress!!, port)
             Log.d(tag, "ServerReply >>> $reply")
-            serverOnPort = -1
             if(!reply.success) {
                 return@withContext false
             } else {
@@ -174,13 +168,8 @@ class ConnectProcessRepository @Inject constructor(
                     Log.e(tag, "Paring device, their port address not valid : $theirUdpServerPort")
                     return@withContext false
                 }
-                while (serverRunning) {
-                    // TODO kill server
-                    Log.d(tag, "Waiting for server to switch on new port : $theirUdpServerPort")
-                    delay(100)
-                }
-                startUDPServerIfNotRunning(theirUdpServerPort!!)
                 updateAndEmitConnectedDeviceDetails(newDetails)
+                startUDPServerIfNotRunning(theirUdpServerPort!!)
                 Log.d(tag, "Stopping UDP server")
                 return@withContext true
             }
@@ -240,7 +229,7 @@ class ConnectProcessRepository @Inject constructor(
 
     fun getPairingDeviceDetails() = pairingDeviceDetails
 
-    fun updateAndEmitConnectedDeviceDetails(newDetails: ConnectedDeviceDetails?) {
+    private fun updateAndEmitConnectedDeviceDetails(newDetails: ConnectedDeviceDetails?) {
         pairingDeviceDetails = newDetails
         CoroutineScope(Dispatchers.IO).launch {
             _connectionUpdateChannel.emit(pairingDeviceDetails)
@@ -248,6 +237,7 @@ class ConnectProcessRepository @Inject constructor(
     }
 
     fun markAsDisconnected() {
+        stopAllUdpProcess()
         updateAndEmitConnectedDeviceDetails(null)
         updateConnectStatus(lastNetworkStatus)
     }
