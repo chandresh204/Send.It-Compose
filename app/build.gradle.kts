@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.zxing.core)
     implementation(libs.zxing.android.embedded)
     kapt(libs.androidx.hilt.compiler)
+    kapt(libs.androidx.hilt.work.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
