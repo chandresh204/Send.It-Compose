@@ -1,5 +1,9 @@
 package chad.orionsoft.sendit
 
+import chad.orionsoft.sendit.domain.EncryptionDecryption
+import chad.orionsoft.sendit.model.QRCodeData
+import chad.orionsoft.sendit.utils.Constants
+import com.google.gson.Gson
 import org.junit.Test
 import kotlin.random.Random
 
@@ -12,6 +16,19 @@ class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
         println(generateRandomString())
+    }
+
+    @Test
+    fun encryptionDecryptionTest() {
+        val qrCodeData = QRCodeData(Constants.DEVICE_TYPE_PHONE, "192.168.43.1", 4444, "ff00ff", "Chad-1234", 404)
+        val gson = Gson()
+        val qrJson = gson.toJson(qrCodeData, QRCodeData::class.java)
+        println("qrJson >>> $qrJson")
+        val encrypted = EncryptionDecryption.encrypt(qrJson)
+        val decryptedText = EncryptionDecryption.decrypt(encrypted)
+        println("encrypted >>> $encrypted")
+        println("decrypted >>> $decryptedText")
+        assert(qrJson == decryptedText)
     }
 
     @Test

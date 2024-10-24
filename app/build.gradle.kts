@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     implementation(libs.io.coil.kt)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.gson)
     implementation(libs.zxing.core)
     implementation(libs.zxing.android.embedded)
     kapt(libs.androidx.hilt.compiler)

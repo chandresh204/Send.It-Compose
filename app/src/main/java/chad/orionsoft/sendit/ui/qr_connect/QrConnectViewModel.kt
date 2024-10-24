@@ -3,7 +3,6 @@ package chad.orionsoft.sendit.ui.qr_connect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chad.orionsoft.sendit.domain.QRConnectDomain
-import chad.orionsoft.sendit.domain.QRDomain
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.utils.Constants
@@ -63,9 +62,9 @@ class QrConnectViewModel @Inject constructor(
                 }
             }
             ConnectStatus.OnWifi -> {
-                val wifiAdd = qrConnectDomain.openQRServerAndShowQR()
-                println("wifi address >>> $wifiAdd")
-                val bitmap = QRDomain.getQRBitmap(wifiAdd, Constants.QR_CODE_SIZE)
+                val qrString = qrConnectDomain.generateQRString()
+                println("wifi address >>> $qrString")
+                val bitmap = qrConnectDomain.getQRBitmap(qrString, Constants.QR_CODE_SIZE)
                 bitmap?.let { bMap ->
                     _qrState.update { state ->
                         state.copy(

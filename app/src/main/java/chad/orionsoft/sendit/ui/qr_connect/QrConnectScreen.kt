@@ -46,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
-import chad.orionsoft.sendit.domain.QRDomain
 import chad.orionsoft.sendit.domain.StartActivity
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith1Button
@@ -237,12 +236,5 @@ private fun ConnectionScreen(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    if(true) {
-        NotConnectedScreen(
-            qrBitmap = QRDomain.getQRBitmap("dummy Qr code", 512),
-            qrResult = "Qr Result"
-        ) {}
-    } else {
-        ConnectionScreen(deviceName = "Android 12", inProgress = true)
-    }
+
 }
