@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.domain.FileIOOperations
 import chad.orionsoft.sendit.domain.NetworkObserver
+import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.utils.Constants
@@ -26,10 +27,12 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.random.Random
 
 @Singleton
 class ConnectProcessRepository @Inject constructor(
     private val networkObserver: NetworkObserver,
+    private val notificationDomain: NotificationDomain,
     @ApplicationContext private val context: Context
 ){
 
@@ -176,6 +179,7 @@ class ConnectProcessRepository @Inject constructor(
         }
     }
 
+    // TODO use this method
     suspend fun pingConnectedDevice() {
         withContext(Dispatchers.IO) {
             try {
@@ -240,6 +244,14 @@ class ConnectProcessRepository @Inject constructor(
         stopAllUdpProcess()
         updateAndEmitConnectedDeviceDetails(null)
         updateConnectStatus(lastNetworkStatus)
+        notificationDomain.closeNotification(Constants.SERVER_WM_NOTIFICATION_ID)
+        notificationDomain.closeNotification(Constants.SENDER_WM_NOTIFICATION_ID)
+        notificationDomain.closeNotification(Constants.SERVER_WM_ERR_NOTIFICATION_ID)
+        notificationDomain.closeNotification(Constants.SENDER_WM_ERR_NOTIFICATION_ID)
+        notificationDomain.showNotification(
+            Random.nextInt(500), "Disconnected",
+            "Not Connected to Any Device"
+        )
     }
 
     companion object {

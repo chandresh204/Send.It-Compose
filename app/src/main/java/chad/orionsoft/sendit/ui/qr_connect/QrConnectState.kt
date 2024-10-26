@@ -9,5 +9,6 @@ data class QrConnectState(
     val connectStatus: ConnectStatus = ConnectStatus.NoNetwork,
     val pairingDeviceDetails: ConnectedDeviceDetails? = null,
     val qrScanResult: String = "",
+    val isNotificationPermission : Boolean = true,
     val connectionError: Pair<String,String>? = null, // Pair of title and description
 )

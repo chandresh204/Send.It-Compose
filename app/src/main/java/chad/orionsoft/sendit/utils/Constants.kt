@@ -43,6 +43,10 @@ object Constants {
     const val THUMBNAIL_DIR = "thumbnails"
 
     // work manager params
+    const val SERVER_WM_NOTIFICATION_ID = 25
+    const val SENDER_WM_NOTIFICATION_ID = 99
+    const val SERVER_WM_ERR_NOTIFICATION_ID = 26
+    const val SENDER_WM_ERR_NOTIFICATION_ID = 100
     const val SERVER_WM_TAG = "tcpServer"
     const val SENDER_WM_TAG = "tcpSender"
     const val TCP_SERVER_WM_PORT = "receiverPort"

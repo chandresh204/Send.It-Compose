@@ -35,13 +35,13 @@ class TcpSenderWorker @AssistedInject constructor(
     private val connectProcessRepository: ConnectProcessRepository
 ) : CoroutineWorker(context, params) {
 
-    private val notificationId = 99
+    private val notificationId = Constants.SENDER_WM_NOTIFICATION_ID
     private val tag = "TCPSenderWorker"
     private var foregroundInfo: ForegroundInfo
 
     init {
         val notification =  notificationDomain.showNotification(
-            notificationId, "TCPSender", "Sending"
+            notificationId, "Sending", ""
         )
         foregroundInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ForegroundInfo(notificationId, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
@@ -64,7 +64,7 @@ class TcpSenderWorker @AssistedInject constructor(
         return withContext(Dispatchers.IO) {
             val connectedDevice = connectProcessRepository.getPairingDeviceDetails()
             if (connectedDevice == null) {
-                showErrorNotification("Connected Device details not found")
+                showErrorNotification("Device disconnected")
                 return@withContext Result.success()
             }
             val selectedItemsToSend = TransferProcessDomain.getTheCurrentTransferSendingList()
@@ -77,10 +77,6 @@ class TcpSenderWorker @AssistedInject constructor(
                     mData.size
                 )
             }
-            notificationDomain.showNotification(
-                notificationId, "TCPSender", "Total ${selectedItemsToSend.size} items to send. " +
-                        "Total ${Converters.formatDataString(totalSizeToSend)}"
-            )
             val modeStr = "${Constants.TCP_MODE_STR}((${Constants.MODE_TYPE_FILE}))${selectedItemsToSend.size}" +
                     "/*$totalSizeToSend*/"
             Log.d(tag, "s1 >>> mode str sending $modeStr to ${connectedDevice.address} : ${connectedDevice.serverPort}")
@@ -109,7 +105,7 @@ class TcpSenderWorker @AssistedInject constructor(
                     val fileInfo = Converters.createTripleData(Constants.TCP_FILE_INFO, file.title, file.mediaType.title, file.size)
                     Log.d(tag, "s3 >>> sending file info for: ${file.title}")
                     notificationDomain.showNotification(
-                        notificationId, file.title, "${TransferProcessDomain.totalSentCount + 1}/$totalCount", false,
+                        notificationId, "Sending - ${file.title}", "${TransferProcessDomain.totalSentCount + 1}/$totalCount", false,
                         progress = (TransferProcessDomain.totalSentCount+1)*100/totalCount
                     )
                     TransferProcessDomain.updateSendingItemCount(TransferProcessDomain.totalSentCount+1)
@@ -206,7 +202,7 @@ class TcpSenderWorker @AssistedInject constructor(
     private suspend fun showErrorNotification(text: String) {
         delay(3000)
         notificationDomain.showNotification(
-            notificationId +1, "Sender Stopped", text, false
+            Constants.SENDER_WM_ERR_NOTIFICATION_ID, "Sending Failed", text, false
         )
     }
 }

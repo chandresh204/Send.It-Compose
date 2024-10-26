@@ -43,9 +43,11 @@ class TcpServerWorker @AssistedInject constructor(
     private val tag = "TcpServerWorker"
     private val onPort = params.inputData.getInt(Constants.TCP_SERVER_WM_PORT, 4848)
     private val connectionName = params.inputData.getString(Constants.TCP_SERVER_WM_DEVICE)
-    private val notificationId = 25
+    private val notificationId = Constants.SERVER_WM_NOTIFICATION_ID
 
     private lateinit var foregroundInfo: ForegroundInfo
+
+    private val connectedText = "Connected to"
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return foregroundInfo
@@ -60,13 +62,11 @@ class TcpServerWorker @AssistedInject constructor(
         Log.d(tag, ">>> Starting")
         if(connectProcessRepository.getPairingDeviceDetails() == null) {
             Log.d(tag, ">>> Stopping due to not connected")
-            showErrorNotification("TCPServer : Not connected to any device")
+            showErrorNotification("Device disconnected")
             return Result.failure()
         }
-        val connectionText = "Started on $onPort, Connected to: $connectionName"
         val notification = notificationDomain.showNotification(
-            notificationId, "TcpServer",
-            connectionText
+            notificationId, connectedText, connectionName ?: "", isSticky = true
         )
         foregroundInfo = ForegroundInfo(notificationId, notification,
             FOREGROUND_SERVICE_TYPE_DATA_SYNC)
@@ -76,15 +76,15 @@ class TcpServerWorker @AssistedInject constructor(
                 Log.d(tag, "Starting tcp server on port: $onPort")
                 serverSocket = ServerSocket(onPort)
                 while (true) {
+                    notificationDomain.showNotification(
+                        notificationId, connectedText,
+                        connectionName ?: ""
+                    )
+                    Log.d(tag, "r1 >>> Receiving on tcp")
                     isTCPServerRunning = true
                     serverSocket.soTimeout = 300000
                     recSocket = serverSocket.accept()
-                    Log.d(tag, "r1 >>> Receiving on tcp")
                     val inStream = recSocket.getInputStream()
-                    notificationDomain.showNotification(
-                        notificationId, "TCP Server",
-                        connectionText
-                    )
                     while (inStream.available() == 0) {
                         delay(100)
                     }
@@ -93,8 +93,7 @@ class TcpServerWorker @AssistedInject constructor(
                     val msg = String(buff, 0, read)
                     Log.d(tag, "r2 >>> Received mode str: $msg")
                     notificationDomain.showNotification(
-                        notificationId, "TCP Server",
-                        "$connectionText - received: $msg"
+                        notificationId, connectedText, connectionName ?: ""
                     )
                     if (msg.contains(Constants.TCP_MODE_STR)) {
                         val modeStr = Converters.extractTripleData(msg)
@@ -171,9 +170,6 @@ class TcpServerWorker @AssistedInject constructor(
             }
             count++
         }
-        showErrorNotification(
-            "Received $success/$count succeed"
-        )
         inStream.close()
         return@coroutineScope
     }
@@ -253,7 +249,7 @@ class TcpServerWorker @AssistedInject constructor(
     private suspend fun showErrorNotification(text: String) {
         delay(3000)
         notificationDomain.showNotification(
-            notificationId +1, "TCP Server Stopped", text, false
+            Constants.SERVER_WM_ERR_NOTIFICATION_ID, "Failed", text, false
         )
     }
 }

@@ -1,7 +1,9 @@
 package chad.orionsoft.sendit.ui.qr_connect
 
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import chad.orionsoft.sendit.domain.PermissionDomain
 import chad.orionsoft.sendit.domain.QRConnectDomain
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
@@ -16,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QrConnectViewModel @Inject constructor(
-    private val qrConnectDomain: QRConnectDomain
+    private val qrConnectDomain: QRConnectDomain,
+    permissionDomain: PermissionDomain
 ) : ViewModel() {
 
     private val _qrState = MutableStateFlow(QrConnectState())
@@ -36,6 +39,14 @@ class QrConnectViewModel @Inject constructor(
                         connectionError = it
                     )
                 }
+            }
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isPermission = permissionDomain.isNotificationPermission()
+            _qrState.update {
+                it.copy(
+                    isNotificationPermission = isPermission
+                )
             }
         }
     }
@@ -119,6 +130,14 @@ class QrConnectViewModel @Inject constructor(
         }
         viewModelScope.launch {
             qrConnectDomain.processScannedQR(qrContent)
+        }
+    }
+
+    fun onNotificationPermissionChanged(granted: Boolean) {
+        _qrState.update {
+            it.copy(
+                isNotificationPermission = granted
+            )
         }
     }
 

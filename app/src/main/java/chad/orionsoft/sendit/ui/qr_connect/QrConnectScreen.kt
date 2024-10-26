@@ -1,7 +1,9 @@
 package chad.orionsoft.sendit.ui.qr_connect
 
 import android.graphics.Bitmap
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +64,17 @@ fun QrConnectScreen(vModel : QrConnectViewModel = hiltViewModel(), onBack: () ->
     val context = LocalContext.current
     var isBackPressedAlready by remember {
         mutableStateOf(false)
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        vModel.onNotificationPermissionChanged(it)
+    }
+
+    LaunchedEffect(key1 = uiState.isNotificationPermission) {
+        if(!uiState.isNotificationPermission) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
     LaunchedEffect(key1 = uiState.connectStatus) {
         if(uiState.connectStatus == ConnectStatus.DeviceConnected) {
@@ -206,7 +219,7 @@ private fun ConnectionScreen(
     deviceName: String,
     inProgress : Boolean
 ) {
-    Column(modifier = Modifier.fillMaxSize(),
+    Column(modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Box(modifier = Modifier

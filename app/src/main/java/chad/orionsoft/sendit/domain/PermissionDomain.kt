@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.domain
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -88,6 +89,10 @@ class PermissionDomain @Inject constructor(
             }
         }
     }
+
+    @TargetApi(Build.VERSION_CODES.TIRAMISU)
+    fun isNotificationPermission()  : Boolean =
+        context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
     fun getRequiredPermissionStringAsPerMediaType(fileType: FileType) : Array<String> {
         return when {

@@ -5,10 +5,13 @@ import android.annotation.TargetApi
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import chad.orionsoft.sendit.MainActivity
 import chad.orionsoft.sendit.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -26,11 +29,16 @@ class NotificationDomain @Inject constructor(
     private var nManager : NotificationManager =
         context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
+    private val defaultPendingIntent : PendingIntent
+
     init {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
             createSilentNotificationChannel()
         }
+        val defaultActIntent = Intent(context, MainActivity::class.java)
+        defaultPendingIntent = PendingIntent.getActivity(context, 100, defaultActIntent,
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     @SuppressLint("NotificationPermission")
@@ -38,9 +46,9 @@ class NotificationDomain @Inject constructor(
         nId: Int,
         title: String,
         content: String,
-        isSticky: Boolean = true,
+        isSticky: Boolean = false,
         progress: Int? = null,
-        type: NotificationType = NotificationType.Normal
+        type: NotificationType = NotificationType.Silent
     ) : Notification {
         val notificationBuilder = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             when (type) {
@@ -57,10 +65,11 @@ class NotificationDomain @Inject constructor(
             Notification.Builder(context)
         }
         notificationBuilder
-            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(content)
             .setOngoing(isSticky)
+            .setContentIntent(defaultPendingIntent)
         if(type == NotificationType.Silent) {
             notificationBuilder.setSound(null)
         }
@@ -76,6 +85,10 @@ class NotificationDomain @Inject constructor(
             nId, notification
         )
         return notification
+    }
+
+    fun closeNotification(notificationId: Int) {
+        nManager.cancel(notificationId)
     }
 
     @TargetApi(Build.VERSION_CODES.O)
