@@ -61,7 +61,6 @@ import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.NavigationConstants
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import kotlinx.coroutines.launch
-import kotlin.system.exitProcess
 
 @Composable
 fun MainScreen(sharedIntent: Intent?,
