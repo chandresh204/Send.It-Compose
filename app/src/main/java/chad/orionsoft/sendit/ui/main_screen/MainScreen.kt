@@ -2,6 +2,7 @@ package chad.orionsoft.sendit.ui.main_screen
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,7 +64,9 @@ import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 @Composable
-fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit) {
+fun MainScreen(sharedIntent: Intent?,
+               gotoScreen: (screenRoute: String) -> Unit,
+               closeApp: () -> Unit) {
     val vModel = hiltViewModel<MainScreenViewModel>()
     val uiState by vModel.mainScreenState.collectAsState()
     var disconnectionRequest by remember {
@@ -71,6 +74,10 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
     }
     var connectedDeviceStatisticsRequest by remember {
         mutableStateOf(false)
+    }
+
+    BackHandler {
+        disconnectionRequest = true
     }
 
     val context = LocalContext.current
@@ -94,7 +101,7 @@ fun MainScreen(sharedIntent: Intent?, gotoScreen: (screenRoute: String) -> Unit)
                 if(uiState.connectedDeviceDetails != null) {
                     vModel.onEvent(MainScreenEvent.DisconnectNow)
                 } else {
-                    exitProcess(0)
+                    closeApp()
                 }
             },
             negativeButtonClick = {

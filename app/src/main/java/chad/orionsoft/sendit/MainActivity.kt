@@ -37,8 +37,12 @@ class MainActivity : ComponentActivity() {
             val userName = preferenceRepository.getUserNameFromPreferences()
             SendItTheme(selectedAppColor) {
                 RuntimeConstants.myColor = selectedAppColor.color ?: MaterialTheme.colorScheme.primary
-                MainNavigation(sharedIntent,
-                    if(userName.isNullOrEmpty()) NavigationConstants.NAV_WELCOME_SCREEN else NavigationConstants.NAV_HOME_SCREEN) {
+                MainNavigation(sharedIntent = sharedIntent,
+                    initScreen = if(userName.isNullOrEmpty()) NavigationConstants.NAV_WELCOME_SCREEN else NavigationConstants.NAV_HOME_SCREEN,
+                    closeApp = {
+                        this.finishAffinity()
+                    })
+                {
                     selectedAppColor = it
                 }
             }

@@ -2,7 +2,15 @@ package chad.orionsoft.sendit.ui
 
 import android.content.Intent
 import android.os.Build
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,9 +31,22 @@ import chad.orionsoft.sendit.utils.NavigationConstants
 @Composable
 fun MainNavigation(sharedIntent : Intent?,
                    initScreen: String,
+                   closeApp: () -> Unit,
                    themeChangeCallback: (ColorConstants) -> Unit) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = initScreen) {
+    NavHost(navController = navController, startDestination = initScreen,
+        enterTransition = {
+            slideIn(animationSpec = tween(durationMillis = 500), initialOffset = {
+                IntOffset(1000,0)
+            }) +
+            fadeIn(animationSpec = tween(durationMillis = 500))
+        },
+        exitTransition = {
+            slideOut(animationSpec = tween(durationMillis = 500), targetOffset = {
+                IntOffset(-1000,0)
+            }) +
+            fadeOut(animationSpec = tween(durationMillis = 500))
+        }) {
         composable(NavigationConstants.NAV_WELCOME_SCREEN) {
             WelcomeScreen(
                 navTo14Permission = {
@@ -37,9 +58,9 @@ fun MainNavigation(sharedIntent : Intent?,
             }
         }
         composable(NavigationConstants.NAV_HOME_SCREEN) {
-            MainScreen(sharedIntent) { route ->
+            MainScreen(sharedIntent , gotoScreen = { route ->
                 navController.navigate(route)
-            }
+            }, closeApp)
         }
         composable(NavigationConstants.NAV_SETTINGS) {
             SettingsScreen(themeChangeCallBack = themeChangeCallback) {
