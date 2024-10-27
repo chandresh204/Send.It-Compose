@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">Send.It</string>
+    <string name="app_intro">Send.it helps you to share your media easily over local network instead of internet. This app requires wifi connection to work. Two devices must be connected to same wifi network and need to have Send.It installed.
+
+When should you use Send.it?
+You can use send.it to send your media files to nearby Android device (soon you will be able to send them to Desktop also). e.g. if you have captured some high quality videos and the amount of data too much, and you want to share this videos to the person standing near you. in that case you can use Send.It to share this data easily without loosing any quality and as this process does not require active internet connection your data is not going to any third party server so your all privacy is in your control</string>
+    <string name="android_14_permission_explain">Android 14 introduces Selected Photos and Video Access, which allows you to grant Send.It to access specific images and videos from your device, rather than granting access to all media of a given type.
+This is android\'s new step to strengthen the user\'s privacy. this also affects how Send.It access your media . As Send.It does not connected to any third party server your media isn't going anywhere on internet directly. So you can select Allow all for the media selection or select limited amount of media and add more photos/videos next time you want</string>
     <string name="send">Send</string>
     <string name="receive">Receive</string>
     <string name="edit">Edit</string>

@@ -42,6 +42,8 @@ object Constants {
 
     const val THUMBNAIL_DIR = "thumbnails"
 
+    const val PLAYSTORE_URL = "https://play.google.com/store/apps/details?id=chad.orionsoft.sendit"
+
     // work manager params
     const val SERVER_WM_NOTIFICATION_ID = 25
     const val SENDER_WM_NOTIFICATION_ID = 99
