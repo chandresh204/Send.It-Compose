@@ -13,6 +13,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
 
@@ -52,6 +55,7 @@ fun AboutScreen(onBack : () -> Unit) {
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(it)
+            .padding(horizontal = Constants.PAGE_PADDING.dp)
             .verticalScroll(scrollState),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
@@ -77,17 +81,17 @@ fun AboutScreen(onBack : () -> Unit) {
                     }
                     context.startActivity(Intent.createChooser(i, "Share via"))
                 }) {
-                    Text(text = stringResource(id = R.string.share_this_app))
+                    TextWithIcon(imageVector = Icons.Default.Share, text = stringResource(id = R.string.share_this_app))
                 }
                 OutlinedButton(onClick = {
                     val i = Intent(Intent.ACTION_VIEW)
                     i.data = Uri.parse(Constants.PLAYSTORE_URL)
                     context.startActivity(i)
                 }) {
-                    Text(text = stringResource(id = R.string.rate_app))
+                    TextWithIcon(imageVector = Icons.Default.Star, text = stringResource(id = R.string.rate_app))
                 }
             }
-            Text(text = "App Version : Unknown")
+            Text(text = "App Version : ${Constants.APP_VERSION}")
         }
     }
 }

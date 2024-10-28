@@ -59,9 +59,9 @@ fun Android14MediaPermissionScreen(
 
     if(openAppSettingsRequested) {
         BottomSheetWith1Button(
-            title = "Go To App Settings",
-            subtitle = "Go to App Settings",
-            negativeButton = { Text(text = "Open App Settings") }) {
+            title = stringResource(id = R.string.provide_permission_from_settings),
+            subtitle = stringResource(id = R.string.provide_permission_settings_text),
+            negativeButton = { Text(text = stringResource(id = R.string.open_app_settings)) }) {
             openAppSettingsRequested = false
             vModel.onEvent(PermissionEvents.OpenAppSettings)
         }
@@ -80,14 +80,14 @@ fun Android14MediaPermissionScreen(
                 ),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Android 14 permission explaining text")
+            Text(text = stringResource(id = R.string.android_14_permission_explain))
             if(!pState.isAudioPermission || pState.avPermissionType == PermissionType.NoPermission) {
                 OutlinedButton(onClick = {
                     permissionLauncher.launch(
                         vModel.getAllRequiredPermissionArray()
                     )
                 }) {
-                    Text(text = "Allow access")
+                    Text(text = stringResource(id = R.string.allow_access))
                 }
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -96,12 +96,12 @@ fun Android14MediaPermissionScreen(
                             vModel.getAllRequiredPermissionArray()
                         )
                     }) {
-                        Text(text = "Allow access to more")
+                        Text(text = stringResource(id = R.string.allow_more))
                     }
                     Button(onClick = {
                         openAppSettingsRequested = true
                     }) {
-                        Text(text = "Allow All")
+                        Text(text = stringResource(id = R.string.allow_all))
                     }
                 }
             }
