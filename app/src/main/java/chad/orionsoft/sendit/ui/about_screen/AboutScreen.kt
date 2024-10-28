@@ -2,7 +2,6 @@ package chad.orionsoft.sendit.ui.about_screen
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
-import com.google.zxing.client.android.BuildConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
