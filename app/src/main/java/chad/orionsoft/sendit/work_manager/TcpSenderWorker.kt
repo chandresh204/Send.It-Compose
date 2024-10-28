@@ -114,6 +114,7 @@ class TcpSenderWorker @AssistedInject constructor(
                     if(reply2.success && reply2.resMsg?.contains(Constants.TCP_CONTINUE) == true) {
                         // start sending file
                         Log.d(tag, "s5 >>> sending file over tcp ${file.title}")
+                        tcpSocket.soTimeout = 10000
                         if(startSendingFile(tcpSocket.getOutputStream(), file)) {
                             TransferProcessDomain.totalSentCount++
                         }
@@ -128,33 +129,7 @@ class TcpSenderWorker @AssistedInject constructor(
                     }
                     loopCount++
                 }
-                /*for ((count, file) in selectedItemsToSend.withIndex()) {
-                    val fileInfo = Converters.createTripleData(Constants.TCP_FILE_INFO, file.title, file.mediaType.title, file.size)
-                    Log.d(tag, "s3 >>> sending file info for: ${file.title}")
-                    notificationDomain.showNotification(
-                        notificationId, file.title, "${count + 1}/$totalCount", false,
-                        progress = (count+1)*100/totalCount
-                    )
-                    TransferProcessDomain.updateSendingItemCount(count+1)
-                    val reply2 = tcpSocket.sendData(fileInfo)
-                    if(reply2.success && reply2.resMsg?.contains(Constants.TCP_CONTINUE) == true) {
-                        // start sending file
-                        Log.d(tag, "s5 >>> sending file over tcp ${file.title}")
-                        if(startSendingFile(tcpSocket.getOutputStream(), file)) {
-                            success++
-                        }
-                        // wait for continue signal
-                        Log.d(tag, "s7 >>> wait for continue signal")
-                        val resp1 = tcpSocket.receiveData()
-                        Log.d(tag, "s7_1 >>> continue response received $resp1")
-                        if(!resp1.success) {
-                            Log.d(tag, "s7_2 >>> failed to get continue signal , stopping process")
-                            break
-                        }
-                    }
-                }*/
             }
-            //
             tcpSocket.sendData(Constants.TCP_DONE, waitForResponse = false)
             Log.d(tag, "s8 >>> disconnect signal sent")
             TransferProcessDomain.clearQueueAndMoveToFinish()

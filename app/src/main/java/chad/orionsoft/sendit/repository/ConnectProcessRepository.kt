@@ -60,6 +60,14 @@ class ConnectProcessRepository @Inject constructor(
 
     fun updateConnectStatus(newStatus: ConnectStatus) {
         connectStatus = newStatus
+        if(connectStatus == ConnectStatus.NoNetwork) {
+            when(connectStatus) {
+                ConnectStatus.ConnectingDevice, ConnectStatus.DeviceConnected -> {
+                    markAsDisconnected()
+                }
+                else -> {}
+            }
+        }
         CoroutineScope(Dispatchers.IO).launch {
             _connectStatusFlow.emit(newStatus)
         }

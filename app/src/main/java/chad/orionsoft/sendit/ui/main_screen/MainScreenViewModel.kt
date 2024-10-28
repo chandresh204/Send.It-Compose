@@ -43,7 +43,7 @@ class MainScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            ConnectProcessRepository.connectionUpdateReceiver.collectLatest {
+            ConnectProcessRepository.connectionUpdateReceiver.collect {
                 _mainScreenState.update { state ->
                     state.copy(
                         connectedDeviceDetails = it
@@ -53,6 +53,12 @@ class MainScreenViewModel @Inject constructor(
                     startTCPServer(it.serverPort, it.name)
                 } else {
                     stopAllTCPWork()
+                    _mainScreenState.update { state ->
+                        state.copy(
+                            sendingFlowInfo = TransferFlowDetails(isVisible = false),
+                            receivingFlowInfo = TransferFlowDetails(isVisible = false)
+                        )
+                    }
                 }
             }
         }

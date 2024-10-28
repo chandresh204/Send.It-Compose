@@ -197,8 +197,19 @@ class TcpServerWorker @AssistedInject constructor(
                 do {
                     loops++
                     val buff = ByteArray(4096)
+                    var waitedForStream = 0
                     while (inStream.available() == 0) {
+                        Log.d(tag, "Waiting for available stream")
                         delay(100)
+                        waitedForStream += 100
+                        // if waited more than 5 sec, check is device connected
+                        if(waitedForStream >= 5000) {
+                            connectProcessRepository.pingConnectedDevice()
+                            delay(1000)
+                        }
+                        if(connectProcessRepository.getPairingDeviceDetails() == null) {
+                            throw Exception("Device Disconnected")
+                        }
                     }
                     val read1 = inStream.read(buff)
                     fileOut?.write(buff, 0, read1)

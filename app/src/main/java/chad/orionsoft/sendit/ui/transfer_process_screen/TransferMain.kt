@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.ui.transfer_process_screen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,18 +36,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.ui.transfer_process_screen.model.TransferTab
 import chad.orionsoft.sendit.ui.transfer_process_screen.transfer_receiving.TransferReceivingScreen
 import chad.orionsoft.sendit.ui.transfer_process_screen.transfer_sending.TransferSendingScreen
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransferMain(landToReceivingTab:Boolean, onBack: () -> Unit) {
     val vModel = hiltViewModel<TransferMainViewModel>()
     val uiState by vModel.tMainState.collectAsState()
     val pagerState = rememberPagerState {
         2
+    }
+    LaunchedEffect(Unit) {
+        ConnectProcessRepository.connectionUpdateReceiver.collectLatest {
+            if(it == null) {
+                onBack()
+            }
+        }
     }
     LaunchedEffect(landToReceivingTab) {
         if(landToReceivingTab) {
