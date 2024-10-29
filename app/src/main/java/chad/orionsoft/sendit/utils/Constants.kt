@@ -18,8 +18,8 @@ object Constants {
     const val DEVICE_TYPE_PHONE = "siopa"
     const val DEVICE_TYPE_DESKTOP = "lyiop"
 
-    const val MIN_SUPPORT_VERSION = 400 // TODO change on release
-    const val MY_APP_VERSION = 400 // TODO change on release
+    const val MIN_SUPPORT_VERSION = 300 // TODO change on release
+    const val MY_APP_VERSION = 300 // TODO change on release
 
     const val TCP_MODE_STR = "3á&ĉ_ĝcĖÄA¹ÙÒ:ÿ¸ûoò.Ğ#ĤM" // + ((mode))count/*size*/
 
