@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.zxing.core)
     implementation(libs.zxing.android.embedded)
+    implementation(libs.play.app.update)
     kapt(libs.androidx.hilt.compiler)
     kapt(libs.androidx.hilt.work.compiler)
     testImplementation(libs.junit)
