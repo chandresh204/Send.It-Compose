@@ -19,8 +19,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
 import chad.orionsoft.sendit.ui.components.CharInCircle
 import chad.orionsoft.sendit.utils.Constants
@@ -82,31 +84,32 @@ private fun SheetContent(modifier: Modifier= Modifier,
             CharInCircle(char = cDevice.name.first(),
                 color = cDevice.color, size = 50)
             Column {
-                Text(text = "Connected to:")
-                Text(text = cDevice.name, style = MaterialTheme.typography.titleLarge)
-                Text(text = "Available Space : ${Converters.formatDataString(cDevice.freeSpace)}")
+                Text(text = stringResource(R.string.connected_to))
+                Text(text = " : ${cDevice.name}", style = MaterialTheme.typography.titleLarge)
+                Text(text = "${stringResource(R.string.available_space)} " +
+                        ": ${Converters.formatDataString(cDevice.freeSpace)}")
             }
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Sent: $sent")
-            Text(text = "Received : $received")
+            Text(text = "${stringResource(R.string.sent)}: $sent")
+            Text(text = "${stringResource(R.string.received)} : $received")
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             OutlinedButton(onClick = onViewClicked) {
-                Text(text = "View List")
+                Text(text = stringResource(R.string.view_list))
             }
             Button(onClick = onDisconnectClicked, colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.error
             )) {
-                Text(text = "Disconnect")
+                Text(text = stringResource(R.string.disconnect))
             }
             TextButton(onClick = onDismiss) {
-                Text("Dismiss")
+                Text(stringResource(R.string.dismiss))
             }
         }
     }

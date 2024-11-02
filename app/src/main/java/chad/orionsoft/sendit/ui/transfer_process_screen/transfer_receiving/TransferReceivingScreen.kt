@@ -45,10 +45,10 @@ fun TransferReceivingScreen(vModel : TransferReceivingViewModel = hiltViewModel(
         BottomSheetWith2Buttons(
             title = stringResource(id = R.string.delete_file),
             positiveButton = {
-                TextWithIcon(Icons.Default.Delete, text = "Delete")
+                TextWithIcon(Icons.Default.Delete, text = stringResource(R.string.delete))
             },
             negativeButton = {
-                TextWithIcon(Icons.Default.Close, text = "No, Keep")
+                TextWithIcon(Icons.Default.Close, text = stringResource(R.string.delete_no))
             },
             positiveButtonClick = {
                 vModel.deleteFile(deleteRequestForId, context)

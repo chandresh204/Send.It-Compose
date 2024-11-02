@@ -1,6 +1,5 @@
 package chad.orionsoft.sendit.ui.transfer_process_screen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +41,7 @@ import chad.orionsoft.sendit.ui.transfer_process_screen.transfer_receiving.Trans
 import chad.orionsoft.sendit.ui.transfer_process_screen.transfer_sending.TransferSendingScreen
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransferMain(landToReceivingTab:Boolean, onBack: () -> Unit) {
     val vModel = hiltViewModel<TransferMainViewModel>()
@@ -94,11 +93,11 @@ fun TransferMain(landToReceivingTab:Boolean, onBack: () -> Unit) {
                 horizontalArrangement = Arrangement.Center) {
                 val total = buildAnnotatedString {
                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Sent : ")
+                        append("${stringResource(R.string.sent)} : ")
                     }
                     append(uiState.totalSentAndReceived.first)
                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(" \t Received : ")
+                        append(" \t ${stringResource(R.string.received)} : ")
                     }
                     append(uiState.totalSentAndReceived.second)
                 }

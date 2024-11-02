@@ -8,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppColorSetting
 import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Constants
@@ -23,12 +25,12 @@ fun WelcomePage2(modifier: Modifier = Modifier,
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Constants.PAGE_PADDING.dp)) {
-        Text(text = "Select Your Color", style = MaterialTheme.typography.titleLarge)
+        Text(text = stringResource(R.string.setting_color_title), style = MaterialTheme.typography.titleLarge)
         AppColorSetting(availableColors = allColors,
             selectedColor = selectedColor,
             onColorSelected = onColorSelected)
         Button(onClick = onSaveColor) {
-            Text(text = "Save and Continue")
+            Text(text = stringResource(R.string.save_and_continue))
         }
     }
 }

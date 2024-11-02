@@ -8,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.UserNameTextField
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.RuntimeConstants
@@ -22,15 +24,14 @@ fun WelcomePage1(modifier: Modifier = Modifier,
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Constants.PAGE_PADDING.dp)) {
-        Text(text = "Welcome to Send.It", style = MaterialTheme.typography.titleLarge)
-        Text(text = "Before starting the Send.It there are few things that needs to be set up, " +
-                "please provide few details that you can get the best from the Send.It")
+        Text(text = stringResource(R.string.app_welcome), style = MaterialTheme.typography.titleLarge)
+        Text(text = stringResource(R.string.app_setup_1))
         UserNameTextField(myName = nameText, onNameEdited = onNameUpdated)
         if(nameText.isNotEmpty()) {
-            Text(text = "Other devices will see you as ${RuntimeConstants.createMyUserName(nameText)}")
+            Text(text = "${stringResource(R.string.setting_name_desc)} as ${RuntimeConstants.createMyUserName(nameText)}")
         }
         Button(onClick = onSaveClicked, enabled = nameText.isNotEmpty()) {
-            Text(text = "Save and Continue")
+            Text(text = stringResource(R.string.save_and_continue))
         }
     }
 }

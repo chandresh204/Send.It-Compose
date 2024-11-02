@@ -2,6 +2,7 @@ package chad.orionsoft.sendit.ui.qr_connect
 
 import android.graphics.Bitmap
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -87,7 +88,7 @@ fun QrConnectScreen(vModel : QrConnectViewModel = hiltViewModel(), onBack: () ->
     Scaffold(
         topBar = {
             TopAppBar(title = {
-                Text(stringResource(R.string.app_name) + " - Connect")
+                Text(stringResource(R.string.app_name) + " - ${stringResource(R.string.connect)}")
             },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -125,7 +126,7 @@ fun QrConnectScreen(vModel : QrConnectViewModel = hiltViewModel(), onBack: () ->
             }
             ConnectStatus.DeviceConnected -> {
                 ConnectionScreen(
-                    deviceName = uiState.pairingDeviceDetails?.name ?: "Unknown",
+                    deviceName = uiState.pairingDeviceDetails?.name ?: stringResource(R.string.unknown),
                     inProgress = false
                 )
             }
@@ -136,7 +137,7 @@ fun QrConnectScreen(vModel : QrConnectViewModel = hiltViewModel(), onBack: () ->
                 title = it.first,
                 subtitle = it.second,
                 negativeButton = {
-                    TextWithIcon(Icons.Default.Close, text = "Dismiss")
+                    TextWithIcon(Icons.Default.Close, text = stringResource(R.string.dismiss))
                 }) {
                 vModel.dismissErrorDialog()
             }
@@ -151,6 +152,7 @@ private fun NotConnectedScreen(
     qrResult : String?,
     processQrScanned: (String) -> Unit
 ) {
+    Log.d("ScanQr", "Result >>> $qrResult")
     val scanLauncher = rememberLauncherForActivityResult(
         contract = ScanContract(),
         onResult = { result ->
@@ -177,7 +179,7 @@ private fun NotConnectedScreen(
         }
         Spacer(modifier = Modifier.padding(16.dp))
         Text(
-            text = "Connect to this device by Scanning the QR Code",
+            text = stringResource(R.string.scan_qr_hint),
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.padding(16.dp))
@@ -192,7 +194,7 @@ private fun NotConnectedScreen(
                     modifier = Modifier.align(Alignment.Center)
                 )
                 Text(
-                    text = "OR",
+                    text = stringResource(R.string.or),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -205,10 +207,7 @@ private fun NotConnectedScreen(
         Button(onClick = {
             scanLauncher.launch(ScanOptions())
         }) {
-            Text(text = "Scan QR")
-        }
-        qrResult?.let {
-            Text(text = "QR Scan Result: $it")
+            Text(text = stringResource(R.string.scan_qr))
         }
     }
 }
@@ -240,8 +239,8 @@ private fun ConnectionScreen(
         }
         Spacer(modifier = Modifier.padding(8.dp))
         Text(text =
-            if(inProgress) "Connecting ...."
-            else "You're now connected with", style = MaterialTheme.typography.titleMedium)
+            if(inProgress) stringResource(R.string.connecting_in_progress)
+            else stringResource(R.string.now_connected), style = MaterialTheme.typography.titleMedium)
         Text(text = deviceName)
     }
 }

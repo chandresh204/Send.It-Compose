@@ -31,7 +31,6 @@ fun WLANConnectionRequiredBottomSheet(
     connectToWifiClick: () -> Unit,
     createNetworkClick: () -> Unit
 ) {
-    // TODO add cancel button and
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
         confirmValueChange = { false }
@@ -69,7 +68,7 @@ fun WLANConnectionRequiredBottomSheet(
             }
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
             TextButton(onClick = closeNow) {
-                Text(text = "Abort for now", color = MaterialTheme.colorScheme.error)
+                Text(text = stringResource(R.string.abort_for_now), color = MaterialTheme.colorScheme.error)
             }
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
         }

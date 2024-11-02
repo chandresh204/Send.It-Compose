@@ -12,16 +12,18 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.utils.Constants
 
 @Composable
 fun UserNameTextField(modifier: Modifier = Modifier, myName: String, onNameEdited: (String) -> Unit) {
-    Column {
-        Text(text = "Your Name", style = MaterialTheme.typography.titleMedium)
-        Text(text = "This will appear on other devices", fontStyle = FontStyle.Italic)
+    Column(modifier) {
+        Text(text = stringResource(R.string.setting_name_title), style = MaterialTheme.typography.titleMedium)
+        Text(text = stringResource(R.string.setting_name_desc), fontStyle = FontStyle.Italic)
         OutlinedTextField(
             value = myName,
             modifier = Modifier.fillMaxWidth(),
@@ -29,11 +31,11 @@ fun UserNameTextField(modifier: Modifier = Modifier, myName: String, onNameEdite
                 Icon(Icons.Default.Face, contentDescription = "User")
             },
             placeholder = {
-                Text(text = "e.g. John",
+                Text(text = stringResource(R.string.setting_name_hint),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
             },
             label = {
-                Text(text = "My Name")
+                Text(text = stringResource(R.string.setting_name_label))
             },
             shape = RoundedCornerShape(Constants.OUTLINE_TEXT_FIELD_RADIUS.dp),
             keyboardOptions = KeyboardOptions(
