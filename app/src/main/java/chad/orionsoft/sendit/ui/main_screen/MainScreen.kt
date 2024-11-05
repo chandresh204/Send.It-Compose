@@ -288,6 +288,8 @@ private fun MainAppBarWithTabs(
     onMenuClick: () -> Unit,
     onAppIconClick: () -> Unit,
     onTabChanged: (Int) -> Unit) {
+    val selectedIconTint = MaterialTheme.colorScheme.onPrimaryContainer
+    val nonSelectedIconColor = MaterialTheme.colorScheme.onBackground
     Row {
         IconButton(onClick = onAppIconClick) {
             Image(painterResource(id = R.drawable.sendit_icon_play), contentDescription = "Send.It")
@@ -305,16 +307,23 @@ private fun MainAppBarWithTabs(
                     .background(MaterialTheme.colorScheme.primaryContainer))
             }){
             IconButton(onClick = { onTabChanged(0) }) {
-                Icon(painterResource(R.drawable.image_24px), contentDescription = "Photos")
+                Icon(painterResource(R.drawable.image_24px),
+                    tint = if(selectedTab == 0) selectedIconTint else nonSelectedIconColor,
+                    contentDescription = "Photos")
             }
             IconButton(onClick = { onTabChanged(1) }) {
-                Icon(painterResource(R.drawable.music_note_24px), contentDescription = "Audio")
+                Icon(painterResource(R.drawable.music_note_24px),
+                    tint = if(selectedTab == 1) selectedIconTint else nonSelectedIconColor,contentDescription = "Audio")
             }
             IconButton(onClick = { onTabChanged(2) }) {
-                Icon(painterResource(R.drawable.play_circle_24px), contentDescription = "Video")
+                Icon(painterResource(R.drawable.play_circle_24px),
+                    tint = if(selectedTab == 2) selectedIconTint else nonSelectedIconColor,
+                    contentDescription = "Video")
             }
             IconButton(onClick = { onTabChanged(3) }) {
-                Icon(painterResource(R.drawable.file_present_24px), contentDescription = "File")
+                Icon(painterResource(R.drawable.file_present_24px),
+                    tint = if(selectedTab == 3) selectedIconTint else nonSelectedIconColor,
+                    contentDescription = "File")
             }
         }
         IconButton(onClick = onDisconnectClick) {
