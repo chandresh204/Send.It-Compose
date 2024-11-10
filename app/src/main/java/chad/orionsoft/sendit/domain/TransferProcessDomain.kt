@@ -107,8 +107,23 @@ object TransferProcessDomain {
         startCalculatingTransferSpeed()
     }
 
-    fun addToSendingList(mediaList: List<MediaData>) {
-        transferSendingList.addAll(mapToTransferringMediaItems(mediaList))
+    /**
+     * adds new selected items to the current sending list, this functions return [Int] which shows
+     * the count of the items that are not added because they were already in the list
+     */
+    fun addToSendingList(mediaList: List<MediaData>) : Int { // returns number of items failed to add
+        val newMediaS = mapToTransferringMediaItems(mediaList)
+        // DO not add already exists items
+        var alreadyExitsItems = 0
+        newMediaS.forEach { newMedia ->
+            if(transferSendingList.find { it.id == newMedia.id } == null &&
+                sentHistoryList.find { it.id == newMedia.id } == null) {
+                transferSendingList.add(newMedia)
+            } else {
+                alreadyExitsItems++
+            }
+        }
+        return alreadyExitsItems
     }
 
     fun addToReceivingList(filename: String, size: Long) : Long { // returns the id of new file

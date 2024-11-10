@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
@@ -62,7 +63,7 @@ fun SendFloatingButton(
                     style = MaterialTheme.typography.bodySmall)
             }
             IconButton(onClick = {  }) {
-                Image(painterResource(id = R.drawable.sendit_icon_play), contentDescription = "send")
+                SendArrow()
             }
         }
     }
@@ -125,7 +126,7 @@ fun SendingFloatingCard(modifier: Modifier,
                 Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconInProgressBar(Icons.Default.KeyboardArrowUp)
+                SendArrow()
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -192,7 +193,7 @@ fun ReceivingFloatingCard(modifier: Modifier,
                         Text(text = "Receiving...", style = MaterialTheme.typography.titleSmall)
                         Text(text = currentItem, style = MaterialTheme.typography.bodySmall, maxLines = 1)
                     }
-                    IconInProgressBar(Icons.Default.KeyboardArrowDown)
+                    SendArrow(rotation = 90f)
                 }
                 AnimatedLinearProgressBar(modifier = Modifier
                     .fillMaxWidth()

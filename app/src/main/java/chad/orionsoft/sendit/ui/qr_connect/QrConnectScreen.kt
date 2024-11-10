@@ -53,6 +53,7 @@ import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith1Button
 import chad.orionsoft.sendit.ui.bottom_sheets.WLANConnectionRequiredBottomSheet
 import chad.orionsoft.sendit.ui.components.TextWithIcon
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.delay
@@ -155,7 +156,9 @@ private fun NotConnectedScreen(
         contract = ScanContract(),
         onResult = { result ->
             println("scan result >>>> ${result.contents}")
-            processQrScanned(result.contents)
+            result?.contents?.let {
+                processQrScanned(result.contents)
+            }
         }
     )
     Column(modifier = modifier.fillMaxSize(),
@@ -171,7 +174,7 @@ private fun NotConnectedScreen(
                     contentDescription = null)
             } else {
                 Image(bitmap = qrBitmap.asImageBitmap(),
-                    modifier = Modifier.size(250.dp),
+                    modifier = Modifier.size(RuntimeConstants.screenWidthDp),
                     contentDescription = null)
            }
         }

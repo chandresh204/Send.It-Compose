@@ -33,8 +33,6 @@ object Constants {
     const val TCP_FILE_IGNORE = "dksjdlascnhlksadkhw"
     const val TCP_FILE_FREE_SPACE_SIGNAL  = "sdnccop5d75sde398jfd%@^"
 
-    // QR Connect Process
-    const val QR_CODE_SIZE = 512
     // QR INFORMATION
     const val QR_INFO = APP_CODE // + triple(deviceType+username, wifiAddress: Port, color)
     // QR Host
@@ -55,6 +53,8 @@ object Constants {
     const val SENDER_WM_TAG = "tcpSender"
     const val TCP_SERVER_WM_PORT = "receiverPort"
     const val TCP_SERVER_WM_DEVICE = "deviceName"
+
+    const val DEVICE_DISCONNECTED_NOTIFICATION_ID = 5467
 
     const val UPDATE_TRANSFER_STATUS_AFTER_LOOPS = 300
 

@@ -31,6 +31,8 @@
 
     <string name="change_sort_order">Change the sorting order of the list</string>
 
+    <string name="already_sent">item(s) is(are) already in process or been sent.</string>
+
     <string name="received_here">Received files will appear here</string>
     <string name="allow_all">Allow all</string>
     <string name="allow_more">Allow access to more</string>

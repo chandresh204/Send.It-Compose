@@ -10,6 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.MainNavigation
 import chad.orionsoft.sendit.ui.theme.SendItTheme
@@ -35,6 +38,14 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(preferenceRepository.getAppColorFromPreference())
             }
             val userName = preferenceRepository.getUserNameFromPreferences()
+            val config = LocalConfiguration.current
+            val density = LocalDensity.current
+            RuntimeConstants.screenWidthDp = config.screenWidthDp.dp
+            RuntimeConstants.screenHeightDp = config.screenHeightDp.dp
+            with(density) {
+                RuntimeConstants.screenWidthPx = RuntimeConstants.screenWidthDp.roundToPx()
+                RuntimeConstants.screenHeightPx = RuntimeConstants.screenHeightDp.roundToPx()
+            }
             SendItTheme(selectedAppColor) {
                 RuntimeConstants.myColor = selectedAppColor.color ?: MaterialTheme.colorScheme.primary
                 MainNavigation(sharedIntent = sharedIntent,

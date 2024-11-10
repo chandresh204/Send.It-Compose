@@ -129,6 +129,7 @@ class QRConnectDomain @Inject constructor(
             }
         } catch (e:Exception) {
             Log.e("QrCodeScanned", "Exception : $e")
+            connectProcessRepository.markAsDisconnected()
             CoroutineScope(Dispatchers.IO).launch {
                 _failedCauseFlow.emit(
                     Pair("Failed to Connect : ",

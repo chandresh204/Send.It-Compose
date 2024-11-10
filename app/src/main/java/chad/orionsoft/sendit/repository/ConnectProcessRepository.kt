@@ -27,7 +27,6 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.random.Random
 
 @Singleton
 class ConnectProcessRepository @Inject constructor(
@@ -51,7 +50,11 @@ class ConnectProcessRepository @Inject constructor(
         CoroutineScope(Dispatchers.IO).launch {
             networkObserver.networkStatus.collectLatest {
                 lastNetworkStatus = it
-                updateConnectStatus(it)
+                if(it == ConnectStatus.NoNetwork) {
+                    markAsDisconnected()
+                } else {
+                    updateConnectStatus(it)
+                }
             }
         }
     }
@@ -60,14 +63,6 @@ class ConnectProcessRepository @Inject constructor(
 
     fun updateConnectStatus(newStatus: ConnectStatus) {
         connectStatus = newStatus
-        if(connectStatus == ConnectStatus.NoNetwork) {
-            when(connectStatus) {
-                ConnectStatus.ConnectingDevice, ConnectStatus.DeviceConnected -> {
-                    markAsDisconnected()
-                }
-                else -> {}
-            }
-        }
         CoroutineScope(Dispatchers.IO).launch {
             _connectStatusFlow.emit(newStatus)
         }
@@ -257,7 +252,7 @@ class ConnectProcessRepository @Inject constructor(
         notificationDomain.closeNotification(Constants.SERVER_WM_ERR_NOTIFICATION_ID)
         notificationDomain.closeNotification(Constants.SENDER_WM_ERR_NOTIFICATION_ID)
         notificationDomain.showNotification(
-            Random.nextInt(500), "Disconnected",
+            Constants.DEVICE_DISCONNECTED_NOTIFICATION_ID, "Disconnected",
             "Not Connected to Any Device"
         )
     }

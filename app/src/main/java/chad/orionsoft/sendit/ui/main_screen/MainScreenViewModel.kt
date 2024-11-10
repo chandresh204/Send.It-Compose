@@ -10,6 +10,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.QRConnectDomain
 import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.MediaData
@@ -95,7 +96,13 @@ class MainScreenViewModel @Inject constructor(
                 if(mainScreenState.value.connectedDeviceDetails == null) {
                     Toast.makeText(context, "Not connected", Toast.LENGTH_LONG).show()
                 } else {
-                    TransferProcessDomain.addToSendingList(selectedItemsToSend)
+                    val alreadyThere = TransferProcessDomain.addToSendingList(selectedItemsToSend)
+                    if(alreadyThere > 0) {
+                        Toast.makeText(
+                            context, "$alreadyThere " + context.getString(R.string.already_sent),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                     clearAllSelection()
                     if(!TransferProcessDomain.isSending) {
                         startTCPSender(mainScreenState.value.connectedDeviceDetails!!.serverPort)

@@ -8,6 +8,7 @@ import chad.orionsoft.sendit.domain.QRConnectDomain
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.utils.Constants
+import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +37,7 @@ class QrConnectViewModel @Inject constructor(
             qrConnectDomain.failedCauseFlow.collect {
                 _qrState.update { state ->
                     state.copy(
-                        connectionError = it
+                        connectionError = it,
                     )
                 }
             }
@@ -75,7 +76,8 @@ class QrConnectViewModel @Inject constructor(
             ConnectStatus.OnWifi -> {
                 val qrString = qrConnectDomain.generateQRString()
                 println("wifi address >>> $qrString")
-                val bitmap = qrConnectDomain.getQRBitmap(qrString, Constants.QR_CODE_SIZE)
+                val bitmap = qrConnectDomain.getQRBitmap(qrString,
+                    RuntimeConstants.screenWidthPx)
                 bitmap?.let { bMap ->
                     _qrState.update { state ->
                         state.copy(

@@ -294,7 +294,8 @@ private fun MainAppBarWithTabs(
         IconButton(onClick = onAppIconClick) {
             Image(painterResource(id = R.drawable.sendit_icon_play), contentDescription = "Send.It")
         }
-        TabRow(selectedTabIndex = selectedTab,
+        TabRow(
+            selectedTabIndex = selectedTab,
             modifier = Modifier.weight(1f),
             divider = {},
             indicator = {
@@ -305,7 +306,8 @@ private fun MainAppBarWithTabs(
                     .clip(CircleShape)
                     .zIndex(-1f)
                     .background(MaterialTheme.colorScheme.primaryContainer))
-            }){
+            })
+        {
             IconButton(onClick = { onTabChanged(0) }) {
                 Icon(painterResource(R.drawable.image_24px),
                     tint = if(selectedTab == 0) selectedIconTint else nonSelectedIconColor,
@@ -313,7 +315,8 @@ private fun MainAppBarWithTabs(
             }
             IconButton(onClick = { onTabChanged(1) }) {
                 Icon(painterResource(R.drawable.music_note_24px),
-                    tint = if(selectedTab == 1) selectedIconTint else nonSelectedIconColor,contentDescription = "Audio")
+                    tint = if(selectedTab == 1) selectedIconTint else nonSelectedIconColor,
+                    contentDescription = "Audio")
             }
             IconButton(onClick = { onTabChanged(2) }) {
                 Icon(painterResource(R.drawable.play_circle_24px),

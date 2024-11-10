@@ -3,13 +3,16 @@ package chad.orionsoft.sendit.ui.transfer_process_screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -26,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -34,9 +40,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
+import chad.orionsoft.sendit.ui.components.SendArrow
 import chad.orionsoft.sendit.ui.transfer_process_screen.model.TransferTab
 import chad.orionsoft.sendit.ui.transfer_process_screen.transfer_receiving.TransferReceivingScreen
 import chad.orionsoft.sendit.ui.transfer_process_screen.transfer_sending.TransferSendingScreen
@@ -119,7 +127,7 @@ fun TransferMain(landToReceivingTab:Boolean, onBack: () -> Unit) {
 }
 
 @Composable
-private fun TransferTabs(
+private fun TransferTabsOld(
     tabList: List<TransferTab>,
     selected: Int,
     sendSpeed : String,
@@ -153,8 +161,72 @@ private fun TransferTabs(
     }
 }
 
+@Composable
+private fun TransferTabs(
+    tabList: List<TransferTab>,
+    selectedTab: Int,
+    sendSpeed : String,
+    sendCount : String,
+    receiveSpeed: String,
+    onTabClick: (Int) -> Unit
+) {
+    TabRow(
+        selectedTabIndex = selectedTab,
+        divider = {},
+        indicator = {
+            Box(modifier = Modifier
+                .tabIndicatorOffset(it[selectedTab])
+                .fillMaxSize()
+                .clip(CircleShape)
+                .zIndex(-1f)
+                .background(MaterialTheme.colorScheme.primaryContainer))
+        })
+    {
+        tabList.forEachIndexed { index, it ->
+            val countAndSpeedText = if(index == 0) {
+                if(sendCount.isEmpty()) "$sendSpeed/s"
+                else "($sendCount) $sendSpeed/s"
+            } else {
+                "$receiveSpeed/s"
+            }
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                SendArrow(
+                    rotation = if(it.ordinal == 0) {
+                        -90f
+                    } else 90f
+                )
+                Text(
+                    text = it.name + "\n$countAndSpeedText",
+                    style = if(selectedTab == it.ordinal) {
+                        MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        MaterialTheme.typography.bodyMedium
+                    },
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .clickable {
+                            onTabClick(it.ordinal)
+                        }
+                )
+            }
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    TransferMain(false){}
+    TransferTabs(
+        tabList = listOf(TransferTab.Sending, TransferTab.Receiving),
+        selectedTab = 1,
+        sendCount = "12 MB/s",
+        sendSpeed = "2",
+        receiveSpeed = "11 MB/s"
+    ) { }
 }
