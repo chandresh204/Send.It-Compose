@@ -14,8 +14,8 @@ android {
         applicationId = "chad.orionsoft.sendit"
         minSdk = 24
         targetSdk = 35
-        versionCode = 5
-        versionName = "3.0"
+        versionCode = 6
+        versionName = "3.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
