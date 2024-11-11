@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
 
@@ -78,7 +80,7 @@ fun EnterValueDialog(
                     Button(onClick = {
                         onCodeSubmit(codeStr)
                     }) {
-                        Text(text = "Submit")
+                        Text(text = stringResource(R.string.submit))
                     }
                     if(timerValue > 0) {
                         Text(text = "In $timerValue Sec")

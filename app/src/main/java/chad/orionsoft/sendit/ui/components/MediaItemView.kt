@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -138,7 +139,7 @@ fun MediaItemAddBar(modifier: Modifier = Modifier, onClick: () -> Unit) {
                 .padding(horizontal = 8.dp, vertical = 15.dp)) {
             Icon(Icons.Default.Add, "Access More")
             Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-            Text(text = "Access More", style = MaterialTheme.typography.titleMedium)
+            Text(text = stringResource(R.string.access_more), style = MaterialTheme.typography.titleMedium)
         }
     }
 }
@@ -233,7 +234,7 @@ fun MediaItemAddGrid(onClick: () -> Unit) {
                 IconButton(onClick = onClick) {
                     Icon(Icons.Default.Add, "Access more")
                 }
-                Text(text = "Access More", textAlign = TextAlign.Center)
+                Text(text = stringResource(R.string.access_more), textAlign = TextAlign.Center)
             }
         }
     }

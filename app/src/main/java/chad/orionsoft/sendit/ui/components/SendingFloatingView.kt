@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chad.orionsoft.sendit.R
@@ -52,7 +53,7 @@ fun SendFloatingButton(
         Row(modifier = Modifier.padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically) {
             Column {
-                Text(text = "$selectedCount selected",
+                Text(text = "$selectedCount ${stringResource(R.string.selected)}",
                     maxLines = 1,
                     style = MaterialTheme.typography.titleSmall)
                 Text(text = sizeText,
@@ -84,7 +85,7 @@ fun NotConnectedFloatingButton(
                     defaultElevation = 4.dp
                 )
         ) {
-            Text(text = "Not\nConnected",
+            Text(text = stringResource(R.string.not_connected_2_lines),
                 modifier = Modifier.padding(start = 33.dp, top = 4.dp, bottom = 4.dp, end = 8.dp),
                 style = MaterialTheme.typography.bodySmall)
         }
@@ -129,7 +130,7 @@ fun SendingFloatingCard(modifier: Modifier,
                         .weight(1f)
                         .padding(horizontal = 4.dp)
                 ) {
-                    Text(text = "Sending...", style = MaterialTheme.typography.titleSmall)
+                    Text(text = stringResource(R.string.sending_in_progress), style = MaterialTheme.typography.titleSmall)
                     Text(
                         text = currentItem,
                         style = MaterialTheme.typography.bodySmall,
@@ -172,8 +173,8 @@ fun ReceivingFloatingCard(modifier: Modifier,
                     verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Check, contentDescription = "Done")
                     Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                        Text(text = "$received file received", style = MaterialTheme.typography.titleSmall)
-                        Text(text = "Tap here to view", style = MaterialTheme.typography.bodySmall, maxLines = 1)
+                        Text(text = "$received ${stringResource(R.string.file_received)}", style = MaterialTheme.typography.titleSmall)
+                        Text(text = stringResource(R.string.tap_here_view), style = MaterialTheme.typography.bodySmall, maxLines = 1)
                     }
                 }
             } else {
@@ -187,7 +188,7 @@ fun ReceivingFloatingCard(modifier: Modifier,
                         .weight(1f)
                         .padding(horizontal = 4.dp),
                         horizontalAlignment = Alignment.End) {
-                        Text(text = "Receiving...", style = MaterialTheme.typography.titleSmall)
+                        Text(text = stringResource(R.string.receiving_in_progress), style = MaterialTheme.typography.titleSmall)
                         Text(text = currentItem, style = MaterialTheme.typography.bodySmall, maxLines = 1)
                     }
                     SendArrow(rotation = 90f)

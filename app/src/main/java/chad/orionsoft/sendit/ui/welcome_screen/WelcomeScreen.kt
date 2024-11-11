@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -91,7 +92,9 @@ fun WelcomeScreen(vModel : WelcomeViewModel = hiltViewModel(),
                         ) { newColor ->
                             vModel.onEvent(WelcomeEvents.OnNewColorSelected(newColor))
                         }
-                        2 -> WelcomePage3(nextButtonString = if(uiState.permissionType == PermissionType.NoPermission) "Allow Permissions" else "Let's Go") {
+                        2 -> WelcomePage3(nextButtonString = if(uiState.permissionType == PermissionType.NoPermission)
+                             stringResource(R.string.allow_permissions) else stringResource(R.string.lets_go)
+                        ) {
                             if(uiState.permissionType == PermissionType.NoPermission) {
                                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                                     navTo14Permission()
@@ -101,7 +104,7 @@ fun WelcomeScreen(vModel : WelcomeViewModel = hiltViewModel(),
                             } else {
                                 if(uiState.userName.isEmpty()) {
                                     currentPage = 0
-                                    Toast.makeText(context, "Please provide username", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.setting_name_req_msg), Toast.LENGTH_SHORT).show()
                                 } else {
                                     navToHome(uiState.appColor)
                                 }

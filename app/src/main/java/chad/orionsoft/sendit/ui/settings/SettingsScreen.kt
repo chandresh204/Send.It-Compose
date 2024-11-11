@@ -19,9 +19,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.AppColorSetting
 import chad.orionsoft.sendit.ui.components.UserNameTextField
 import chad.orionsoft.sendit.utils.ColorConstants
@@ -37,7 +39,7 @@ fun SettingsScreen(modifier: Modifier = Modifier,
     val verticalScrollState = rememberScrollState()
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Settings") },
+            TopAppBar(title = { Text(text = stringResource(R.string.app_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, "back")
@@ -45,7 +47,7 @@ fun SettingsScreen(modifier: Modifier = Modifier,
                 })
         }
     ) { innerPadding ->
-        Column(modifier = Modifier
+        Column(modifier = modifier
             .padding(innerPadding)
             .padding(Constants.PAGE_PADDING.dp)
             .verticalScroll(verticalScrollState)) {
@@ -63,7 +65,7 @@ fun SettingsScreen(modifier: Modifier = Modifier,
                 themeChangeCallBack(uiState.appColor)
                 onBack()
             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text(text = "Save")
+                Text(text = stringResource(R.string.save))
             }
         }
     }

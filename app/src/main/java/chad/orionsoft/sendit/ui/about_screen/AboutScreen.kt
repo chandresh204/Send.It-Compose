@@ -39,7 +39,6 @@ import chad.orionsoft.sendit.utils.Constants
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(onBack : () -> Unit) {
-    // TODO add icons in button and app version
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     Scaffold(

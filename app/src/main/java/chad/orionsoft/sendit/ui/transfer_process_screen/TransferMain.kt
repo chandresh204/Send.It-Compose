@@ -110,11 +110,11 @@ fun TransferMain(landToReceivingTab:Boolean, onBack: () -> Unit) {
                 horizontalArrangement = Arrangement.Center) {
                 val total = buildAnnotatedString {
                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Sent : ")
+                        append("${stringResource(R.string.sent)} : ")
                     }
                     append(uiState.totalSentAndReceived.first)
                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(" \t Received : ")
+                        append(" \t ${stringResource(R.string.received)} : ")
                     }
                     append(uiState.totalSentAndReceived.second)
                 }

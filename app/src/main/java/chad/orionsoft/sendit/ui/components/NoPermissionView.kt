@@ -12,9 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import chad.orionsoft.sendit.R
 
 @Composable
 fun NoPermissionView(modifier: Modifier = Modifier,
@@ -27,14 +29,14 @@ fun NoPermissionView(modifier: Modifier = Modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
-                text = "Permission Not Granted",
+                text = stringResource(R.string.permission_not_granted),
                 style = MaterialTheme.typography.titleMedium
             )
-            Text(text = "Send.It can not access media files if the permission is not granted," +
-                    "click on the allow button to provide permission",
+            Text(text = stringResource(R.string.request_permission_text),
                 textAlign = TextAlign.Center)
             Button(onClick = onAllowClick) {
-                Text(text = if(isDeniedPermanently) "Go To Settings" else "Allow Access")
+                Text(text = if(isDeniedPermanently) stringResource(R.string.goto_settings)
+                else stringResource(R.string.allow_access))
             }
         }
 

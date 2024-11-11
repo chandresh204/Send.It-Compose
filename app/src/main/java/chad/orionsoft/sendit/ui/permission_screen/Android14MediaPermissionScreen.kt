@@ -109,22 +109,22 @@ fun Android14MediaPermissionScreen(
                 MediaCountRow(
                     iconRes = R.drawable.image_24px,
                     count = pState.imageAccessedCount,
-                    title = "Image(s)"
+                    title = stringResource(R.string.image_s)
                 )
                 MediaCountRow(
                     iconRes = R.drawable.music_note_24px,
                     count = pState.audioAccessCount,
-                    title = "Audio"
+                    title = stringResource(R.string.audio)
                 )
                 MediaCountRow(
                     iconRes = R.drawable.play_circle_24px,
                     count = pState.videoAccessCount,
-                    title = "Video(s)"
+                    title = stringResource(R.string.video_s)
                 )
                 Button(onClick = backToParentScreen) {
                     TextWithIcon(
                         Icons.Default.Check,
-                        text = "Done"
+                        text = stringResource(R.string.done)
                     )
                 }
             }

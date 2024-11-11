@@ -19,8 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.utils.ColorConstants
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -30,9 +32,8 @@ fun AppColorSetting(modifier: Modifier = Modifier,
                             selectedColor: ColorConstants,
                             onColorSelected : (ColorConstants) -> Unit) {
     Column(modifier) {
-        Text(text = "Your App Color", style = MaterialTheme.typography.titleMedium)
-        Text(text = "This is the primary color of your app, " +
-                "but connected device will also show your color in some UI elements",
+        Text(text = stringResource(R.string.setting_color_title), style = MaterialTheme.typography.titleMedium)
+        Text(text = stringResource(R.string.setting_color_desc),
             fontStyle = FontStyle.Italic)
         FlowRow(modifier = Modifier.padding(vertical = 8.dp)) {
             availableColors.forEach {
@@ -54,13 +55,13 @@ private fun ColorPlate(modifier: Modifier = Modifier,
         .size(100.dp)
         .padding(4.dp)
         .clip(CircleShape)
-        .background(color ?: Color.Gray)
+        .background(color ?: MaterialTheme.colorScheme.primary)
         .clickable(onClick = onClick)
     ) {
         Column(modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally) {
             if(isSystem) {
-                Text(text = "Device",
+                Text(text = stringResource(R.string.device),
                     color = MaterialTheme.colorScheme.onPrimary)
             }
             if(isSelected) {
