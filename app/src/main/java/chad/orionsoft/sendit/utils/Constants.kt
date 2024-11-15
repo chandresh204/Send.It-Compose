@@ -2,7 +2,7 @@ package chad.orionsoft.sendit.utils
 
 object Constants {
 
-    const val APP_VERSION = "3.0.0"
+    const val APP_VERSION = "3.0.1"
     const val OUTLINE_TEXT_FIELD_RADIUS = 16
     const val PAGE_PADDING = 16
     const val DIALOG_PADDING = 8
@@ -12,6 +12,7 @@ object Constants {
     const val APP_CODE = "zôrC*jìéHÊ3mFF¾4ÕúëHXåÐ"
     const val UDP_DISCONNECT = "ĜĘēãÃé¨ôfs[öąČaċåā2çDó³)ÅðJ"
     const val UDP_IS_PRESENT = "ñĝÁ,º|ÌĄ&es|SÖÛ¶DÕ>Æ"
+    const val UDP_VERSION_INCOMPATIBLE = "dsacl9sackjsa" // TODO change code
 
     // triple data pattern == ((data1))data2/*data3*/
 
@@ -30,8 +31,6 @@ object Constants {
     const val TCP_OKAY = "d%@^"
     const val TCP_DONE = "¹ÙÒ:ÿ"
     const val TCP_FILE_INFO = "e398jfd%@^"
-    const val TCP_FILE_IGNORE = "dksjdlascnhlksadkhw"
-    const val TCP_FILE_FREE_SPACE_SIGNAL  = "sdnccop5d75sde398jfd%@^"
 
     // QR INFORMATION
     const val QR_INFO = APP_CODE // + triple(deviceType+username, wifiAddress: Port, color)

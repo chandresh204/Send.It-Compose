@@ -20,3 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep class chad.orionsoft.sendit.model.QRCodeData { *; }
+-keep class chad.orionsoft.sendit.model.DeviceHandshakeData { *; }

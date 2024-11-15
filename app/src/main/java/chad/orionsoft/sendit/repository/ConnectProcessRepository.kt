@@ -3,16 +3,20 @@ package chad.orionsoft.sendit.repository
 import android.content.Context
 import android.util.Log
 import androidx.compose.ui.graphics.Color
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.FileIOOperations
 import chad.orionsoft.sendit.domain.NetworkObserver
 import chad.orionsoft.sendit.domain.NotificationDomain
 import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.model.ConnectedDeviceDetails
+import chad.orionsoft.sendit.model.DeviceHandshakeData
+import chad.orionsoft.sendit.model.QrConnectionResult
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import chad.orionsoft.sendit.utils.getResponse
 import chad.orionsoft.sendit.utils.sendData
+import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -96,21 +100,34 @@ class ConnectProcessRepository @Inject constructor(
                     val resPort = res.partnerPort
                     when {
                         res.response.contains(Constants.APP_CODE) -> {
-                            val tripleData = Converters.extractTripleData(res.response)
-                            val deviceName = tripleData.first
-                            RuntimeConstants.theirColor = Converters.convertStringToColor(tripleData.second)
-                            val deviceFree = tripleData.third
-                            val connectedDetails = ConnectedDeviceDetails(
-                                deviceName,
-                                resAddress,
-                                Constants.DEVICE_TYPE_PHONE,
-                                RuntimeConstants.theirColor,
-                                deviceFree.toLong(),
-                                port
-                            )
-                            Log.d(tag, "Device details: $connectedDetails")
-                            updateAndEmitConnectedDeviceDetails(connectedDetails)
                             try {
+                                val deviceHandshakeJson = res.response.split("===")[1]
+                                val deviceHandshakeData = Gson().fromJson(deviceHandshakeJson, DeviceHandshakeData::class.java)
+                                val deviceName = deviceHandshakeData.name
+                                val deviceFree = deviceHandshakeData.freeSpace
+                                val appVersion = deviceHandshakeData.appVersion
+                                if(appVersion < Constants.MIN_SUPPORT_VERSION) {
+                                    // TODO return if app version lower than supported
+                                    emitConnectionFailedCause(
+                                        Pair(
+                                        context.getString(R.string.failed_to_connect),
+                                        context.getString(R.string.failed_to_connect_low_version, deviceName)
+                                        )
+                                    )
+                                    Log.d(tag, "Sending not compatible reply")
+                                    sendVersionNotCompatibleReply(dSocket, resAddress, resPort)
+                                    continue
+                                }
+                                val connectedDetails = ConnectedDeviceDetails(
+                                    deviceName,
+                                    resAddress,
+                                    Constants.DEVICE_TYPE_PHONE,
+                                    RuntimeConstants.theirColor,
+                                    deviceFree,
+                                    port
+                                )
+                                Log.d(tag, "Device details: $connectedDetails")
+                                updateAndEmitConnectedDeviceDetails(connectedDetails)
                                 val freeSpace = FileIOOperations.getMyFreeSpace(context)
                                 val replyBytes = "${Constants.QR_CONNECT_REPLY}/*$freeSpace*/".toByteArray()
                                 val replyPacket = DatagramPacket(
@@ -151,10 +168,18 @@ class ConnectProcessRepository @Inject constructor(
         dSocket.send(replyPacket)
     }
 
+    private fun sendVersionNotCompatibleReply(dSocket : DatagramSocket, resAddress: InetAddress, resPort: Int) {
+        val replyBytes = Constants.UDP_VERSION_INCOMPATIBLE.toByteArray()
+        val replyPacket = DatagramPacket(
+            replyBytes, replyBytes.size, resAddress, resPort
+        )
+        dSocket.send(replyPacket)
+    }
+
     suspend fun noteUDPServerAndSendHandshake(
         userName: String,
         inetAddressStr: String, port: Int, connectRequest: String
-    ) : Boolean {
+    ) : QrConnectionResult {
         return withContext(Dispatchers.IO) {
             theirUdpServerAddress = InetAddress.getByName(inetAddressStr)
             theirUdpServerPort = port
@@ -162,7 +187,14 @@ class ConnectProcessRepository @Inject constructor(
             val reply = dSocket.sendData(connectRequest, theirUdpServerAddress!!, port)
             Log.d(tag, "ServerReply >>> $reply")
             if(!reply.success) {
-                return@withContext false
+                if(reply.response.contains(Constants.UDP_VERSION_INCOMPATIBLE)) {
+                    return@withContext QrConnectionResult(
+                        false,
+                        context.getString(R.string.failed_to_connect_low_version)
+                    )
+                }
+                return@withContext QrConnectionResult(false,
+                    context.getString(R.string.failed_to_connect_diff_wifi, userName))
             } else {
                 val freeSpace = Converters.extractDataInNormalCase(reply.response)
                 val newDetails = ConnectedDeviceDetails(
@@ -172,12 +204,15 @@ class ConnectProcessRepository @Inject constructor(
                 Log.d(tag, "Connected Device: $newDetails ")
                 if((theirUdpServerPort ?: 0) <= 0) {
                     Log.e(tag, "Paring device, their port address not valid : $theirUdpServerPort")
-                    return@withContext false
+                    return@withContext QrConnectionResult(
+                        false,
+                        context.getString(R.string.failed_to_connect_invalid_port)
+                    )
                 }
                 updateAndEmitConnectedDeviceDetails(newDetails)
                 startUDPServerIfNotRunning(theirUdpServerPort!!)
                 Log.d(tag, "Stopping UDP server")
-                return@withContext true
+                return@withContext QrConnectionResult(true, "success")
             }
         }
     }
@@ -257,6 +292,13 @@ class ConnectProcessRepository @Inject constructor(
         )
     }
 
+    fun emitConnectionFailedCause(cause : Pair<String,String>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            _failedCauseFlow.emit(cause)
+        }
+        updateConnectStatus(lastNetworkStatus)
+    }
+
     companion object {
 
         private val _connectionUpdateChannel = MutableSharedFlow<ConnectedDeviceDetails?>()
@@ -264,5 +306,8 @@ class ConnectProcessRepository @Inject constructor(
 
         private val _connectStatusFlow = MutableSharedFlow<ConnectStatus>()
         val connectStatusFlow = _connectStatusFlow.asSharedFlow()
+
+        private val _failedCauseFlow = MutableSharedFlow<Pair<String,String>>()
+        val failedCauseFlow = _failedCauseFlow.asSharedFlow()
     }
 }

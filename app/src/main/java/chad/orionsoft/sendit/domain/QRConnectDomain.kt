@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
+import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.model.ConnectStatus
+import chad.orionsoft.sendit.model.DeviceHandshakeData
 import chad.orionsoft.sendit.model.QRCodeData
 import chad.orionsoft.sendit.repository.ConnectProcessRepository
 import chad.orionsoft.sendit.repository.PreferenceRepository
@@ -32,9 +34,6 @@ class QRConnectDomain @Inject constructor(
 ) {
 
     private var udpServerPortForThisSession : String? = RuntimeConstants.generateRandomCode(4)
-
-    private val _failedCauseFlow = MutableSharedFlow<Pair<String,String>>()
-    val failedCauseFlow = _failedCauseFlow.asSharedFlow()
 
     fun generateQRString() : String {
         val wifiAddress = networkObserver.getWifiAddress()?.split("/")?.get(0)
@@ -97,8 +96,20 @@ class QRConnectDomain @Inject constructor(
             val qrCodeDataJson = EncryptionDecryption.decrypt(qrCodeDataEncrypted)
             println("Qr code json = $qrCodeDataJson")
             val qrCodeData = Gson().fromJson(qrCodeDataJson, QRCodeData::class.java)
+            val theirVersion = qrCodeData.appVersion
             val userName = qrCodeData.userName
+            if(theirVersion < Constants.MIN_SUPPORT_VERSION) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    connectProcessRepository.emitConnectionFailedCause(
+                        Pair( context.getString(R.string.failed_to_connect)+" : $userName",
+                        context.getString(R.string.failed_to_connect_low_version, userName))
+                    )
+                }
+                return
+            }
             val deviceType = qrCodeData.deviceType
+            val myColor = Converters.convertColorToString(RuntimeConstants.myColor)
+            val myFreeSpace = FileIOOperations.getMyFreeSpace(context)
             connectProcessRepository.updateConnectStatus(ConnectStatus.ConnectingDevice.also {
                 it.msg = userName
             })
@@ -110,20 +121,22 @@ class QRConnectDomain @Inject constructor(
             println("Scanned >>>> Color : $theirColor")
             RuntimeConstants.theirColor = Converters.convertStringToColor(theirColor)
             // My Details
-            val myNameAndType = RuntimeConstants.createMyUserName(preferenceRepository)
-            val myColor = Converters.convertColorToString(RuntimeConstants.myColor)
-            val myFreeSpace = FileIOOperations.getMyFreeSpace(context)
-            val success = connectProcessRepository.noteUDPServerAndSendHandshake(
-                userName, ipAddress, port,
-                Converters.createTripleData(Constants.APP_CODE, myNameAndType, myColor, myFreeSpace))
-            if(success) {
+            val myUserName = RuntimeConstants.createMyUserName(preferenceRepository)
+            val deviceHandshakeDetails = DeviceHandshakeData(
+                myUserName, deviceType, myColor, myFreeSpace, Constants.MY_APP_VERSION
+            )
+            val deviceDetailsJson = Gson().toJson(deviceHandshakeDetails, DeviceHandshakeData::class.java)
+            val qrConnectResult = connectProcessRepository.noteUDPServerAndSendHandshake(
+                myUserName, ipAddress, port,
+                "${Constants.APP_CODE} === $deviceDetailsJson")
+            if(qrConnectResult.isSuccess) {
                 connectProcessRepository.updateConnectStatus(ConnectStatus.DeviceConnected)
             } else {
                 connectProcessRepository.markAsDisconnected()
                 CoroutineScope(Dispatchers.IO).launch {
-                    _failedCauseFlow.emit(
-                        Pair("Failed to Connect : $userName",
-                            "This device is not in your wifi network, make sure you and $userName are connected on same wifi network")
+                    connectProcessRepository.emitConnectionFailedCause(
+                        Pair( context.getString(R.string.failed_to_connect) + " : $userName",
+                            qrConnectResult.failureTitleAndMessage)
                     )
                 }
             }
@@ -131,9 +144,9 @@ class QRConnectDomain @Inject constructor(
             Log.e("QrCodeScanned", "Exception : $e")
             connectProcessRepository.markAsDisconnected()
             CoroutineScope(Dispatchers.IO).launch {
-                _failedCauseFlow.emit(
-                    Pair("Failed to Connect : ",
-                        "Something went wrong....")
+                connectProcessRepository.emitConnectionFailedCause(
+                    Pair( context.getString(R.string.failed_to_connect),
+                        context.getString(R.string.something_went_wrong))
                 )
             }
         }
@@ -153,4 +166,6 @@ class QRConnectDomain @Inject constructor(
 
     fun getPairingDeviceDetails() = connectProcessRepository.getPairingDeviceDetails()
     fun getCurrentConnectState(): ConnectStatus = connectProcessRepository.getCurrentConnectState()
+
+    fun getFailedCauseFlow() = ConnectProcessRepository.failedCauseFlow
 }
