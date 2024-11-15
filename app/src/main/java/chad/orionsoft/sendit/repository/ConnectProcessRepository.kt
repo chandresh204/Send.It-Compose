@@ -107,7 +107,6 @@ class ConnectProcessRepository @Inject constructor(
                                 val deviceFree = deviceHandshakeData.freeSpace
                                 val appVersion = deviceHandshakeData.appVersion
                                 if(appVersion < Constants.MIN_SUPPORT_VERSION) {
-                                    // TODO return if app version lower than supported
                                     emitConnectionFailedCause(
                                         Pair(
                                         context.getString(R.string.failed_to_connect),
