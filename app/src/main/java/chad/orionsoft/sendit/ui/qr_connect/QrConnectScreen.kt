@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.qr_connect
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import android.util.Log
@@ -15,7 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -27,6 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -42,9 +46,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,6 +61,7 @@ import chad.orionsoft.sendit.model.ConnectStatus
 import chad.orionsoft.sendit.ui.bottom_sheets.BottomSheetWith1Button
 import chad.orionsoft.sendit.ui.bottom_sheets.WLANConnectionRequiredBottomSheet
 import chad.orionsoft.sendit.ui.components.TextWithIcon
+import chad.orionsoft.sendit.utils.IntentUtil
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
@@ -154,6 +162,7 @@ private fun NotConnectedScreen(
     processQrScanned: (String) -> Unit
 ) {
     Log.d("ScanQr", "Result >>> $qrResult")
+    val context = LocalContext.current
     val scanLauncher = rememberLauncherForActivityResult(
         contract = ScanContract(),
         onResult = { result ->
@@ -163,7 +172,9 @@ private fun NotConnectedScreen(
             }
         }
     )
-    Column(modifier = modifier.fillMaxSize(),
+    Column(modifier = modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         Box {
@@ -182,7 +193,8 @@ private fun NotConnectedScreen(
         }
         Spacer(modifier = Modifier.padding(16.dp))
         Text(
-            text = stringResource(R.string.scan_qr_hint),
+            text = stringResource(
+                if(qrBitmap != null) R.string.scan_qr_hint else R.string.scan_qr_hint_no_own),
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.padding(16.dp))
@@ -211,6 +223,18 @@ private fun NotConnectedScreen(
             scanLauncher.launch(ScanOptions())
         }) {
             Text(text = stringResource(R.string.scan_qr))
+        }
+        Spacer(modifier = Modifier.padding(16.dp))
+        Text(text = stringResource(id = R.string.app_share_request), textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.padding(4.dp))
+        OutlinedButton(onClick = {
+            context.startActivity(
+                Intent.createChooser(
+                IntentUtil.getAppSharingIntent(context), "Share via"))
+        }) {
+            TextWithIcon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.android_24px),
+                text = stringResource(id = R.string.share_this_app))
         }
     }
 }
@@ -248,8 +272,10 @@ private fun ConnectionScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun Preview() {
+    NotConnectedScreen(qrBitmap = null, qrResult = "dsdasdsad") {
 
+    }
 }

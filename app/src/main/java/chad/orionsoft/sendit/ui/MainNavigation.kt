@@ -18,7 +18,6 @@ import chad.orionsoft.sendit.ui.about_screen.AboutScreen
 import chad.orionsoft.sendit.ui.main_screen.MainScreen
 import chad.orionsoft.sendit.ui.permission_screen.Android14MediaPermissionScreen
 import chad.orionsoft.sendit.ui.qr_connect.QrConnectScreen
-import chad.orionsoft.sendit.ui.sender_image.SenderImagesScreen
 import chad.orionsoft.sendit.ui.settings.SettingsScreen
 import chad.orionsoft.sendit.ui.transfer_process_screen.TransferMain
 import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
@@ -62,11 +61,6 @@ fun MainNavigation(sharedIntent : Intent?,
         }
         composable(NavigationConstants.NAV_SETTINGS) {
             SettingsScreen(themeChangeCallBack = themeChangeCallback) {
-                navController.popBackStack()
-            }
-        }
-        composable(NavigationConstants.NAV_SENDER_IMAGES) {
-            SenderImagesScreen { _ , _ ->
                 navController.popBackStack()
             }
         }

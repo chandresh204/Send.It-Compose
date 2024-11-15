@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,6 +36,7 @@ import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
+import chad.orionsoft.sendit.utils.IntentUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,32 +72,27 @@ fun AboutScreen(onBack : () -> Unit) {
                 color = MaterialTheme.colorScheme.primary
             )
             Text(text = stringResource(id = R.string.when_use_desc))
+            Spacer(modifier = Modifier.padding(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedButton(onClick = {
-                    val shareMsg = context.getString(R.string.share_app_message) +
-                            "\n${Constants.PLAYSTORE_URL}"
-                    val i = Intent(Intent.ACTION_SEND).apply {
-                        putExtra(Intent.EXTRA_TEXT, shareMsg)
-                        type = "text/plain"
-                    }
-                    context.startActivity(Intent.createChooser(i, "Share via"))
+                    context.startActivity(Intent.createChooser(
+                        IntentUtil.getAppSharingIntent(context), "Share via"))
                 }) {
                     TextWithIcon(imageVector = Icons.Default.Share, text = stringResource(id = R.string.share_this_app))
                 }
                 OutlinedButton(onClick = {
-                    val i = Intent(Intent.ACTION_VIEW)
-                    i.data = Uri.parse(Constants.PLAYSTORE_URL)
-                    context.startActivity(i)
+                    context.startActivity(IntentUtil.appPlayStoreIntent())
                 }) {
                     TextWithIcon(imageVector = Icons.Default.Star, text = stringResource(id = R.string.rate_app))
                 }
             }
+            Spacer(modifier = Modifier.padding(8.dp))
             Text(text = "App Version : ${Constants.APP_VERSION}")
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun Preview() {
     SendItTheme {
