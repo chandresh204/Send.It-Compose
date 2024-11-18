@@ -125,7 +125,7 @@ class QRConnectDomain @Inject constructor(
             )
             val deviceDetailsJson = Gson().toJson(deviceHandshakeDetails, DeviceHandshakeData::class.java)
             val qrConnectResult = connectProcessRepository.noteUDPServerAndSendHandshake(
-                myUserName, ipAddress, port,
+                userName, qrCodeData.color, ipAddress, port,
                 "${Constants.APP_CODE} === $deviceDetailsJson")
             if(qrConnectResult.isSuccess) {
                 connectProcessRepository.updateConnectStatus(ConnectStatus.DeviceConnected)

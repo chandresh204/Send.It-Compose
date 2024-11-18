@@ -106,6 +106,7 @@ class ConnectProcessRepository @Inject constructor(
                                 val deviceName = deviceHandshakeData.name
                                 val deviceFree = deviceHandshakeData.freeSpace
                                 val appVersion = deviceHandshakeData.appVersion
+                                RuntimeConstants.theirColor = Converters.convertStringToColor(deviceHandshakeData.color)
                                 if(appVersion < Constants.MIN_SUPPORT_VERSION) {
                                     emitConnectionFailedCause(
                                         Pair(
@@ -176,7 +177,7 @@ class ConnectProcessRepository @Inject constructor(
     }
 
     suspend fun noteUDPServerAndSendHandshake(
-        userName: String,
+        userName: String, colorString: String, // other device username and color required
         inetAddressStr: String, port: Int, connectRequest: String
     ) : QrConnectionResult {
         return withContext(Dispatchers.IO) {
@@ -198,7 +199,7 @@ class ConnectProcessRepository @Inject constructor(
                 val freeSpace = Converters.extractDataInNormalCase(reply.response)
                 val newDetails = ConnectedDeviceDetails(
                     userName, InetAddress.getByName(inetAddressStr), Constants.DEVICE_TYPE_PHONE,
-                    Color.Red, freeSpace.toLong(), port
+                    Converters.convertStringToColor(colorString), freeSpace.toLong(), port
                 )
                 Log.d(tag, "Connected Device: $newDetails ")
                 if((theirUdpServerPort ?: 0) <= 0) {
