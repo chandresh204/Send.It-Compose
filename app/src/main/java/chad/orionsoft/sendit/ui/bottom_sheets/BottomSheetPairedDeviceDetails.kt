@@ -85,7 +85,7 @@ private fun SheetContent(modifier: Modifier= Modifier,
                 color = cDevice.color, size = 50)
             Column {
                 Text(text = stringResource(R.string.connected_to))
-                Text(text = "${cDevice.name}", style = MaterialTheme.typography.titleLarge)
+                Text(text = cDevice.name, style = MaterialTheme.typography.titleLarge)
                 Text(text = "${stringResource(R.string.available_space)} " +
                         ": ${Converters.formatDataString(cDevice.freeSpace)}")
             }

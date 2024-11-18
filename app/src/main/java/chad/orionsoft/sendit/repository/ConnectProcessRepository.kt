@@ -2,7 +2,6 @@ package chad.orionsoft.sendit.repository
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.ui.graphics.Color
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.FileIOOperations
 import chad.orionsoft.sendit.domain.NetworkObserver
