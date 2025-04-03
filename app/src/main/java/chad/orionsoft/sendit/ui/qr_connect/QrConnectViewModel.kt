@@ -13,6 +13,7 @@ import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -31,13 +32,13 @@ class QrConnectViewModel @Inject constructor(
     val qrState = _qrState.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             updateAsPerConnectStatus(qrConnectDomain.getCurrentConnectState())
             ConnectProcessRepository.connectStatusFlow.collectLatest {
                 updateAsPerConnectStatus(it)
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             qrConnectDomain.getFailedCauseFlow().collect {
                 _qrState.update { state ->
                     state.copy(
@@ -134,7 +135,7 @@ class QrConnectViewModel @Inject constructor(
                 qrScanResult = qrContent
             )
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             qrConnectDomain.processScannedQR(qrContent)
         }
     }

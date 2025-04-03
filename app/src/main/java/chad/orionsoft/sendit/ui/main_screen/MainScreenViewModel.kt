@@ -21,6 +21,7 @@ import chad.orionsoft.sendit.work_manager.TcpSenderWorker
 import chad.orionsoft.sendit.work_manager.TcpServerWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -43,7 +44,7 @@ class MainScreenViewModel @Inject constructor(
     private val selectedItemsToSend : MutableList<MediaData> = mutableListOf()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             ConnectProcessRepository.connectionUpdateReceiver.collect {
                 _mainScreenState.update { state ->
                     state.copy(
@@ -111,7 +112,7 @@ class MainScreenViewModel @Inject constructor(
             }
 
             MainScreenEvent.DisconnectNow -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     qrConnectDomain.sendDisconnectSignal()
                 }
             }
@@ -199,7 +200,7 @@ class MainScreenViewModel @Inject constructor(
 
     private fun clearAllSelection() {
         selectedItemsToSend.clear()
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _clearAllSelectionFlow.emit(true)
         }
         _mainScreenState.update {
@@ -210,7 +211,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun receiveTransferSpeedFlow() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.transferSpeedFlow.collect {
                 // sending card logic
                 if(it.first <= 0) {
@@ -265,7 +266,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun receiveCurrentSendingCountFlow() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.sendingItemCountFlow.collectLatest {
                 val oldStatus = mainScreenState.value.sendingFlowInfo
                 val currentDetailsArray = oldStatus.transferItemDetail
@@ -283,7 +284,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun receiveCurrentReceivingCountFlow() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.receivingItemCountFlow.collectLatest {
                 val oldStatus = mainScreenState.value.receivingFlowInfo
                 val currentDetailsArray = oldStatus.transferItemDetail
@@ -303,7 +304,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun receiveCurrentSendingItemTitle() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.sendingItemTitleFlow.collectLatest {
                 val oldStatus = mainScreenState.value.sendingFlowInfo
                 val currentDetailsArray = oldStatus.transferItemDetail
@@ -321,7 +322,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun receiveCurrentReceivingItemTitle() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.receivingItemTitleFlow.collectLatest {
                 val oldStatus = mainScreenState.value.receivingFlowInfo
                 val currentDetailsArray = oldStatus.transferItemDetail
@@ -339,7 +340,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun receiveCurrentSendingProgress() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.sendingItemProgressPercFlow.collectLatest {
                 val oldStatus = mainScreenState.value.sendingFlowInfo
                 val newStatus = oldStatus.copy(
@@ -355,7 +356,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun receiveCurrentReceivingProgress() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.receivingItemProgressPercFlow.collectLatest {
                 val oldStatus = mainScreenState.value.receivingFlowInfo
                 val newStatus = oldStatus.copy(

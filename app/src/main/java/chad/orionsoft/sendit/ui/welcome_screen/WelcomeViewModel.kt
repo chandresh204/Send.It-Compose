@@ -10,6 +10,7 @@ import chad.orionsoft.sendit.ui.permission_screen.Android14PermissionChangeEvent
 import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -39,7 +40,7 @@ class WelcomeViewModel @Inject constructor(
             )
         }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 Android14PermissionChangeEvent.permissionFlow.collectLatest {
                     _uiState.update {  state ->
                         state.copy(

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.utils.Converters
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -22,7 +23,7 @@ class TransferMainViewModel : ViewModel() {
 
 
     private fun receiveSendingSpeedEvent() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.transferSpeedFlow.collectLatest { sentBytes ->
                 _tMainState.update {
                     it.copy(
@@ -40,7 +41,7 @@ class TransferMainViewModel : ViewModel() {
     }
 
     private fun receiveSendingCountEvent() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.sendingItemCountFlow.collectLatest { countNTotal ->
                 _tMainState.update {
                     it.copy(

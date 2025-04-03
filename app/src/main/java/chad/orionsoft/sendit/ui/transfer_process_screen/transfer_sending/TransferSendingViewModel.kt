@@ -7,6 +7,7 @@ import chad.orionsoft.sendit.model.TransferringMediaItem
 import chad.orionsoft.sendit.ui.transfer_process_screen.model.TransferItemUi
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -50,7 +51,7 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
     }
 
     private fun receiveSendingProgressUpdate() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.sendingItemProgressFlow.collectLatest { progressData ->
                 val itemToUpdate = _transferSendingState.value.sentList.find {
                     it.transferringMediaItem.id == progressData.id
@@ -75,7 +76,7 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
     }
 
     private fun receiveSendingStatusChanges() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.sendingItemStatusFlow.collect { newStatus ->
                 val itemToUpdate = _transferSendingState.value.sentList.find {
                     it.transferringMediaItem.id == newStatus.first
@@ -97,7 +98,7 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
     }
 
     private fun receiveSessionCleared() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.clearEverythingFlow.collect {
                 _transferSendingState.update {
                     it.copy(

@@ -10,6 +10,7 @@ import chad.orionsoft.sendit.ui.main_screen.MainScreenViewModel
 import chad.orionsoft.sendit.ui.model.MediaUiData
 import chad.orionsoft.sendit.utils.Converters
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +24,7 @@ class FileSelectViewModel @Inject constructor(
 
     val selectedMedia = mutableStateListOf<MediaUiData>()
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             MainScreenViewModel.clearAllSelectionReceiver.collect {
                 selectedMedia.clear()
             }
@@ -40,7 +41,7 @@ class FileSelectViewModel @Inject constructor(
                         val newMUIData = MediaUiData(mData, true, null)
                         selectedMedia.add(newMUIData)
                         // launch the thumbnail generate process async for this file
-                        viewModelScope.launch {
+                        viewModelScope.launch(Dispatchers.IO) {
                             val thumbBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                 thumbnailDomain.generateThumbnail(mData.uri)
                             } else {

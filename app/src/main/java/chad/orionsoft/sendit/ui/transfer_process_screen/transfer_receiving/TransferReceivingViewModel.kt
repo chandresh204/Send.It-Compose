@@ -8,6 +8,7 @@ import chad.orionsoft.sendit.domain.TransferProcessDomain
 import chad.orionsoft.sendit.model.TransferringMediaItem
 import chad.orionsoft.sendit.ui.transfer_process_screen.model.TransferItemUi
 import chad.orionsoft.sendit.utils.Converters
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -36,7 +37,7 @@ class TransferReceivingViewModel : ViewModel() {
     }
 
     private fun receiveProgressData() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.receivingItemProgressData.collectLatest { progress ->
                 val iToUpdate = _transferReceivingState.value.receiveList.find {
                     it.transferringMediaItem.id == progress.id
@@ -55,7 +56,7 @@ class TransferReceivingViewModel : ViewModel() {
     }
 
     private fun receiveStatusChange() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.receivingItemStatusFlow.collect { statusPair ->
                 val iToUpdate = _transferReceivingState.value.receiveList.find {
                     it.transferringMediaItem.id == statusPair.first
@@ -73,7 +74,7 @@ class TransferReceivingViewModel : ViewModel() {
     }
 
     private fun observeList() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.transferReceivingListFlow.collect { newItem ->
                 val newList = _transferReceivingState.value.receiveList.toMutableList()
                 if(newList.find {
@@ -87,7 +88,7 @@ class TransferReceivingViewModel : ViewModel() {
     }
 
     private fun receiveThumbnailUpdate() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.receivingItemThumbnailFlow.collect { thumbPair ->
                 val newList = _transferReceivingState.value.receiveList.toMutableList()
                 val iToUpdate = newList.find { it.transferringMediaItem.id == thumbPair.first }
@@ -123,7 +124,7 @@ class TransferReceivingViewModel : ViewModel() {
     }
 
     private fun receiveEverythingCleared() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             TransferProcessDomain.clearEverythingFlow.collect {
                 _transferReceivingState.update {
                     it.copy(
