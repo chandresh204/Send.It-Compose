@@ -1,7 +1,6 @@
 package chad.orionsoft.sendit.ui.about_screen
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,6 +36,7 @@ import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import chad.orionsoft.sendit.utils.Constants
 import chad.orionsoft.sendit.utils.IntentUtil
+import chad.orionsoft.sendit.BuildConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +87,7 @@ fun AboutScreen(onBack : () -> Unit) {
                 }
             }
             Spacer(modifier = Modifier.padding(8.dp))
-            Text(text = "App Version : ${Constants.APP_VERSION}")
+            Text(text = "App Version : ${BuildConfig.VERSION_NAME}")
         }
     }
 }
