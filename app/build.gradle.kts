@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "chad.orionsoft.sendit"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "chad.orionsoft.sendit"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 7
         versionName = "3.0.2"
 

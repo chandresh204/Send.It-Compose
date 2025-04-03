@@ -32,6 +32,13 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun encryptionTestHelloWorld() {
+        val qrString = "Hello, World!"
+        val output = EncryptionDecryption.encrypt(qrString)
+        assert(output == "7faniPkeIySAZfjSDsTgkQ==")
+    }
+
+    @Test
     fun empty_uri_thumbnail_file_name() {
         val emptyUri = ""
         val fileName = emptyUri.run {
