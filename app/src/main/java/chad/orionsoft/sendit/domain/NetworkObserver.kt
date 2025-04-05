@@ -19,7 +19,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class NetworkObserver @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
@@ -40,7 +42,6 @@ class NetworkObserver @Inject constructor(
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
             isWifiConnected = true
-//            getBroadcastAddressOfWifi()
             val linkProperties = connectivityManager.getLinkProperties(connectivityManager.activeNetwork)
             if(linkProperties != null) {
                 linkAddress = linkProperties.linkAddresses.find {
@@ -104,6 +105,10 @@ class NetworkObserver @Inject constructor(
                 if(!isWifiConnected) isOnHotspot()
             }
         }
+
         context.registerReceiver(apStateChangeReceiver, IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
+
+        // on newer android devices the broadcast not receiving in init so can not detect if the hotspot is on
+        if(!isWifiConnected) isOnHotspot()
     }
 }
