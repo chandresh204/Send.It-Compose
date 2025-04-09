@@ -107,8 +107,5 @@ class NetworkObserver @Inject constructor(
         }
 
         context.registerReceiver(apStateChangeReceiver, IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
-
-        // on newer android devices the broadcast not receiving in init so can not detect if the hotspot is on
-        if(!isWifiConnected) isOnHotspot()
     }
 }
