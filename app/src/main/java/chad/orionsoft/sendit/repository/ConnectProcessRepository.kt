@@ -216,7 +216,6 @@ class ConnectProcessRepository @Inject constructor(
         }
     }
 
-    // TODO use this method
     suspend fun pingConnectedDevice() {
         withContext(Dispatchers.IO) {
             try {

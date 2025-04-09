@@ -82,8 +82,8 @@ class TcpServerWorker @AssistedInject constructor(
                     )
                     Log.d(tag, "r1 >>> Receiving on tcp")
                     isTCPServerRunning = true
-                    serverSocket.soTimeout = 300000
                     recSocket = serverSocket.accept()
+                    recSocket.soTimeout = 300000
                     val inStream = recSocket.getInputStream()
                     while (inStream.available() == 0) {
                         delay(100)

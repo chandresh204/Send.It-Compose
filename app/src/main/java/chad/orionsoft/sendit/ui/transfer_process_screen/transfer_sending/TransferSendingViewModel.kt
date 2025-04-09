@@ -84,6 +84,7 @@ class TransferSendingViewModel @Inject constructor(): ViewModel() {
                 itemToUpdate?.let {
                     val itemList = _transferSendingState.value.sentList.toMutableList()
                     val index = itemList.indexOf(it)
+                    // TODO getting index -1 here
                     itemList[index] = itemList[index].copy(
                         status = newStatus.second
                     )
