@@ -158,7 +158,6 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                     }
                     item {
                         LaunchedEffect(true) {
-                            println("$mediaType >> loading more In Grid...")
                             vModel.loadMoreItemsToDisplay()
                         }
                     }

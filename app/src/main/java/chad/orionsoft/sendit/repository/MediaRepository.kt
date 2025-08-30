@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import chad.orionsoft.sendit.model.FileType
 import chad.orionsoft.sendit.model.MediaData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,10 +37,14 @@ class MediaRepository @Inject constructor(
                         var size = iCursor.getLong(sizeIndex)
                         val modified = iCursor.getLong(modifyIndex)
                         val pathData = iCursor.getString(mediaDataPath)
-                        if (size == 0L) {
-                            val iStream = context.contentResolver.openInputStream(uri)
-                            size = iStream?.available()?.toLong() ?: 0L
-                            iStream?.close()
+                        try {
+                            if (size == 0L) {
+                                val iStream = context.contentResolver.openInputStream(uri)
+                                size = iStream?.available()?.toLong() ?: 0L
+                                iStream?.close()
+                            }
+                        } catch (e: Exception) {
+                            Log.e("getImages", "exception on title: $title >> $e")
                         }
                         imagesList.add(MediaData(id, uri, title, null, -1, uri, size, modified,
                             FileType.FileTypeImage, pathData = pathData))
