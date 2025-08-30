@@ -1,15 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Send.It</string>
-    <string name="app_intro">Send.it allows you to easily share your media over a local network instead of the internet. This app requires a Wi-Fi connection to work. Both devices must be connected to the same Wi-Fi network and have Send.it installed.</string>
-    <string name="when_use_title">When should you use Send.it?</string>
-    <string name="when_use_desc">Use Send.it to send media files to a nearby Android device (and soon to desktop, too!). For example, if you\'ve captured high-quality videos that are too large to share easily, and you want to send them to someone nearby, you can use Send.it to share this data without losing quality. Since this process doesn’t require an internet connection, your data stays private, with no third-party servers involved—keeping all your privacy in your control.</string>
-    <string name="app_welcome">Welcome to Send.It</string>
-    <string name="app_setup_1">Before starting Send.it, there are a few things that need to be set up. Please provide the necessary details to get the best experience with Send.it.</string>
-    <string name="app_welcome_permission_explain">Send.it allows you to easily share media with nearby devices, so it requires permission to access your media, enabling you to select the content you want to share. Send.it is designed to keep your data private; it does not share any information with third-party servers and only transfers data over the local network. An active internet connection is not required for Send.it to work—both devices just need to be connected to the same Wi-Fi network, whether or not that network has internet access.</string>
-    <string name="android_14_permission_explain">Android 14 introduces Selected Photos and Videos Access, allowing you to grant Send.it access to specific images and videos on your device, rather than giving access to all media files of a certain type. This new feature is part of Android\'s ongoing efforts to enhance user privacy. It also affects how Send.it accesses your media. Since Send.it doesn\’t connect to any third-party server, your media isn\’t shared over the internet. You can choose to allow access to all media or select specific items, and you can add more photos or videos next time as needed.</string>
-    <string name="send_it_not_installed">If the other device doesn\’t have Send.it installed, share the installation link with them by clicking the button below.</string>
+    <string name="app_name">mTransmitter</string>
+    <string name="app_intro">mTransmitter allows you to easily share your media over a local network instead of the internet. This app requires a Wi-Fi connection to work. Both devices must be connected to the same Wi-Fi network and have mTransmitter installed.</string>
+    <string name="when_use_title">When should you use mTransmitter?</string>
+    <string name="when_use_desc">Use mTransmitter to send media files to a nearby Android device (and soon to desktop, too!). For example, if you\'ve captured high-quality videos that are too large to share easily, and you want to send them to someone nearby, you can use mTransmitter to share this data without losing quality. Since this process doesn’t require an internet connection, your data stays private, with no third-party servers involved—keeping all your privacy in your control.</string>
+    <string name="app_welcome">Welcome to mTransmitter</string>
+    <string name="app_setup_1">Before starting mTransmitter, there are a few things that need to be set up. Please provide the necessary details to get the best experience with mTransmitter.</string>
+    <string name="app_welcome_permission_explain">mTransmitter allows you to easily share media with nearby devices, so it requires permission to access your media, enabling you to select the content you want to share. mTransmitter is designed to keep your data private; it does not share any information with third-party servers and only transfers data over the local network. An active internet connection is not required for mTransmitter to work—both devices just need to be connected to the same Wi-Fi network, whether or not that network has internet access.</string>
+    <string name="android_14_permission_explain">Android 14 introduces Selected Photos and Videos Access, allowing you to grant mTransmitter access to specific images and videos on your device, rather than giving access to all media files of a certain type. This new feature is part of Android\'s ongoing efforts to enhance user privacy. It also affects how mTransmitter accesses your media. Since mTransmitter doesn\’t connect to any third-party server, your media isn\’t shared over the internet. You can choose to allow access to all media or select specific items, and you can add more photos or videos next time as needed.</string>
+    <string name="send_it_not_installed">If the other device doesn\’t have mTransmitter installed, share the installation link with them by clicking the button below.</string>
     <string name="share_this_app">Share This App</string>
-    <string name="share_app_message">Hello I\'m using Send.It to sharing my photos and videos with nearby devices, it\'s easy and quick. You can also try this, click on the link below to download it from the play store.</string>
+    <string name="share_app_message">Hello I\'m using mTransmitter to sharing my photos and videos with nearby devices, it\'s easy and quick. You can also try this, click on the link below to download it from the play store.</string>
     <string name="rate_app">Rate This App</string>
     <string name="device">Device</string>
     <string name="send">Send</string>
@@ -18,7 +18,7 @@
     <string name="received">Received</string>
     <string name="edit">Edit</string>
     <string name="done">Done</string>
-    <string name="welcome_to_send_it">Welcome To Send.It</string>
+    <string name="welcome_to_send_it">Welcome To mTransmitter</string>
     <string name="enter_name_to_continue">Please enter your name so others can identify you.</string>
     <string name="next">Next</string>
     <string name="save">Save</string>
@@ -47,11 +47,11 @@
 
     <string name="unknown">Unknown</string>
     <string name="scan_qr_hint">Connect to this device by Scanning the QR Code</string>
-    <string name="scan_qr_hint_no_own">Scan the Send.It QR code to connect</string>
+    <string name="scan_qr_hint_no_own">Scan the mTransmitter QR code to connect</string>
     <string name="scan_qr">Scan QR</string>
-    <string name="app_share_request">If other device does not have Send.It installed, Please tap on below button to share them the download link.</string>
-    <string name="not_send_it_qr_title">Not a Send.It QR</string>
-    <string name="not_send_it_qr_desc">The QR code you scanned was not generated by Send.It.</string>
+    <string name="app_share_request">If other device does not have mTransmitter installed, Please tap on below button to share them the download link.</string>
+    <string name="not_send_it_qr_title">Not a mTransmitter QR</string>
+    <string name="not_send_it_qr_desc">The QR code you scanned was not generated by mTransmitter.</string>
     <string name="now_connected">You\'re now connected with</string>
     <string name="failed_to_connect">Failed to connect</string>
     <string name="failed_to_connect_diff_wifi">This device is not in your wifi network, make sure you and %1$s are connected on same wifi network</string>
@@ -63,7 +63,7 @@
     <string name="available_space">Available Space</string>
     <string name="view_list">View List</string>
     <string name="wlan_connection_required">WLAN Connection Required</string>
-    <string name="wlan_explanation">To share files with other devices, Send.it requires both devices to be connected to the same Wi-Fi network. It appears that this device is currently not connected to any Wi-Fi network.</string>
+    <string name="wlan_explanation">To share files with other devices, mTransmitter requires both devices to be connected to the same Wi-Fi network. It appears that this device is currently not connected to any Wi-Fi network.</string>
     <string name="wlan_connect_to_wifi">Connect to same wifi network on which the other device is connected</string>
     <string name="wlan_create_network">Create your own WLAN network by turning on the mobile hotspot, and ask the other device to join your network.</string>
     <string name="button_connect_to_wifi">Connect To Wifi</string>
@@ -97,7 +97,7 @@
     <string name="video_s">Video(s)</string>
 
     <string name="permission_not_granted">Permission Not Granted</string>
-    <string name="request_permission_text">Send.It can not access media files if the permission is not granted, click on the allow button to provide permission</string>
+    <string name="request_permission_text">mTransmitter can not access media files if the permission is not granted, click on the allow button to provide permission</string>
 
     <string name="setting_name_title">Your Name</string>
     <string name="setting_name_desc">Other devices will see you as</string>
