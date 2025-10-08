@@ -86,7 +86,7 @@ fun SenderFileSelect(
             }) {  index ->
                 val media = selectedList[index]
                 MediaItemViewBar(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier,
                     isSelected = false,
                     thumbnail = media.thumbnailBitmap,
                     placeHolder = Converters.getPlaceHolderIconsAsPerFileName(media.mediaData.title),
