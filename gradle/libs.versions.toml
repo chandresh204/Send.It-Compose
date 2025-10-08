@@ -19,6 +19,7 @@ gson="2.13.2"
 zxing = "3.5.3"
 zxingAndroidEmbedded = "4.3.0"
 inAppUpdate="2.1.0"
+play-service-code-scanner= "16.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ gson= {group = "com.google.code.gson", name = "gson" , version.ref = "gson"}
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing"}
 zxing-android-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingAndroidEmbedded"}
 play-app-update = { group="com.google.android.play", name = "app-update-ktx", version.ref = "inAppUpdate" }
+play-services-code-scanner = { group = "com.google.android.gms", name = "play-services-code-scanner", version.ref = "play-service-code-scanner"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

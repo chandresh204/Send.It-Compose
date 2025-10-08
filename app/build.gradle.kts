@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.zxing.core)
     implementation(libs.zxing.android.embedded)
     implementation(libs.play.app.update)
+    implementation(libs.play.services.code.scanner)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.hilt.work.compiler)
     testImplementation(libs.junit)

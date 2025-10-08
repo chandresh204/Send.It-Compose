@@ -63,8 +63,10 @@ import chad.orionsoft.sendit.ui.bottom_sheets.WLANConnectionRequiredBottomSheet
 import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.utils.IntentUtil
 import chad.orionsoft.sendit.utils.RuntimeConstants
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -161,17 +163,18 @@ private fun NotConnectedScreen(
     qrResult : String?,
     processQrScanned: (String) -> Unit
 ) {
-    Log.d("ScanQr", "Result >>> $qrResult")
+
     val context = LocalContext.current
-    val scanLauncher = rememberLauncherForActivityResult(
-        contract = ScanContract(),
-        onResult = { result ->
-            println("scan result >>>> ${result.contents}")
-            result?.contents?.let {
-                processQrScanned(result.contents)
-            }
-        }
-    )
+    val scanner = remember {
+        val options = GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                Barcode.FORMAT_QR_CODE
+            )
+            .enableAutoZoom() // available on 16.1.0 and higher
+            .build()
+
+        GmsBarcodeScanning.getClient(context, options)
+    }
     Column(modifier = modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState()),
@@ -220,7 +223,21 @@ private fun NotConnectedScreen(
         }
         Spacer(modifier = Modifier.padding(16.dp))
         Button(onClick = {
-            scanLauncher.launch(ScanOptions())
+            scanner.startScan()
+                .addOnSuccessListener { barcode ->
+                    // Task completed successfully
+                    val rawValue: String? = barcode.rawValue
+                    Log.d("Barcode value", "$rawValue")
+                    processQrScanned(rawValue ?: "")
+                }
+                .addOnCanceledListener {
+                    Log.e("Barcode", "Cancelled" )
+                    // Task canceled
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Barcode", "Failure >>> $e" )
+                    // Task failed with an exception
+                }
         }) {
             Text(text = stringResource(R.string.scan_qr))
         }
