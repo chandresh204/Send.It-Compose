@@ -15,6 +15,7 @@ import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.graphics.createBitmap
 
 @Singleton
 class QRConnectDomain @Inject constructor(
@@ -54,7 +56,12 @@ class QRConnectDomain @Inject constructor(
 
     fun getQRBitmap(msg: String, size : Int) : Bitmap? {
         val result = try {
-            MultiFormatWriter().encode(msg, BarcodeFormat.QR_CODE, size, size)
+            MultiFormatWriter().encode(
+                msg,
+                BarcodeFormat.QR_CODE,
+                size,
+                size,
+                mapOf<EncodeHintType, String>(EncodeHintType.CHARACTER_SET to "UTF-8"))
         } catch (e: Exception) {
             Log.e("getQRBitmap", "$e")
             return null
@@ -71,7 +78,7 @@ class QRConnectDomain @Inject constructor(
             }
         }
 
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(w, h)
         bitmap.setPixels(pixels, 0,size, 0,0,w,h)
         return bitmap
     }
