@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.common_media_screen
 
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import chad.orionsoft.sendit.R
 import chad.orionsoft.sendit.domain.StartActivity
@@ -35,6 +37,7 @@ import chad.orionsoft.sendit.ui.components.MediaItemAddGrid
 import chad.orionsoft.sendit.ui.components.MediaItemViewBar
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
 import chad.orionsoft.sendit.ui.components.NoPermissionView
+import chad.orionsoft.sendit.ui.dialogs.VideoPlayerDialog
 import chad.orionsoft.sendit.utils.Converters
 
 @Composable
@@ -51,6 +54,9 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
     val context = LocalContext.current
     var isPermissionPermanentlyDenied by remember {
         mutableStateOf(false)
+    }
+    var playVideoData : VideoPlayerData? by remember {
+        mutableStateOf(null)
     }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         Log.d("OnPermission", "$it")
@@ -75,18 +81,31 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
         }
         return
     }
+    if(playVideoData != null) {
+        Dialog(onDismissRequest = {
+            playVideoData = null
+        }) {
+            playVideoData?.let {
+                VideoPlayerDialog(it.uri, it.title) {
+                    playVideoData = null
+                }
+            }
+        }
+    }
     Column {
-        when(screenState.viewMode) {
+        when (screenState.viewMode) {
             ViewMode.ByNameInList -> {
-                LazyColumn(modifier = modifier
-                    .weight(1f)
-                    .fillMaxSize()) {
+                LazyColumn(
+                    modifier = modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                ) {
                     items(mediaList.size) { index ->
                         val media = mediaList[index]
                         MediaItemViewBar(
                             isSelected = media.selected,
                             thumbnail = media.thumbnailBitmap,
-                            placeHolder = when(mediaType) {
+                            placeHolder = when (mediaType) {
                                 FileType.FileTypeImage -> R.drawable.image_24px
                                 FileType.FileTypeAudio -> R.drawable.music_note_24px
                                 FileType.FileTypeVideo -> R.drawable.play_circle_24px
@@ -98,13 +117,17 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                             actionIconVector = Icons.Default.PlayArrow,
                             actionIconDrawableRes = null,
                             onActionClick = {
-                                StartActivity.openFile(context, media.mediaData.title, media.mediaData.uri)
+                                StartActivity.openFile(
+                                    context,
+                                    media.mediaData.title,
+                                    media.mediaData.uri
+                                )
                             }) {
                             onItemSelectedChanged(media.mediaData, !media.selected)
                             vModel.changeItemSelection(index)
                         }
                     }
-                    if(screenState.permissionType == PermissionType.PartialAccess) {
+                    if (screenState.permissionType == PermissionType.PartialAccess) {
                         item {
                             MediaItemAddGrid(onClick = navTo14Permission)
                         }
@@ -120,6 +143,7 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                     }
                 }
             }
+
             ViewMode.ByLastModifiedInGrid -> {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(100.dp),
@@ -141,17 +165,23 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                             actionIconDrawableRes = if (mediaType == FileType.FileTypeImage)
                                 R.drawable.visibility_24px else R.drawable.play_arrow_24px,
                             onActionClick = {
-                                StartActivity.openFile(
-                                    context,
-                                    media.mediaData.title,
-                                    media.mediaData.uri
-                                )
+                                if (media.mediaData.mediaType == FileType.FileTypeVideo) {
+                                    playVideoData = VideoPlayerData(
+                                        media.mediaData.title, media.mediaData.uri,
+                                    )
+                                } else {
+                                    StartActivity.openFile(
+                                        context,
+                                        media.mediaData.title,
+                                        media.mediaData.uri
+                                    )
+                                }
                             }) {
                             vModel.changeItemSelection(index)
                             onItemSelectedChanged(media.mediaData, !media.selected)
                         }
                     }
-                    if(screenState.permissionType == PermissionType.PartialAccess) {
+                    if (screenState.permissionType == PermissionType.PartialAccess) {
                         item {
                             MediaItemAddGrid(onClick = navTo14Permission)
                         }
@@ -167,10 +197,17 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                 }
             }
         }
-        if(mediaList.isEmpty() && screenState.permissionType != PermissionType.PartialAccess) {
-            Box(modifier = Modifier.fillMaxWidth().height(200.dp)) {
-                Text("Nothing here!", modifier = Modifier.align(Alignment.Center))
-            }
+    }
+    if(mediaList.isEmpty() && screenState.permissionType != PermissionType.PartialAccess) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)) {
+            Text("Nothing here!", modifier = Modifier.align(Alignment.Center))
         }
     }
 }
+
+data class VideoPlayerData(
+    val title: String,
+    val uri: Uri
+)
