@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit.ui.common_media_screen
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -37,6 +38,7 @@ import chad.orionsoft.sendit.ui.components.MediaItemAddGrid
 import chad.orionsoft.sendit.ui.components.MediaItemViewBar
 import chad.orionsoft.sendit.ui.components.MediaItemViewGrid
 import chad.orionsoft.sendit.ui.components.NoPermissionView
+import chad.orionsoft.sendit.ui.dialogs.AudioPlayerDialog
 import chad.orionsoft.sendit.ui.dialogs.VideoPlayerDialog
 import chad.orionsoft.sendit.utils.Converters
 
@@ -56,6 +58,9 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
         mutableStateOf(false)
     }
     var playVideoData : VideoPlayerData? by remember {
+        mutableStateOf(null)
+    }
+    var playAudioData : AudioPlayerData? by remember {
         mutableStateOf(null)
     }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -92,6 +97,19 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
             }
         }
     }
+    if(playAudioData != null) {
+        Dialog(onDismissRequest = {
+            playAudioData = null
+        }) {
+            playAudioData?.let {
+                AudioPlayerDialog(
+                    it.uri, it.albumArt, it.title
+                ) {
+                    playAudioData = null
+                }
+            }
+        }
+    }
     Column {
         when (screenState.viewMode) {
             ViewMode.ByNameInList -> {
@@ -117,11 +135,25 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                             actionIconVector = Icons.Default.PlayArrow,
                             actionIconDrawableRes = null,
                             onActionClick = {
-                                StartActivity.openFile(
-                                    context,
-                                    media.mediaData.title,
-                                    media.mediaData.uri
-                                )
+                                when(media.mediaData.mediaType) {
+                                    FileType.FileTypeAudio -> {
+                                        playAudioData = AudioPlayerData(
+                                            media.mediaData.title, media.thumbnailBitmap, media.mediaData.uri
+                                        )
+                                    }
+                                    FileType.FileTypeVideo -> {
+                                        playVideoData = VideoPlayerData(
+                                            media.mediaData.title, media.mediaData.uri,
+                                        )
+                                    }
+                                    else -> {
+                                        StartActivity.openFile(
+                                            context,
+                                            media.mediaData.title,
+                                            media.mediaData.uri
+                                        )
+                                    }
+                                }
                             }) {
                             onItemSelectedChanged(media.mediaData, !media.selected)
                             vModel.changeItemSelection(index)
@@ -165,16 +197,24 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                             actionIconDrawableRes = if (mediaType == FileType.FileTypeImage)
                                 R.drawable.visibility_24px else R.drawable.play_arrow_24px,
                             onActionClick = {
-                                if (media.mediaData.mediaType == FileType.FileTypeVideo) {
-                                    playVideoData = VideoPlayerData(
-                                        media.mediaData.title, media.mediaData.uri,
-                                    )
-                                } else {
-                                    StartActivity.openFile(
-                                        context,
-                                        media.mediaData.title,
-                                        media.mediaData.uri
-                                    )
+                                when(media.mediaData.mediaType) {
+                                    FileType.FileTypeAudio -> {
+                                        playAudioData = AudioPlayerData(
+                                            media.mediaData.title, media.thumbnailBitmap, media.mediaData.uri
+                                        )
+                                    }
+                                    FileType.FileTypeVideo -> {
+                                        playVideoData = VideoPlayerData(
+                                            media.mediaData.title, media.mediaData.uri,
+                                        )
+                                    }
+                                    else -> {
+                                        StartActivity.openFile(
+                                            context,
+                                            media.mediaData.title,
+                                            media.mediaData.uri
+                                        )
+                                    }
                                 }
                             }) {
                             vModel.changeItemSelection(index)
@@ -210,4 +250,10 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
 data class VideoPlayerData(
     val title: String,
     val uri: Uri
+)
+
+data class AudioPlayerData(
+    val title: String,
+    val albumArt : Bitmap?,
+    val uri : Uri
 )
