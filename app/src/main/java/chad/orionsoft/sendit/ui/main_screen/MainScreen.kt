@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui.main_screen
 
 import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -144,6 +145,10 @@ fun MainScreen(sharedIntent: Intent?,
                 onAppIconClick = {
                     gotoScreen(NavigationConstants.NAV_ABOUT_SCREEN)
                 },
+                onViewImage = {
+                    val uriEncode = Uri.encode(it.toString())
+                    gotoScreen("${NavigationConstants.NAV_FULL_SCREEN_IMAGE}/$uriEncode")
+                },
                 onNavTo14Permission = {
                     gotoScreen(NavigationConstants.NAV_14_PERMISSION_SCREEN)
                 }
@@ -233,6 +238,7 @@ private fun ScreenContent(modifier: Modifier = Modifier,
                           onMenuClick: () -> Unit,
                           onAppIconClick: () -> Unit,
                           onNavTo14Permission : () -> Unit,
+                          onViewImage: (Uri) -> Unit,
                           onMediaSelected : (MediaData, Boolean) -> Unit) {
     val pagerState = rememberPagerState {
         4
@@ -255,7 +261,7 @@ private fun ScreenContent(modifier: Modifier = Modifier,
             when (it) {
                 0 -> {
                     CommonMediaTabContent(
-                        mediaType = FileType.FileTypeImage, navTo14Permission = onNavTo14Permission, onItemSelectedChanged = onMediaSelected)
+                        mediaType = FileType.FileTypeImage, navTo14Permission = onNavTo14Permission, viewImage = onViewImage ,onItemSelectedChanged = onMediaSelected)
                 }
 
                 1 -> {

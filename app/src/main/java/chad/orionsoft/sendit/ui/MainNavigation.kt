@@ -24,6 +24,7 @@ import chad.orionsoft.sendit.ui.welcome_screen.WelcomeScreen
 import chad.orionsoft.sendit.utils.ColorConstants
 import chad.orionsoft.sendit.utils.Converters
 import chad.orionsoft.sendit.utils.NavigationConstants
+import androidx.core.net.toUri
 
 @Composable
 fun MainNavigation(sharedIntent : Intent?,
@@ -72,7 +73,9 @@ fun MainNavigation(sharedIntent : Intent?,
         ) {
             val arg = it.arguments?.getString(NavigationConstants.FULL_SCREEN_IMG_URI)
             val decodedPath = Converters.decodeUriPath(arg ?: "")
-            FullScreenImage(decodedPath)
+            FullScreenImage(decodedPath.toUri()) {
+                navController.popBackStack()
+            }
         }
         composable(
             route = NavigationConstants.NAV_TRANSFER_PROGRESS_SCREEN +

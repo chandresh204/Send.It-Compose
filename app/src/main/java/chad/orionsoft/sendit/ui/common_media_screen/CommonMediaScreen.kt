@@ -46,6 +46,7 @@ import chad.orionsoft.sendit.utils.Converters
 fun CommonMediaTabContent(modifier: Modifier = Modifier,
                           mediaType: FileType,
                           navTo14Permission: () -> Unit,
+                          viewImage : (Uri) -> Unit = {},
                           onItemSelectedChanged: (MediaData, Boolean) -> Unit) {
     val vModel : CommonMediaScreenViewModel = hiltViewModel(
         creationCallback = { factory : CommonMediaScreenViewModel.CommonMediaViewModelFactory ->
@@ -146,6 +147,9 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                                             media.mediaData.title, media.mediaData.uri,
                                         )
                                     }
+                                    FileType.FileTypeImage -> {
+                                        viewImage(media.mediaData.uri)
+                                    }
                                     else -> {
                                         StartActivity.openFile(
                                             context,
@@ -207,6 +211,9 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                                         playVideoData = VideoPlayerData(
                                             media.mediaData.title, media.mediaData.uri,
                                         )
+                                    }
+                                    FileType.FileTypeImage -> {
+                                        viewImage(media.mediaData.uri)
                                     }
                                     else -> {
                                         StartActivity.openFile(
