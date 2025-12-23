@@ -28,8 +28,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun WLANConnectionRequiredBottomSheet(
     onDismiss: () -> Unit,
+    skipHotspot: () -> Unit,
     connectToWifiClick: () -> Unit,
-    createNetworkClick: () -> Unit
+    createNetworkClick: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
@@ -67,8 +68,11 @@ fun WLANConnectionRequiredBottomSheet(
                     text = stringResource(id = R.string.button_create_network), tint = MaterialTheme.colorScheme.primary)
             }
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
-            TextButton(onClick = closeNow) {
-                Text(text = stringResource(R.string.abort_for_now), color = MaterialTheme.colorScheme.error)
+            TextButton(onClick = {
+                skipHotspot()
+                closeNow()
+            }) {
+                Text(text = stringResource(R.string.my_hotspot_is_on), color = MaterialTheme.colorScheme.error)
             }
             Spacer(modifier = Modifier.padding(vertical = 9.dp))
         }

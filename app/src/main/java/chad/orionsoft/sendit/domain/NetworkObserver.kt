@@ -42,19 +42,16 @@ class NetworkObserver @Inject constructor(
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
             isWifiConnected = true
-            val linkProperties = connectivityManager.getLinkProperties(connectivityManager.activeNetwork)
-            if(linkProperties != null) {
-                linkAddress = linkProperties.linkAddresses.find {
-                    it.toString().contains("192.168")
-                }.toString()
+            val linkAdd = getLinkAddressOnWifi()
+            if(!linkAdd.isNullOrEmpty()) {
+                linkAddress = linkAdd
                 Log.d("Link Properties", "Link Address: $linkAddress")
+                ioScope.launch {
+                    _networkStatus.send(ConnectStatus.OnWifi)
                 }
-            ioScope.launch {
-                _networkStatus.send(ConnectStatus.OnWifi)
+                Log.d(tag, "Connected")
             }
-            Log.d(tag, "Connected")
         }
-
 
         // lost network connection
         override fun onLost(network: Network) {
@@ -68,6 +65,35 @@ class NetworkObserver @Inject constructor(
     private val networkRequest = NetworkRequest.Builder()
         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
         .build()
+
+    init {
+        val linkAdd = getLinkAddressOnWifi()
+        if(!linkAdd.isNullOrEmpty()) {
+            linkAddress = linkAdd
+            Log.d("Link Properties", "Link Address: $linkAddress")
+        } else {
+            Log.d("Link Properties", "not available")
+        }
+        connectivityManager.requestNetwork(networkRequest, networkCallback)
+        val apStateChangeReceiver = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                if(!isWifiConnected) isOnHotspot()
+            }
+        }
+
+        context.registerReceiver(apStateChangeReceiver, IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
+    }
+
+    private fun getLinkAddressOnWifi() : String? {
+        val linkProperties = connectivityManager.getLinkProperties(connectivityManager.activeNetwork)
+        linkProperties?.let { prop ->
+            return prop.linkAddresses.find {
+                it.toString().startsWith("192.168") ||
+                        it.toString().startsWith("10.")
+            }?.toString()
+        }
+        return null
+    }
 
     private fun isOnHotspot() {
         val wManager = context.getSystemService(WIFI_SERVICE) as WifiManager
@@ -87,25 +113,4 @@ class NetworkObserver @Inject constructor(
     }
 
     fun getWifiAddress() = linkAddress
-
-    init {
-        val linkProperties = connectivityManager.getLinkProperties(connectivityManager.activeNetwork)
-        if(linkProperties != null) {
-            linkAddress = linkProperties.linkAddresses.find {
-                it.toString().contains("192.168")
-            }.toString()
-            Log.d("Link Properties", "Link Address: $linkAddress")
-        } else {
-            Log.d("Link Properties", "not available")
-        }
-        connectivityManager.requestNetwork(networkRequest, networkCallback)
-
-        val apStateChangeReceiver = object : BroadcastReceiver() {
-            override fun onReceive(p0: Context?, p1: Intent?) {
-                if(!isWifiConnected) isOnHotspot()
-            }
-        }
-
-        context.registerReceiver(apStateChangeReceiver, IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
-    }
 }

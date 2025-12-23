@@ -66,7 +66,6 @@ import chad.orionsoft.sendit.utils.RuntimeConstants
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
-import com.journeyapps.barcodescanner.ScanContract
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,6 +116,7 @@ fun QrConnectScreen(vModel : QrConnectViewModel = hiltViewModel(), onBack: () ->
                 vModel.performNetworkGoneOperations()
                 WLANConnectionRequiredBottomSheet(
                     onDismiss = onBack,
+                    skipHotspot = { vModel.assumeHotSpotIsOn() },
                     connectToWifiClick = {
                         StartActivity.openWifiSettings(context)
                     }) {

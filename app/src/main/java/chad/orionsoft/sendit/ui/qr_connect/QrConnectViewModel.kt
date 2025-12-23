@@ -148,6 +148,14 @@ class QrConnectViewModel @Inject constructor(
         }
     }
 
+    fun assumeHotSpotIsOn() {
+        _qrState.update {
+            it.copy(
+                connectStatus = ConnectStatus.OnHotspot
+            )
+        }
+    }
+
     fun performNetworkGoneOperations() {
         qrConnectDomain.stopAllUdpProcess()
     }

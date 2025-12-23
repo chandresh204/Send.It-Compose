@@ -71,7 +71,6 @@
     <string name="add_files_manually">Click on the + button to select the files manually</string>
     <string name="turn_on_hotspot">Please turn on Mobile Hotspot</string>
     <string name="an_error_occurred">An Error Occurred</string>
-    <string name="abort_for_now">Abort For Now</string>
     <string name="app_settings">Settings</string>
     <string name="goto_settings">Go To Settings</string>
 
@@ -108,4 +107,5 @@
     <string name="setting_color_desc">This is the primary color of your app, but connected device will also show your color in some UI elements</string>
 
     <string name="delete_file">Are you sure to delete this file?</string>
+    <string name="my_hotspot_is_on">Hotspot is already on</string>
 </resources>
