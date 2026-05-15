@@ -33,11 +33,16 @@ object FileIOOperations {
                 exists=true
         }
         return if(exists) {
-            val lastIndexOfName = filename.lastIndexOf(".")
-            val file1= filename.substring(0,lastIndexOfName)
-            val ext = filename.substring(lastIndexOfName)
-            File(saveDir,"$file1(1)$ext")
-            provideFile("$file1(1)$ext")
+            val lastIndexOfDot = filename.lastIndexOf(".")
+            if(lastIndexOfDot < 0) {
+                File(saveDir, "$filename(1)")
+                provideFile("$filename(1)")
+            } else {
+                val file1 = filename.substring(0, lastIndexOfDot)
+                val ext = filename.substring(lastIndexOfDot)
+                File(saveDir, "$file1(1)$ext")
+                provideFile("$file1(1)$ext")
+            }
         } else {
             File(saveDir,filename)
         }

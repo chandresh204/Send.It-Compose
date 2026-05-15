@@ -145,7 +145,9 @@ object Converters {
     }
 
     fun getPlaceHolderIconsAsPerFileName(filename: String) : Int {
-        val extension = filename.substring(filename.lastIndexOf(".")).lowercase()
+        val lastIndexOfDot = filename.lastIndexOf(".")
+        if (lastIndexOfDot < 0) return R.drawable.file_present_24px
+        val extension = filename.substring(lastIndexOfDot).lowercase()
         return when {
             Constants.audioExtensions.contains(extension) -> R.drawable.music_note_24px
             Constants.imageExtensions.contains(extension) -> R.drawable.image_24px
@@ -163,6 +165,8 @@ object Converters {
     }
 
     fun getFileTypeFromFileName(filename: String) : FileType {
+        val lastIndexOfDot = filename.lastIndexOf(".")
+        if(lastIndexOfDot < 0) return FileType.FileTypeOther
         val extension = filename.substring(filename.lastIndexOf(".")).lowercase()
         return when {
             Constants.audioExtensions.contains(extension) -> FileType.FileTypeAudio
@@ -173,6 +177,8 @@ object Converters {
     }
 
     fun getMimeTypeFromFileName(filename: String) : String {
+        val lastIndexOfDot = filename.lastIndexOf(".")
+        if(lastIndexOfDot < 0) return "*/*"
         val extension = filename.substring(filename.lastIndexOf(".")).lowercase()
         return when {
             Constants.audioExtensions.contains(extension) -> "audio/*"
