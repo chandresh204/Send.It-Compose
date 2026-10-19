@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.ksp)
@@ -16,12 +15,12 @@ kotlin {
 
 android {
     namespace = "chad.orionsoft.sendit"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "chad.orionsoft.sendit"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 12
         versionName = "3.0.7"
 
@@ -66,6 +65,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation)
     implementation(libs.androidx.hilt.compose)
     implementation(libs.androidx.hilt.android)

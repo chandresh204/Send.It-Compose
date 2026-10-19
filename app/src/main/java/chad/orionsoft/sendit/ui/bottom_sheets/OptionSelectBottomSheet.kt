@@ -36,7 +36,7 @@ import chad.orionsoft.sendit.ui.theme.SendItTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> OptionSelectBottomSheet(
     title: String,
@@ -45,9 +45,8 @@ fun <T> OptionSelectBottomSheet(
     onSelectOption: (T) -> Unit,
     onCancel: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        confirmValueChange = {false}
-    )
+    val sheetState = rememberModalBottomSheetState()
+
     var selectedOption1 by remember {
         mutableStateOf(selectedOption)
     }

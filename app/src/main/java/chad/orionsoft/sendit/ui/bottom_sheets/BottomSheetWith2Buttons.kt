@@ -26,6 +26,7 @@ import chad.orionsoft.sendit.ui.components.TextWithIcon
 import chad.orionsoft.sendit.ui.theme.SendItTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,14 +39,12 @@ fun BottomSheetWith2Buttons(
     negativeButtonClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        confirmValueChange = { false }
-    )
+    val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     val hideAndCloseSheet : (action: () -> Unit) -> Unit = {
         coroutineScope.launch {
             sheetState.hide()
-            delay(500)
+            delay(500.milliseconds)
             it()
             onDismiss()
         }

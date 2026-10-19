@@ -33,8 +33,7 @@ fun WLANConnectionRequiredBottomSheet(
     createNetworkClick: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-        confirmValueChange = { false }
+        skipPartiallyExpanded = true
     )
     val coroutineScope = rememberCoroutineScope()
     val closeNow : () -> Unit = {
