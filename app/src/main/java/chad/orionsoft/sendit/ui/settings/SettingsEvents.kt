@@ -6,4 +6,6 @@ sealed class SettingsEvents {
     data class OnNameEdited(val newString: String) : SettingsEvents()
     data class OnAppColorSelected(val colorConstants: ColorConstants) : SettingsEvents()
     data object OnSettingSave : SettingsEvents()
+    data object OnShareLogs : SettingsEvents()
+    data class OnDeveloperOptionChanged(val isChecked: Boolean) : SettingsEvents()
 }

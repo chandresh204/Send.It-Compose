@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
+import chad.orionsoft.sendit.domain.AppLogger
 import chad.orionsoft.sendit.domain.PermissionDomain
 import chad.orionsoft.sendit.repository.MediaRepository
 import chad.orionsoft.sendit.ui.common_media_screen.PermissionType
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class Android14PermissionViewModel @Inject constructor(
     private val permissionDomain: PermissionDomain,
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    private val appLogger: AppLogger
 ) : ViewModel() {
 
     private val _pState = MutableStateFlow(PermissionState())
@@ -58,6 +60,7 @@ class Android14PermissionViewModel @Inject constructor(
                         } else PermissionType.NoPermission
                     )
                 }
+                appLogger.log("Permission event : isAudio : $audioPermission, partialAccessPermission: $partialAccessPermission")
                 if(audioPermission == true && partialAccessPermission == true) {
                     Android14PermissionChangeEvent.updateAndroid14PermissionState(PermissionType.PartialAccess)
                     obtainMediaCountsIfPermission()

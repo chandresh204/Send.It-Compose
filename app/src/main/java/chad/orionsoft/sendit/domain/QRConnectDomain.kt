@@ -30,7 +30,8 @@ class QRConnectDomain @Inject constructor(
     private val networkObserver: NetworkObserver,
     private val preferenceRepository: PreferenceRepository,
     private val connectProcessRepository: ConnectProcessRepository,
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    private val appLogger: AppLogger
 ) {
 
     private var udpServerPortForThisSession : String? = RuntimeConstants.generateRandomCode(4)
@@ -49,7 +50,6 @@ class QRConnectDomain @Inject constructor(
             val qrJson = gson.toJson(qrCode, QRCodeData::class.java)
             val encryptedQrData = EncryptionDecryption.encrypt(qrJson)
             qrString = Constants.APP_CODE + "-" + encryptedQrData
-            println("qr >>> $qrString")
         }
         return qrString
     }
@@ -64,6 +64,7 @@ class QRConnectDomain @Inject constructor(
                 mapOf<EncodeHintType, String>(EncodeHintType.CHARACTER_SET to "UTF-8"))
         } catch (e: Exception) {
             Log.e("getQRBitmap", "$e")
+            appLogger.log("getQRBitmap : $e", LogType.Error)
             return null
         }
 
@@ -99,7 +100,7 @@ class QRConnectDomain @Inject constructor(
         try {
             val qrCodeDataEncrypted = qrContent.substring(startIndex = (qrContent.indexOf("-") + 1))
             val qrCodeDataJson = EncryptionDecryption.decrypt(qrCodeDataEncrypted)
-            println("Qr code json = $qrCodeDataJson")
+            appLogger.log("processScannedQR : $qrCodeDataJson")
             val qrCodeData = Gson().fromJson(qrCodeDataJson, QRCodeData::class.java)
             val theirVersion = qrCodeData.appVersion
             val userName = qrCodeData.userName
@@ -110,6 +111,7 @@ class QRConnectDomain @Inject constructor(
                         context.getString(R.string.failed_to_connect_low_version, userName))
                     )
                 }
+                appLogger.log("Failed to connect using lower version", LogType.Error)
                 return
             }
             val deviceType = qrCodeData.deviceType
@@ -118,12 +120,9 @@ class QRConnectDomain @Inject constructor(
             connectProcessRepository.updateConnectStatus(ConnectStatus.ConnectingDevice.also {
                 it.msg = userName
             })
-            println("Scanned >>>> Name : $userName")
             val ipAddress = qrCodeData.address
             val port = qrCodeData.port
-            println("Scanned >>>> Ip Address : $ipAddress:$port")
             val theirColor = qrCodeData.color
-            println("Scanned >>>> Color : $theirColor")
             RuntimeConstants.theirColor = Converters.convertStringToColor(theirColor)
             // My Details
             val myUserName = RuntimeConstants.createMyUserName(preferenceRepository)
@@ -144,6 +143,7 @@ class QRConnectDomain @Inject constructor(
                             qrConnectResult.failureTitleAndMessage)
                     )
                 }
+                appLogger.log("processScannedQR : failed to connect : ${qrConnectResult.failureTitleAndMessage}")
             }
         } catch (e:Exception) {
             Log.e("QrCodeScanned", "Exception : $e")
@@ -154,8 +154,8 @@ class QRConnectDomain @Inject constructor(
                         context.getString(R.string.something_went_wrong))
                 )
             }
+            appLogger.log("processScannedQR : failed to connect : $e")
         }
-
     }
 
     suspend fun sendDisconnectSignal() {

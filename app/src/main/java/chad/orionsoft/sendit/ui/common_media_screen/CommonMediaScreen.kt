@@ -189,7 +189,6 @@ fun CommonMediaTabContent(modifier: Modifier = Modifier,
                 ) {
                     items(mediaList.size) { index ->
                         val media = mediaList[index]
-                        println("$mediaType >>> updating $index")
                         MediaItemViewGrid(
                             isSelected = media.selected,
                             thumbnail = media.thumbnailBitmap,

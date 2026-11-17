@@ -6,7 +6,7 @@
     <string name="app_welcome">Welcome to mTransmitter</string>
     <string name="app_setup_1">Before starting mTransmitter, there are a few things that need to be set up. Please provide the necessary details to get the best experience with mTransmitter.</string>
     <string name="app_welcome_permission_explain">mTransmitter allows you to easily share media with nearby devices, so it requires permission to access your media, enabling you to select the content you want to share. mTransmitter is designed to keep your data private; it does not share any information with third-party servers and only transfers data over the local network. An active internet connection is not required for mTransmitter to work—both devices just need to be connected to the same Wi-Fi network, whether or not that network has internet access.</string>
-    <string name="android_14_permission_explain">Android 14 introduces Selected Photos and Videos Access, allowing you to grant mTransmitter access to specific images and videos on your device, rather than giving access to all media files of a certain type. This new feature is part of Android\'s ongoing efforts to enhance user privacy. It also affects how mTransmitter accesses your media. Since mTransmitter doesn\’t connect to any third-party server, your media isn\’t shared over the internet. You can choose to allow access to all media or select specific items, and you can add more photos or videos next time as needed.</string>
+    <string name="android_14_permission_explain">Android 14+ introduces Selected Photos and Videos Access, allowing you to grant mTransmitter access to specific images and videos on your device, rather than giving access to all media files of a certain type. This new feature is part of Android\'s ongoing efforts to enhance user privacy. It also affects how mTransmitter accesses your media. Since mTransmitter doesn\’t connect to any third-party server, your media isn\’t shared over the internet. You can choose to allow access to all media or select specific items, and you can add more photos or videos next time as needed.</string>
     <string name="send_it_not_installed">If the other device doesn\’t have mTransmitter installed, share the installation link with them by clicking the button below.</string>
     <string name="share_this_app">Share This App</string>
     <string name="share_app_message">Hello I\'m using mTransmitter to sharing my photos and videos with nearby devices, it\'s easy and quick. You can also try this, click on the link below to download it from the play store.</string>
@@ -105,6 +105,8 @@
     <string name="setting_name_hint">e.g. John</string>
     <string name="setting_color_title">Your App Color</string>
     <string name="setting_color_desc">This is the primary color of your app, but connected device will also show your color in some UI elements</string>
+    <string name="setting_share_log_title">Share logs with Developer</string>
+    <string name="setting_share_log_desc">If you encountered any error, you can mail the logs to the developer</string>
 
     <string name="delete_file">Are you sure to delete this file?</string>
     <string name="my_hotspot_is_on">Hotspot is already on</string>

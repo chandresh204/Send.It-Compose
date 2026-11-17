@@ -1,6 +1,7 @@
 package chad.orionsoft.sendit.ui.settings
 
 import androidx.lifecycle.ViewModel
+import chad.orionsoft.sendit.domain.AppLogger
 import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.utils.RuntimeConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val preferenceRepository: PreferenceRepository
+    private val preferenceRepository: PreferenceRepository,
+    private val appLogger : AppLogger
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsState(
@@ -49,6 +51,18 @@ class SettingsViewModel @Inject constructor(
             SettingsEvents.OnSettingSave -> {
                 preferenceRepository.setUserNameInPreferences(uiState.value.myName)
                 preferenceRepository.setAppColorInPreferences(uiState.value.appColor)
+            }
+
+            is SettingsEvents.OnDeveloperOptionChanged -> {
+                _uiState.update {
+                    it.copy(
+                        isDeveloperOptions = event.isChecked
+                    )
+                }
+            }
+
+            SettingsEvents.OnShareLogs -> {
+                appLogger.sendLogFile()
             }
         }
     }

@@ -108,8 +108,7 @@ object Converters {
         val red = colorStr.substring(0, 2)
         val green = colorStr.substring(2,4)
         val blue = colorStr.substring(4,6)
-        println(red.toInt(radix = 16)/255f)
-        return Color.Unspecified.copy(
+        return Color(
             alpha = 1f,
             red = red.toInt(radix = 16)/255f,
             green = green.toInt(radix = 16)/255f,
@@ -202,4 +201,11 @@ object Converters {
     fun encodeUriPath(path: String) : String = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
 
     fun decodeUriPath(encoded: String) : String = URLDecoder.decode(encoded, StandardCharsets.UTF_8.toString())
+
+    fun formatDateTime(time: Long) : String {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = time
+        val formatter = Formatter()
+        return formatter.format("%tD %tT", cal, cal).toString()
+    }
 }

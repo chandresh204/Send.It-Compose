@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import chad.orionsoft.sendit.domain.AppLogger
 import chad.orionsoft.sendit.repository.PreferenceRepository
 import chad.orionsoft.sendit.ui.MainNavigation
 import chad.orionsoft.sendit.ui.theme.SendItTheme
@@ -33,6 +34,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject lateinit var preferenceRepository: PreferenceRepository
+    @Inject lateinit var appLogger : AppLogger
 
     private lateinit var appUpdateManager: AppUpdateManager
 
@@ -45,6 +47,7 @@ class MainActivity : ComponentActivity() {
             // navigate directly to file select tab and show shared items
             intent
         } else null
+        appLogger.log("Activity Started")
         setContent {
             var selectedAppColor by remember {
                 mutableStateOf(preferenceRepository.getAppColorFromPreference())

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel(assistedFactory = CommonMediaScreenViewModel.CommonMediaViewModelFactory::class)
 class CommonMediaScreenViewModel @AssistedInject constructor(
@@ -140,7 +141,7 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
         ioScope.launch {
             while (isStillLoadingFromDevice) {
                 println("Waiting for list to be populated from device")
-                delay(100)  // wait for list to be populated
+                delay(100.milliseconds)  // wait for list to be populated
             }
             for(i in startIndex until endIndex) {
                 val media = try {
@@ -150,7 +151,6 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
                     break
                 }
                 mediaList.add(MediaUiData(media, false, null))
-                println("$fileType >>> added in list at $i")
             }
             for(i in startIndex until endIndex) {
                 val media = try {
@@ -170,7 +170,6 @@ class CommonMediaScreenViewModel @AssistedInject constructor(
                 mediaList[i] = mediaList[i].copy(
                     thumbnailBitmap = newThumb
                 )
-                println("$fileType >>> thumb generated for $i")
             }
         }
     }

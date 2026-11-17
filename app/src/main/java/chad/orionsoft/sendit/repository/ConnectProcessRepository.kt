@@ -3,6 +3,7 @@ package chad.orionsoft.sendit.repository
 import android.content.Context
 import android.util.Log
 import chad.orionsoft.sendit.R
+import chad.orionsoft.sendit.domain.AppLogger
 import chad.orionsoft.sendit.domain.FileIOOperations
 import chad.orionsoft.sendit.domain.NetworkObserver
 import chad.orionsoft.sendit.domain.NotificationDomain
@@ -30,12 +31,14 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 class ConnectProcessRepository @Inject constructor(
     private val networkObserver: NetworkObserver,
     private val notificationDomain: NotificationDomain,
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    private val appLogger: AppLogger
 ){
 
     private val tag = "ConnectProcessRepository"
@@ -72,9 +75,11 @@ class ConnectProcessRepository @Inject constructor(
     }
 
     fun startUDPServerIfNotRunning(port: Int) {
+        appLogger.log("start UDP Server on port : $port")
         Log.d(tag, "Starting udp server on port >>> $port")
         if(serverOnPort == port) {
             Log.d(tag, "Udp server already running on $serverOnPort")
+            appLogger.log("Udp server already running on $serverOnPort")
             return
         } else {
             serverOnPort = port
@@ -94,6 +99,7 @@ class ConnectProcessRepository @Inject constructor(
                 val res = dSocket.getResponse()
                 if(res.success) {
                     Log.d(tag,"received : ${res.response}")
+                    appLogger.log("$tag >> received : ${res.response}")
                     _connectStatusFlow.emit(ConnectStatus.ConnectingDevice)
                     val resAddress = res.partnerAddress
                     val resPort = res.partnerPort
@@ -114,6 +120,7 @@ class ConnectProcessRepository @Inject constructor(
                                         )
                                     )
                                     Log.d(tag, "Sending not compatible reply")
+                                    appLogger.log("$tag >> sending not compatible reply")
                                     sendVersionNotCompatibleReply(dSocket, resAddress, resPort)
                                     continue
                                 }
@@ -133,28 +140,32 @@ class ConnectProcessRepository @Inject constructor(
                                     replyBytes, replyBytes.size, resAddress, resPort
                                 )
                                 dSocket.send(replyPacket)
-                                delay(500)
+                                delay(500.milliseconds)
                                 _connectStatusFlow.emit(ConnectStatus.DeviceConnected)
                             }catch (e:Exception) {
+                                appLogger.log("$tag >> exception : $e, so setting ConnectStatus to OnWifi")
                                 _connectStatusFlow.emit(ConnectStatus.OnWifi)
                             }
                         }
                         res.response.contains(Constants.UDP_DISCONNECT) -> {
                             Log.d(tag, "Disconnect signal received")
+                            appLogger.log("$tag >> Disconnect signal received")
                             markAsDisconnected()
                             sendGenericReply(dSocket, resAddress, resPort)
                         }
                         res.response.contains(Constants.UDP_IS_PRESENT) -> {
                             Log.d(tag, "ping signal received")
+                            appLogger.log("$tag >> ping signal received")
                             sendGenericReply(dSocket, resAddress, resPort)
                         }
                     }
                 } else {
-                    delay(500)
+                    delay(500.milliseconds)
                 }
             }
             dSocket.close()
             Log.d(tag, "Stopped udp server on $port")
+            appLogger.log("$tag >> Stopped udp server on $port")
             serverRunning = false
         }
     }
@@ -187,11 +198,13 @@ class ConnectProcessRepository @Inject constructor(
             Log.d(tag, "ServerReply >>> $reply")
             if(!reply.success) {
                 if(reply.response.contains(Constants.UDP_VERSION_INCOMPATIBLE)) {
+                    appLogger.log("$tag >> Server reply incompatible version")
                     return@withContext QrConnectionResult(
                         false,
                         context.getString(R.string.failed_to_connect_low_version)
                     )
                 }
+                appLogger.log("$tag >> Server reply not in network")
                 return@withContext QrConnectionResult(false,
                     context.getString(R.string.failed_to_connect_diff_wifi, userName))
             } else {
@@ -201,8 +214,10 @@ class ConnectProcessRepository @Inject constructor(
                     Converters.convertStringToColor(colorString), freeSpace.toLong(), port
                 )
                 Log.d(tag, "Connected Device: $newDetails ")
+                appLogger.log("$tag >> Connected Device")
                 if((theirUdpServerPort ?: 0) <= 0) {
                     Log.e(tag, "Paring device, their port address not valid : $theirUdpServerPort")
+                    appLogger.log("$tag >> Paring device, their port address not valid : $theirUdpServerPort")
                     return@withContext QrConnectionResult(
                         false,
                         context.getString(R.string.failed_to_connect_invalid_port)
@@ -211,6 +226,7 @@ class ConnectProcessRepository @Inject constructor(
                 updateAndEmitConnectedDeviceDetails(newDetails)
                 startUDPServerIfNotRunning(theirUdpServerPort!!)
                 Log.d(tag, "Stopping UDP server")
+                appLogger.log("$tag >> Stopping udp server")
                 return@withContext QrConnectionResult(true, "success")
             }
         }
@@ -226,13 +242,16 @@ class ConnectProcessRepository @Inject constructor(
                         it.address, it.serverPort)
                     if(!reply.success) {
                         Log.e(tag, "Ping to device failed, setting not connected")
+                        appLogger.log("$tag >> Ping to device failed, setting not connected")
                         markAsDisconnected()
                     } else {
                         Log.d(tag, "Ping to device : Present")
+                        appLogger.log("$tag >> Ping to device : Present")
                     }
                 }
             } catch (e: Exception) {
                 Log.e(tag, "Ping to device failed: $e")
+                appLogger.log("$tag >> Ping to device failed, setting disconected: $e")
                 markAsDisconnected()
             }
         }
@@ -241,10 +260,12 @@ class ConnectProcessRepository @Inject constructor(
     suspend fun sendDisconnectSignal() {
         if(serverOnPort <= 0) {
             Log.e(tag, "Disconnect signal : Server not on port")
+            appLogger.log("$tag >> Disconnect signal : Server not on port")
             return
         }
         if(pairingDeviceDetails?.address == null) {
             Log.e(tag, "Disconnect signal : No device address")
+            appLogger.log("$tag >> Disconnect signal : No device address")
             return
         }
         withContext(Dispatchers.IO) {
@@ -258,12 +279,14 @@ class ConnectProcessRepository @Inject constructor(
             } catch (e: Exception) {
                 serverOnPort = -1
                 Log.e(tag, "Disconnect Signal : sending failed: $e")
+                appLogger.log("$tag >> Disconnect Signal : sending failed: $e")
             }
         }
     }
 
     fun stopAllUdpProcess() {
         Log.d(tag, "Stopping UDP server")
+        appLogger.log("$tag >> Stopping udp server, serverOnPort -1")
         serverOnPort = -1
     }
 

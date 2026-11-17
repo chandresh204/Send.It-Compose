@@ -18,7 +18,7 @@ object RuntimeConstants {
 
 //    var connectedDeviceDetails : ConnectedDeviceDetails? = null
 
-    var myColor : Color = Color.Unspecified
+    var myColor : Color = Color.DarkGray
     var theirColor : Color = Color.DarkGray
 
     fun generateRandomCode(digit: Int) : String {
